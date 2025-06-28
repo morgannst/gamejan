@@ -113,10 +113,8 @@
     <!-- End Game Modal -->
     <div id="end-game-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4">
         <div id="modal-content" class="bg-white rounded-3xl p-8 text-center shadow-2xl space-y-4 transform">
-            <div class="text-yellow-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v1a1 1 0 001 1h12a1 1 0 001-1v-1a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                </svg>
+            <div id="star-rating" class="flex justify-center mb-4">
+                <!-- Stars will be injected by JavaScript -->
             </div>
             <h2 id="end-game-title" class="text-4xl font-bold gradient-text">เยี่ยมไปเลย!</h2>
             <p id="final-score" class="text-2xl text-gray-800">คะแนนของคุณ: 10/10</p>
@@ -142,6 +140,7 @@
             const feedbackEl = document.getElementById('feedback');
             const endGameModal = document.getElementById('end-game-modal');
             const modalContent = document.getElementById('modal-content');
+            const starRatingEl = document.getElementById('star-rating');
             const endGameTitleEl = document.getElementById('end-game-title');
             const finalScoreEl = document.getElementById('final-score');
             const playAgainBtn = document.getElementById('play-again-btn');
@@ -151,16 +150,7 @@
 
             // --- Game Data with Sentences ---
             const words = [
-                { word: 'happy', hint: 'เด็กผู้หญิงยิ้มกว้างมีความสุข', sentence: "She feels happy today.", translation: "วันนี้เธอรู้สึกมีความสุข" },
-                { word: 'sad', hint: 'เด็กผู้หญิงร้องไห้', sentence: "The boy is sad because he lost his toy.", translation: "เด็กชายเสียใจเพราะของเล่นหาย" },
-                { word: 'angry', hint: 'เด็กผู้หญิงหน้าบึ้งโกรธ', sentence: "He gets angry when he is hungry.", translation: "เขาจะโกรธเมื่อเขาหิว" },
-                { word: 'excited', hint: 'เด็กผู้หญิงกระโดดดีใจ', sentence: "The children are excited about the party.", translation: "เด็กๆ ตื่นเต้นกับงานปาร์ตี้" },
-                { word: 'scared', hint: 'เด็กผู้หญิงทำหน้าตกใจกลัว', sentence: "She is scared of the dark.", translation: "เธอกลัวความมืด" },
-                { word: 'tired', hint: 'เด็กผู้หญิงกำลังหาวนอน', sentence: "I feel tired after a long day.", translation: "ฉันรู้สึกเหนื่อยหลังจากวันที่ยาวนาน" },
-                { word: 'confused', hint: 'เด็กผู้หญิงทำหน้างง', sentence: "The map made him feel confused.", translation: "แผนที่ทำให้เขารู้สึกสับสน" },
-                { word: 'unhappy', hint: 'เด็กผู้หญิงหน้าบึ้งไม่พอใจ', sentence: "The cat looks unhappy in the rain.", translation: "แมวดูไม่มีความสุขตอนฝนตก" },
-                { word: 'upset', hint: 'เด็กผู้หญิงกำลังจะร้องไห้', sentence: "Don't be upset, it was an accident.", translation: "อย่าเสียใจเลย มันเป็นอุบัติเหตุ" },
-                { word: 'cheerful', hint: 'เด็กผู้หญิงยิ้มอย่างร่าเริง', sentence: "He has a cheerful personality.", translation: "เขามีบุคลิกที่ร่าเริง" }
+                { word: 'happy', hint: 'เด็กผู้หญิงยิ้มกว้างมีความสุข', sentence: "She feels happy today.", translation: "วันนี้เธอรู้สึกมีความสุข" }, { word: 'sad', hint: 'เด็กผู้หญิงร้องไห้', sentence: "The boy is sad because he lost his toy.", translation: "เด็กชายเสียใจเพราะของเล่นหาย" }, { word: 'angry', hint: 'เด็กผู้หญิงหน้าบึ้งโกรธ', sentence: "He gets angry when he is hungry.", translation: "เขาจะโกรธเมื่อเขาหิว" }, { word: 'excited', hint: 'เด็กผู้หญิงกระโดดดีใจ', sentence: "The children are excited about the party.", translation: "เด็กๆ ตื่นเต้นกับงานปาร์ตี้" }, { word: 'scared', hint: 'เด็กผู้หญิงทำหน้าตกใจกลัว', sentence: "She is scared of the dark.", translation: "เธอกลัวความมืด" }, { word: 'tired', hint: 'เด็กผู้หญิงกำลังหาวนอน', sentence: "I feel tired after a long day.", translation: "ฉันรู้สึกเหนื่อยหลังจากวันที่ยาวนาน" }, { word: 'confused', hint: 'เด็กผู้หญิงทำหน้างง', sentence: "The map made him feel confused.", translation: "แผนที่ทำให้เขารู้สึกสับสน" }, { word: 'unhappy', hint: 'เด็กผู้หญิงหน้าบึ้งไม่พอใจ', sentence: "The cat looks unhappy in the rain.", translation: "แมวดูไม่มีความสุขตอนฝนตก" }, { word: 'upset', hint: 'เด็กผู้หญิงกำลังจะร้องไห้', sentence: "Don't be upset, it was an accident.", translation: "อย่าเสียใจเลย มันเป็นอุบัติเหตุ" }, { word: 'cheerful', hint: 'เด็กผู้หญิงยิ้มอย่างร่าเริง', sentence: "He has a cheerful personality.", translation: "เขามีบุคลิกที่ร่าเริง" }
             ];
             
             let currentWordIndex = 0;
@@ -242,11 +232,9 @@
             function checkAnswer() {
                 const userAnswer = answerInput.value.trim().toLowerCase();
                 const correctAnswer = shuffledWords[currentWordIndex].word;
-                
                 answerInput.disabled = true;
                 checkBtn.disabled = true;
                 hintBtn.disabled = true;
-
                 if (userAnswer === correctAnswer) {
                     handleCorrectAnswer();
                 } else {
@@ -256,23 +244,12 @@
             
             function showExampleAndProceed() {
                 const currentWordData = shuffledWords[currentWordIndex];
-                feedbackEl.innerHTML = `
-                    <div class="space-y-2 text-center animate-fade-in">
-                        <div class="flex items-center justify-center gap-2">
-                            <p class="text-xl text-blue-600">${currentWordData.sentence}</p>
-                            <button onclick="speak('${currentWordData.sentence.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                            </button>
-                        </div>
-                        <p class="text-lg text-gray-500">"${currentWordData.translation}"</p>
-                    </div>
-                `;
+                feedbackEl.innerHTML = `<div class="space-y-2 text-center animate-fade-in"><div class="flex items-center justify-center gap-2"><p class="text-xl text-blue-600">${currentWordData.sentence}</p><button onclick="speak('${currentWordData.sentence.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button></div><p class="text-lg text-gray-500">"${currentWordData.translation}"</p></div>`;
                 speak(currentWordData.sentence);
-                
                 setTimeout(() => {
                     currentWordIndex++;
                     displayQuestion();
-                }, 4000); // Wait 4 seconds before next question
+                }, 4000);
             }
 
             function handleCorrectAnswer() {
@@ -282,7 +259,6 @@
                 playCorrectSound();
                 let correctMessage = hintUsed ? `ถูกต้อง! (ไม่ได้คะแนน)` : `ถูกต้อง!`;
                 feedbackEl.innerHTML = `<div class="flex items-center gap-2 text-2xl text-green-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>${correctMessage}</span></div>`;
-                
                 setTimeout(showExampleAndProceed, 1500);
             }
 
@@ -293,7 +269,6 @@
                 if (score > 0) score--;
                 answerInput.classList.remove('border-pink-200');
                 answerInput.classList.add('border-red-400', 'shake');
-                
                 setTimeout(showExampleAndProceed, 2000);
             }
             
@@ -305,10 +280,33 @@
             }
 
             function endGame() {
+                // Star Rating Logic
+                let starCount = 0;
+                if (score >= 8) {
+                    starCount = 3;
+                    endGameTitleEl.textContent = 'สุดยอดไปเลย!';
+                } else if (score >= 5) {
+                    starCount = 2;
+                    endGameTitleEl.textContent = 'เก่งมากจ้า!';
+                } else {
+                    starCount = 1;
+                    endGameTitleEl.textContent = 'พยายามได้ดีมาก!';
+                }
+                
+                let starsHtml = '';
+                const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
+
+                for (let i = 0; i < 3; i++) {
+                    if (i < starCount) {
+                        starsHtml += `<span class="text-yellow-400">${starSvg}</span>`;
+                    } else {
+                        starsHtml += `<span class="text-gray-300">${starSvg}</span>`;
+                    }
+                }
+                starRatingEl.innerHTML = starsHtml;
+
                 finalScoreEl.textContent = `คะแนนของคุณ: ${score}/${words.length}`;
-                if(score >= 8) endGameTitleEl.textContent = 'สุดยอดไปเลย!';
-                else if (score >= 5) endGameTitleEl.textContent = 'เก่งมากจ้า!';
-                else endGameTitleEl.textContent = 'พยายามได้ดีมาก!';
+                
                 gameContainer.classList.add('blur-md');
                 gameContainer.style.opacity = '0.5';
                 endGameModal.classList.remove('hidden');
@@ -325,7 +323,6 @@
 
             // --- Initialisation ---
             window.speechSynthesis.onvoiceschanged = () => { const voices = window.speechSynthesis.getVoices(); const englishVoice = voices.find(voice => voice.lang === 'en-US' || voice.lang.startsWith('en-')); if (englishVoice) speech.voice = englishVoice; };
-            // Make the global speak function available for the inline onclick
             window.speak = speak;
             startGame();
         });
