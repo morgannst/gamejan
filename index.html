@@ -102,7 +102,7 @@
             <div class="mt-8">
                 <h2 class="text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
                 <div id="high-scores-start" class="space-y-2 text-left">
-                    <!-- High scores will be populated here -->
+                    <p class="text-gray-400">กำลังโหลดคะแนน...</p>
                 </div>
             </div>
         </div>
@@ -180,6 +180,9 @@
     </div>
 
     <script>
+        // --- API URL ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyE7z5ELBLTeJdnZJhwqyOMWGzHN31jcYatPJYLWpN_KopcDOLS-P3W_IsiE0QJYGG_QA/exec';
+
         // --- DOM Elements ---
         const startScreen = document.getElementById('start-screen');
         const gameScreen = document.getElementById('game-screen');
@@ -294,21 +297,51 @@
             }
         }
 
-        // --- High Score Functions ---
-        function loadHighScores() {
-            const storedScores = localStorage.getItem('funVocabHighScores');
-            highScores = storedScores ? JSON.parse(storedScores) : [];
+        // --- High Score Functions (using Google Sheets API) ---
+        async function loadHighScores() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                
+                // FIX: Check if the received data is an array before using it.
+                if (Array.isArray(data)) {
+                    highScores = data;
+                } else {
+                    console.warn("Received non-array data from high scores API, treating as empty.", data);
+                    highScores = [];
+                }
+
+                renderHighScores(highScoresStart);
+                renderHighScores(highScoresEnd);
+            } catch (error) {
+                console.error('Failed to load high scores:', error);
+                highScoresStart.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>';
+                highScoresEnd.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>';
+                highScores = [];
+            }
         }
 
-        function saveHighScores() {
-            highScores.sort((a, b) => b.score - a.score);
-            highScores = highScores.slice(0, 5);
-            localStorage.setItem('funVocabHighScores', JSON.stringify(highScores));
+        async function saveHighScore(scoreData) {
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', // Use text/plain to avoid CORS preflight
+                    },
+                    body: JSON.stringify(scoreData) // Send data as a string
+                });
+            } catch (error) {
+                console.error('Failed to save high score:', error);
+            }
         }
 
         function renderHighScores(container) {
             container.innerHTML = '';
-            if (highScores.length === 0) {
+            // FIX: Add a check to ensure highScores is an array before calling forEach.
+            if (!Array.isArray(highScores) || highScores.length === 0) {
                 container.innerHTML = '<p class="text-gray-400">ยังไม่มีใครเล่นเลย!</p>';
                 return;
             }
@@ -439,7 +472,7 @@
             answerInput.focus();
         }
 
-        function endGame() {
+        async function endGame() {
             if (Tone.Transport.state === 'started') {
                 Tone.Transport.stop();
             }
@@ -478,18 +511,20 @@
                 month: 'short',
                 year: 'numeric'
             });
-            highScores.push({ name: playerName, score: score, date: formattedDate });
-            saveHighScores();
-            renderHighScores(highScoresEnd);
+            
+            const scoreData = { name: playerName, score: score, date: formattedDate };
+            await saveHighScore(scoreData);
+            await loadHighScores(); // Reload scores to show the latest
         }
 
         // --- Event Listeners ---
         startGameBtn.addEventListener('click', startGame);
-        playAgainBtn.addEventListener('click', () => {
+        
+        playAgainBtn.addEventListener('click', async () => {
             endScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
-            loadHighScores();
-            renderHighScores(highScoresStart);
+            highScoresStart.innerHTML = '<p class="text-gray-400">กำลังโหลดคะแนน...</p>';
+            await loadHighScores();
         });
 
         submitAnswerBtn.addEventListener('click', checkAnswer);
@@ -510,14 +545,13 @@
         musicToggleBtn.addEventListener('click', toggleMusic);
 
         // --- Initial Load ---
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('funVocabPlayerName');
             if (savedName) {
                 playerNameInput.value = savedName;
             }
             
-            loadHighScores();
-            renderHighScores(highScoresStart);
+            await loadHighScores();
             musicOnIcon.classList.remove('hidden');
             musicOffIcon.classList.add('hidden');
         });
