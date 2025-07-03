@@ -174,6 +174,7 @@
                         ฟังเสียงประโยค
                     </button>
                 </div>
+                <button id="next-question-btn" class="w-full mt-4 py-3 px-6 rounded-lg btn btn-primary text-xl">ข้อถัดไป</button>
             </div>
         </div>
 
@@ -212,6 +213,7 @@
         const exampleSentenceTh = document.getElementById('example-sentence-th');
         const replaySentenceAudioBtn = document.getElementById('replay-sentence-audio-btn');
         const particleContainer = document.getElementById('particle-container');
+        const nextQuestionBtn = document.getElementById('next-question-btn'); // New button element
 
         // --- Game Data ---
         const words = [
@@ -306,7 +308,6 @@
                 }
                 const data = await response.json();
                 
-                // FIX: Check if the received data is an array before using it.
                 if (Array.isArray(data)) {
                     highScores = data;
                 } else {
@@ -329,9 +330,9 @@
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', // Use text/plain to avoid CORS preflight
+                        'Content-Type': 'text/plain;charset=utf-8', 
                     },
-                    body: JSON.stringify(scoreData) // Send data as a string
+                    body: JSON.stringify(scoreData)
                 });
             } catch (error) {
                 console.error('Failed to save high score:', error);
@@ -340,7 +341,6 @@
 
         function renderHighScores(container) {
             container.innerHTML = '';
-            // FIX: Add a check to ensure highScores is an array before calling forEach.
             if (!Array.isArray(highScores) || highScores.length === 0) {
                 container.innerHTML = '<p class="text-gray-400">ยังไม่มีใครเล่นเลย!</p>';
                 return;
@@ -456,10 +456,11 @@
             
             feedbackModal.classList.remove('hidden');
 
-            setTimeout(() => {
-                feedbackModal.classList.add('hidden');
-                nextQuestion();
-            }, 4000);
+            // REMOVED: Automatic timeout to go to the next question.
+            // setTimeout(() => {
+            //     feedbackModal.classList.add('hidden');
+            //     nextQuestion();
+            // }, 4000);
         }
 
         function useHint() {
@@ -506,13 +507,16 @@
             setTimeout(() => speakText(endSpeech, 'th-TH'), 500);
 
             const today = new Date();
-            const formattedDate = today.toLocaleDateString('th-TH', {
+            const formattedDateTime = today.toLocaleString('th-TH', {
                 day: '2-digit',
                 month: 'short',
-                year: 'numeric'
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Bangkok'
             });
             
-            const scoreData = { name: playerName, score: score, date: formattedDate };
+            const scoreData = { name: playerName, score: score, date: formattedDateTime };
             await saveHighScore(scoreData);
             await loadHighScores(); // Reload scores to show the latest
         }
@@ -543,6 +547,12 @@
         });
         
         musicToggleBtn.addEventListener('click', toggleMusic);
+
+        // ADDED: Event listener for the new "Next Question" button
+        nextQuestionBtn.addEventListener('click', () => {
+            feedbackModal.classList.add('hidden');
+            nextQuestion();
+        });
 
         // --- Initial Load ---
         window.addEventListener('DOMContentLoaded', async () => {
