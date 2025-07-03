@@ -8,380 +8,520 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tone.js for sound effects and music -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    
-    <!-- Google Fonts: Kanit -->
+    <!-- Google Fonts (Kanit for a friendly look) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Tone.js for audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background-image: linear-gradient(to top right, #fde6f0, #e6e6fa);
+            background-color: #fdf2f8; /* bg-pink-50 */
         }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        .game-container {
+            background: white;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
         }
-        .shake { animation: shake 0.5s ease-in-out; }
+        .btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .btn-primary {
+            background-color: #d8b4fe; /* bg-purple-300 */
+            color: #581c87; /* text-purple-900 */
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #c084fc; /* bg-purple-400 */
+        }
+        .progress-bar-inner {
+            transition: width 0.5s ease-in-out;
+        }
+        .star-filled {
+            color: #facc15; /* yellow-400 */
+        }
+        .star-empty {
+            color: #d1d5db; /* gray-300 */
+        }
 
-        @keyframes bounce-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
+        /* --- Animation Keyframes --- */
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(3deg); }
+            50% { transform: rotate(-3deg); }
+            75% { transform: rotate(1deg); }
         }
-        .bounce-in { animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .animate-wobble {
+            animation: wobble 0.5s ease-in-out;
+        }
 
-        .gradient-text {
-            background-image: linear-gradient(to right, #ec4899, #8b5cf6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        @keyframes fly-out {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            left: 50%;
+            top: 40%; /* Start near the title */
+            width: 15px;
+            height: 15px;
+            background: #facc15; /* yellow-400 */
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: fly-out 1.2s ease-out forwards;
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="w-full max-w-md mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl shadow-pink-200/50 p-6 md:p-8 space-y-6 border-2 border-white">
-        <h1 class="text-4xl font-bold text-center gradient-text">เกมทายศัพท์หรรษา</h1>
-        <div class="space-y-4">
-            <input type="text" id="player-name-input" placeholder="ใส่ชื่อของคุณ..." maxlength="15" class="w-full p-4 text-2xl text-center border-2 border-pink-200 rounded-lg focus:ring-4 focus:ring-pink-300 focus:border-transparent transition duration-300">
-            <button id="start-game-btn" class="w-full bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg shadow-green-200/80 transition-all duration-300 transform hover:scale-105">
-                เริ่มเกม
-            </button>
-        </div>
-        <div class="mt-6">
-            <h2 class="text-2xl font-bold text-center text-pink-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
-            <div id="highscore-list" class="space-y-2">
-                <!-- High scores will be loaded here -->
-            </div>
-        </div>
-    </div>
+    <div id="main-container" class="w-full max-w-lg">
 
-    <!-- Game Container (Initially Hidden) -->
-    <div id="game-container" class="w-full max-w-md mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl shadow-pink-200/50 p-6 md:p-8 space-y-6 border-2 border-white transition-all duration-500 hidden">
-        
-        <!-- Header -->
-        <header>
-            <h1 class="text-4xl font-bold text-center gradient-text">เกมทายศัพท์หรรษา</h1>
-            <div class="flex justify-between items-center mt-4">
-                <div class="flex items-center gap-4">
-                    <p id="score" class="text-lg font-bold text-gray-700">คะแนน: 0</p>
-                    <button id="music-toggle-btn" title="เปิด/ปิดเสียงดนตรี" class="text-pink-500 hover:text-purple-500 transition-colors focus:outline-none">
-                        <svg id="music-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/>
-                        </svg>
-                        <svg id="music-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/>
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18"/>
-                        </svg>
-                    </button>
+        <!-- Start Screen -->
+        <div id="start-screen" class="game-container text-center">
+            <h1 class="text-4xl font-bold text-purple-600 mb-2">เกมทายศัพท์หรรษา</h1>
+            <p class="text-gray-500 mb-6">มาทบทวนคำศัพท์ภาษาอังกฤษกันเถอะ!</p>
+            
+            <div class="mb-4">
+                <label for="player-name" class="block text-left text-gray-700 mb-1">ใส่ชื่อของคุณ:</label>
+                <input type="text" id="player-name" class="w-full p-3 border-2 border-purple-200 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="น้องน่ารัก">
+            </div>
+
+            <button id="start-game-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl">เริ่มเกม!</button>
+            
+            <div class="mt-8">
+                <h2 class="text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
+                <div id="high-scores-start" class="space-y-2 text-left">
+                    <!-- High scores will be populated here -->
                 </div>
-                <p id="progress-text" class="text-lg font-bold text-gray-700">ข้อที่ 1/10</p>
             </div>
-            <div class="w-full bg-pink-100 rounded-full h-4 mt-2 overflow-hidden border border-white/50">
-                <div id="progress-bar" class="bg-gradient-to-r from-pink-400 to-purple-400 h-full rounded-full transition-all duration-500"></div>
-            </div>
-        </header>
+        </div>
 
-        <!-- Main Game Content -->
-        <main class="space-y-4">
-            <div class="relative group">
-                <img id="word-image" src="" alt="คำใบ้" class="w-full h-64 object-cover rounded-2xl shadow-lg border-4 border-white">
-                <button id="listen-again-btn" class="absolute top-4 right-4 bg-gradient-to-br from-pink-500 to-purple-500 text-white rounded-full p-3 shadow-md transition-transform transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-pink-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    </svg>
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-container hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-xl font-bold text-purple-700">คะแนน: <span id="score">0</span></div>
+                <button id="music-toggle-btn" class="p-2 rounded-full hover:bg-purple-100">
+                    <svg id="music-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /></svg>
+                    <svg id="music-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15.586a1 1 0 01.02-1.413l7.414-7.414a1 1 0 011.414 0l.02.02a1 1 0 010 1.414l-7.414 7.414a1 1 0 01-1.414-.02zM9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /><line x1="1" y1="1" x2="23" y2="23" stroke-width="2.5" /></svg>
                 </button>
             </div>
+
+            <div class="w-full bg-purple-100 rounded-full h-4 mb-6">
+                <div id="progress-bar" class="bg-purple-400 h-4 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div class="text-center">
+                <img id="word-image" src="" alt="คำใบ้รูปภาพ" class="w-full h-52 object-contain rounded-lg mb-4 bg-purple-50 border-2 border-purple-200">
+                
+                <button id="replay-word-audio-btn" class="mb-4 p-3 rounded-full bg-pink-200 hover:bg-pink-300 btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 15.536a5 5 0 010-7.072m-2.828 9.9a9 9 0 010-12.728" /></svg>
+                </button>
+
+                <div class="relative flex items-center">
+                    <input type="text" id="answer-input" class="w-full p-4 text-2xl tracking-widest text-center border-2 border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="พิมพ์คำตอบที่นี่">
+                    <button id="hint-btn" class="absolute right-2 p-2 rounded-full hover:bg-yellow-200" title="ใช้คำใบ้ (ไม่ได้คะแนน)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM9 12a1 1 0 012 0v5a1 1 0 11-2 0v-5zM4.343 5.757a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM1 11a1 1 0 100 2h1a1 1 0 100-2H1zM12 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM5.05 14.95a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zM19 11a1 1 0 100 2h-1a1 1 0 100-2h1zM14.95 14.95a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z" /><path d="M10 7a3 3 0 100 6 3 3 0 000-6z" /></svg>
+                    </button>
+                </div>
+                
+                <button id="submit-answer-btn" class="w-full mt-4 py-3 px-6 rounded-lg btn btn-primary text-xl">ส่งคำตอบ</button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="game-container text-center hidden">
+            <h2 class="text-3xl font-bold text-purple-600 mb-4">จบเกมแล้วจ้า!</h2>
             
-            <div class="space-y-4">
-                 <input type="text" id="answer-input" placeholder="พิมพ์คำตอบที่นี่..." class="w-full p-4 text-2xl text-center border-2 border-pink-200 rounded-lg focus:ring-4 focus:ring-pink-300 focus:border-transparent transition duration-300">
-                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <button id="hint-btn" class="md:col-span-1 w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg shadow-yellow-200/80 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        <span>คำใบ้</span>
-                    </button>
-                    <button id="check-btn" class="md:col-span-2 w-full bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg shadow-green-200/80 transition-all duration-300 transform hover:scale-105">
-                        ตรวจคำตอบ
-                    </button>
-                 </div>
+            <div id="star-rating" class="text-5xl mb-4">
+                <!-- Stars will be populated here -->
             </div>
             
-            <div id="feedback" class="h-24 flex flex-col items-center justify-center text-center font-bold transition-opacity duration-300"></div>
-        </main>
-    </div>
+            <p id="end-message" class="text-xl text-gray-700 mb-2"></p>
+            <p id="final-score" class="text-2xl font-semibold bg-purple-100 text-purple-800 rounded-lg py-2 px-4 inline-block mb-6"></p>
 
-    <!-- End Game Modal -->
-    <div id="end-game-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4">
-        <div id="modal-content" class="bg-white rounded-3xl p-8 text-center shadow-2xl space-y-4 transform">
-            <div id="star-rating" class="flex justify-center mb-4"></div>
-            <h2 id="end-game-title" class="text-4xl font-bold gradient-text">เยี่ยมไปเลย!</h2>
-            <p id="final-score" class="text-2xl text-gray-800"></p>
-            <p id="end-game-message" class="text-lg text-gray-600"></p>
-            <div id="end-game-highscore-list" class="mt-4 text-left"></div>
-            <button id="play-again-btn" class="w-full mt-4 bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg shadow-pink-200/80 transition-all duration-300 transform hover:scale-105">
-                เล่นอีกครั้ง
-            </button>
+            <button id="play-again-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl mb-6">เล่นอีกครั้ง</button>
+
+            <div>
+                <h2 class="text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
+                <div id="high-scores-end" class="space-y-2 text-left">
+                    <!-- High scores will be populated here -->
+                </div>
+            </div>
         </div>
+        
+        <!-- Feedback Modal -->
+        <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="game-container text-center relative">
+                <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                <h3 id="feedback-title" class="text-4xl font-bold mb-4"></h3>
+                <div id="feedback-details" class="text-left bg-purple-50 p-4 rounded-lg">
+                    <p class="font-semibold text-purple-800">ประโยคตัวอย่าง:</p>
+                    <p id="example-sentence-en" class="text-lg text-gray-700"></p>
+                    <p id="example-sentence-th" class="text-md text-gray-500 mb-3"></p>
+                    <button id="replay-sentence-audio-btn" class="flex items-center gap-2 text-purple-600 hover:text-purple-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                        ฟังเสียงประโยค
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements ---
-            const startScreen = document.getElementById('start-screen');
-            const playerNameInput = document.getElementById('player-name-input');
-            const startGameBtn = document.getElementById('start-game-btn');
-            const highscoreListEl = document.getElementById('highscore-list');
-            const gameContainer = document.getElementById('game-container');
-            const scoreEl = document.getElementById('score');
-            const progressTextEl = document.getElementById('progress-text');
-            const progressBarEl = document.getElementById('progress-bar');
-            const wordImageEl = document.getElementById('word-image');
-            const listenAgainBtn = document.getElementById('listen-again-btn');
-            const answerInput = document.getElementById('answer-input');
-            const checkBtn = document.getElementById('check-btn');
-            const hintBtn = document.getElementById('hint-btn');
-            const feedbackEl = document.getElementById('feedback');
-            const endGameModal = document.getElementById('end-game-modal');
-            const modalContent = document.getElementById('modal-content');
-            const starRatingEl = document.getElementById('star-rating');
-            const endGameTitleEl = document.getElementById('end-game-title');
-            const finalScoreEl = document.getElementById('final-score');
-            const endGameMessageEl = document.getElementById('end-game-message');
-            const endGameHighscoreListEl = document.getElementById('end-game-highscore-list');
-            const playAgainBtn = document.getElementById('play-again-btn');
-            const musicToggleBtn = document.getElementById('music-toggle-btn');
-            const musicOnIcon = document.getElementById('music-on-icon');
-            const musicOffIcon = document.getElementById('music-off-icon');
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const playerNameInput = document.getElementById('player-name');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const scoreDisplay = document.getElementById('score');
+        const progressBar = document.getElementById('progress-bar');
+        const wordImage = document.getElementById('word-image');
+        const replayWordAudioBtn = document.getElementById('replay-word-audio-btn');
+        const answerInput = document.getElementById('answer-input');
+        const hintBtn = document.getElementById('hint-btn');
+        const submitAnswerBtn = document.getElementById('submit-answer-btn');
+        const starRating = document.getElementById('star-rating');
+        const endMessage = document.getElementById('end-message');
+        const finalScore = document.getElementById('final-score');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const highScoresStart = document.getElementById('high-scores-start');
+        const highScoresEnd = document.getElementById('high-scores-end');
+        const musicToggleBtn = document.getElementById('music-toggle-btn');
+        const musicOnIcon = document.getElementById('music-on-icon');
+        const musicOffIcon = document.getElementById('music-off-icon');
+        const feedbackModal = document.getElementById('feedback-modal');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDetails = document.getElementById('feedback-details');
+        const exampleSentenceEn = document.getElementById('example-sentence-en');
+        const exampleSentenceTh = document.getElementById('example-sentence-th');
+        const replaySentenceAudioBtn = document.getElementById('replay-sentence-audio-btn');
+        const particleContainer = document.getElementById('particle-container');
 
-            // --- Game Data with Sentences ---
-            const words = [
-                { word: 'happy', hint: 'เด็กผู้หญิงยิ้มกว้างมีความสุข', sentence: "She feels happy today.", translation: "วันนี้เธอรู้สึกมีความสุข" }, { word: 'sad', hint: 'เด็กผู้หญิงร้องไห้', sentence: "The boy is sad because he lost his toy.", translation: "เด็กชายเสียใจเพราะของเล่นหาย" }, { word: 'angry', hint: 'เด็กผู้หญิงหน้าบึ้งโกรธ', sentence: "He gets angry when he is hungry.", translation: "เขาจะโกรธเมื่อเขาหิว" }, { word: 'excited', hint: 'เด็กผู้หญิงกระโดดดีใจ', sentence: "The children are excited about the party.", translation: "เด็กๆ ตื่นเต้นกับงานปาร์ตี้" }, { word: 'scared', hint: 'เด็กผู้หญิงทำหน้าตกใจกลัว', sentence: "She is scared of the dark.", translation: "เธอกลัวความมืด" }, { word: 'tired', hint: 'เด็กผู้หญิงกำลังหาวนอน', sentence: "I feel tired after a long day.", translation: "ฉันรู้สึกเหนื่อยหลังจากวันที่ยาวนาน" }, { word: 'confused', hint: 'เด็กผู้หญิงทำหน้างง', sentence: "The map made him feel confused.", translation: "แผนที่ทำให้เขารู้สึกสับสน" }, { word: 'unhappy', hint: 'เด็กผู้หญิงหน้าบึ้งไม่พอใจ', sentence: "The cat looks unhappy in the rain.", translation: "แมวดูไม่มีความสุขตอนฝนตก" }, { word: 'upset', hint: 'เด็กผู้หญิงกำลังจะร้องไห้', sentence: "Don't be upset, it was an accident.", translation: "อย่าเสียใจเลย มันเป็นอุบัติเหตุ" }, { word: 'cheerful', hint: 'เด็กผู้หญิงยิ้มอย่างร่าเริง', sentence: "He has a cheerful personality.", translation: "เขามีบุคลิกที่ร่าเริง" }
-            ];
+        // --- Game Data ---
+        const words = [
+            { en: 'running', th_hint: 'เด็กผู้หญิงกำลังวิ่ง', sentence_en: 'The girl is running in the park.', sentence_th: 'เด็กผู้หญิงกำลังวิ่งอยู่ในสวนสาธารณะ' },
+            { en: 'dancing', th_hint: 'เด็กผู้หญิงกำลังเต้น', sentence_en: 'She loves dancing to the music.', sentence_th: 'เธอชอบเต้นไปกับเสียงเพลง' },
+            { en: 'cycling', th_hint: 'เด็กผู้ชายกำลังปั่นจักรยาน', sentence_en: 'He is cycling to school.', sentence_th: 'เขากำลังปั่นจักรยานไปโรงเรียน' },
+            { en: 'standing', th_hint: 'เด็กผู้ชายกำลังยืน', sentence_en: 'The boy is standing near the tree.', sentence_th: 'เด็กผู้ชายกำลังยืนอยู่ใกล้ต้นไม้' },
+            { en: 'touching', th_hint: 'เด็กกำลังสัมผัสแมว', sentence_en: 'She is touching the soft cat.', sentence_th: 'เธอกำลังสัมผัสแมวที่นุ่มนิ่ม' },
+            { en: 'nodding', th_hint: 'ผู้ชายกำลังพยักหน้า', sentence_en: 'He is nodding his head to say yes.', sentence_th: 'เขากำลังพยักหน้าเพื่อบอกว่าใช่' },
+            { en: 'falling', th_hint: 'ใบไม้กำลังร่วงหล่น', sentence_en: 'The leaves are falling from the tree.', sentence_th: 'ใบไม้กำลังร่วงหล่นจากต้นไม้' },
+            { en: 'waving', th_hint: 'เด็กผู้หญิงกำลังโบกมือ', sentence_en: 'She is waving goodbye to her friend.', sentence_th: 'เธอกำลังโบกมือลาเพื่อนของเธอ' },
+            { en: 'hopping', th_hint: 'กระต่ายกำลังกระโดด', sentence_en: 'The rabbit is hopping in the garden.', sentence_th: 'กระต่ายกำลังกระโดดอยู่ในสวน' },
+            { en: 'clapping', th_hint: 'ผู้ชมกำลังปรบมือ', sentence_en: 'The audience is clapping their hands.', sentence_th: 'ผู้ชมกำลังปรบมือ' },
+        ];
+        
+        const correctFeedbackPhrases = ['เก่งมากเลยจ้า!', 'ถูกต้องนะค้าบ!', 'เยี่ยมไปเลย!'];
+        const incorrectFeedbackPhrases = ['อุ๊ย ผิดนิดเดียวเอง', 'ลองอีกทีนะ', 'ไม่เป็นไรนะ สู้ๆ'];
+
+        // --- Game State ---
+        let currentWordIndex = -1;
+        let score = 0;
+        let playerName = '';
+        let highScores = [];
+        let isHintUsed = false;
+        let isMusicOn = true;
+        let synth, musicLoop;
+
+        // --- Audio Functions ---
+        function initializeAudio() {
+            synth = new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
+            }).toDestination();
             
-            // --- Game State ---
-            let playerName = '';
-            let currentWordIndex = 0;
-            let score = 0;
-            let shuffledWords = [];
-            let hintUsed = false;
+            const musicNotes = ['C4', 'E4', 'G4', 'B4'];
+            let noteIndex = 0;
+            musicLoop = new Tone.Loop(time => {
+                synth.triggerAttackRelease(musicNotes[noteIndex % musicNotes.length], '8n', time);
+                noteIndex++;
+            }, '2n').start(0);
+        }
 
-            // --- Sound Effects & Music ---
-            const fxSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-            function playCorrectSound() { const now = Tone.now(); fxSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now); }
-            function playIncorrectSound() { const now = Tone.now(); fxSynth.triggerAttackRelease("A2", "8n", now); }
-            let isMusicPlaying = false;
-            const musicSynth = new Tone.FMSynth({ harmonicity: 1.2, modulationIndex: 10, envelope: { attack: 0.01, decay: 0.5, sustain: 0.1, release: 1 }, modulationEnvelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 1 } }).toDestination();
-            musicSynth.volume.value = -22;
-            const melody = new Tone.Sequence((time, note) => { musicSynth.triggerAttackRelease(note, "8n", time); }, ["C4", "E4", "G4", "C5", "G4", "E4"], "4n").start(0);
-            melody.loop = true;
-            function toggleMusic() {
-                if (Tone.context.state !== 'running') { Tone.start(); }
-                isMusicPlaying = !isMusicPlaying;
-                if (isMusicPlaying) {
-                    Tone.Transport.start();
-                    musicOnIcon.classList.remove('hidden');
-                    musicOffIcon.classList.add('hidden');
-                } else {
-                    Tone.Transport.stop();
-                    musicOnIcon.classList.add('hidden');
-                    musicOffIcon.classList.remove('hidden');
-                }
+        function speakText(text, lang = 'en-US') {
+            if (typeof SpeechSynthesisUtterance === 'undefined') {
+                console.warn('Web Speech API is not supported in this browser.');
+                return;
             }
+            speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
 
-            // --- Speech Synthesis ---
-            let speech = new SpeechSynthesisUtterance();
-            speech.lang = "en-US";
-            speech.volume = 1;
-            speech.rate = 0.9;
-            speech.pitch = 1.2;
-            function speak(text) { window.speechSynthesis.cancel(); speech.text = text; window.speechSynthesis.speak(speech); }
+        function playSound(note, duration = '8n') {
+            if(synth) synth.triggerAttackRelease(note, duration);
+        }
 
-            // --- High Score Logic ---
-            const HIGHSCORES_KEY = 'vocabGameHighscores';
-            function loadHighScores(element) {
-                const highScores = JSON.parse(localStorage.getItem(HIGHSCORES_KEY)) || [];
-                if (highScores.length === 0) {
-                    element.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีคะแนนสูงสุด</p>';
-                    return;
-                }
-                const scoreHtml = highScores.map((score, index) => `
-                    <div class="flex justify-between items-center bg-white/50 p-2 rounded-lg">
-                        <span class="font-bold text-purple-600">${index + 1}. ${score.name}</span>
-                        <span class="font-bold text-pink-500">${score.score} คะแนน</span>
+        function toggleMusic() {
+            isMusicOn = !isMusicOn;
+            if (isMusicOn) {
+                Tone.Transport.start();
+                musicOnIcon.classList.remove('hidden');
+                musicOffIcon.classList.add('hidden');
+            } else {
+                Tone.Transport.pause();
+                musicOnIcon.classList.add('hidden');
+                musicOffIcon.classList.remove('hidden');
+            }
+        }
+        
+        // --- Animation Function ---
+        function createStarParticles() {
+            particleContainer.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const x = (Math.random() - 0.5) * 400;
+                const y = (Math.random() - 0.5) * 400;
+                particle.style.setProperty('--x', `${x}px`);
+                particle.style.setProperty('--y', `${y}px`);
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // --- High Score Functions ---
+        function loadHighScores() {
+            const storedScores = localStorage.getItem('funVocabHighScores');
+            highScores = storedScores ? JSON.parse(storedScores) : [];
+        }
+
+        function saveHighScores() {
+            highScores.sort((a, b) => b.score - a.score);
+            highScores = highScores.slice(0, 5);
+            localStorage.setItem('funVocabHighScores', JSON.stringify(highScores));
+        }
+
+        function renderHighScores(container) {
+            container.innerHTML = '';
+            if (highScores.length === 0) {
+                container.innerHTML = '<p class="text-gray-400">ยังไม่มีใครเล่นเลย!</p>';
+                return;
+            }
+            highScores.forEach((entry, index) => {
+                const scoreElement = document.createElement('div');
+                scoreElement.className = 'flex justify-between items-center p-2 rounded-lg hover:bg-purple-50';
+                scoreElement.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-semibold ${index === 0 ? 'text-purple-700' : 'text-gray-800'}">${index + 1}. ${entry.name}</span>
+                        <span class="text-xs text-gray-400">${entry.date}</span>
                     </div>
-                `).join('');
-                element.innerHTML = scoreHtml;
-            }
+                    <span class="font-bold text-lg ${index === 0 ? 'text-purple-700' : 'text-gray-600'}">${entry.score} คะแนน</span>
+                `;
+                container.appendChild(scoreElement);
+            });
+        }
 
-            function saveHighScore(name, score) {
-                const newScore = { name, score };
-                const highScores = JSON.parse(localStorage.getItem(HIGHSCORES_KEY)) || [];
-                highScores.push(newScore);
-                highScores.sort((a, b) => b.score - a.score);
-                const topScores = highScores.slice(0, 5);
-                localStorage.setItem(HIGHSCORES_KEY, JSON.stringify(topScores));
-            }
+        // --- Game Flow Functions ---
+        function startGame() {
+            playerName = playerNameInput.value.trim() || 'ผู้เล่นนิรนาม';
+            localStorage.setItem('funVocabPlayerName', playerName);
+            
+            score = 0;
+            currentWordIndex = -1;
+            
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
 
-            // --- Game Flow ---
-            function handleStartGame() {
-                const name = playerNameInput.value.trim();
-                if (name === "") {
-                    alert("กรุณาใส่ชื่อของคุณก่อนเริ่มเกมค่ะ");
-                    return;
-                }
-                playerName = name;
-                startScreen.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
-                startGame();
-            }
-
-            function startGame() {
-                currentWordIndex = 0;
-                score = 0;
-                shuffledWords = [...words].sort(() => Math.random() - 0.5);
-                endGameModal.classList.add('hidden');
-                modalContent.classList.remove('bounce-in');
-                displayQuestion();
-            }
-
-            function displayQuestion() {
-                if (currentWordIndex >= shuffledWords.length) { endGame(); return; }
-                const currentWord = shuffledWords[currentWordIndex];
-                hintUsed = false;
-                hintBtn.disabled = false;
-                answerInput.disabled = false;
-                checkBtn.disabled = false;
-                updateProgress();
-                answerInput.value = '';
-                answerInput.focus();
-                answerInput.classList.remove('border-red-400', 'shake');
-                answerInput.classList.add('border-pink-200');
-                feedbackEl.innerHTML = '';
-                const imageUrl = `https://placehold.co/600x400/f8c3d0/4a2328?text=${encodeURIComponent(currentWord.hint)}`;
-                wordImageEl.src = imageUrl;
-                setTimeout(() => speak(currentWord.word), 300);
-            }
-
-            function showHint() {
-                if (hintUsed) return;
-                hintUsed = true;
-                hintBtn.disabled = true;
-                const correctAnswer = shuffledWords[currentWordIndex].word;
-                answerInput.value = correctAnswer[0];
-                answerInput.focus();
-                feedbackEl.innerHTML = `<span class="text-xl text-orange-500">ใช้คำใบ้แล้ว (ข้อนี้จะไม่ได้คะแนนนะ)</span>`;
-            }
-
-            function checkAnswer() {
-                const userAnswer = answerInput.value.trim().toLowerCase();
-                const correctAnswer = shuffledWords[currentWordIndex].word;
-                answerInput.disabled = true;
-                checkBtn.disabled = true;
-                hintBtn.disabled = true;
-                if (userAnswer === correctAnswer) {
-                    handleCorrectAnswer();
+            scoreDisplay.textContent = score;
+            
+            Tone.start().then(() => {
+                if(!synth) initializeAudio();
+                if (isMusicOn) {
+                    Tone.Transport.start();
                 } else {
-                    handleIncorrectAnswer();
+                    Tone.Transport.pause();
+                }
+            });
+
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            currentWordIndex++;
+            if (currentWordIndex >= words.length) {
+                endGame();
+                return;
+            }
+
+            isHintUsed = false;
+            answerInput.value = '';
+            answerInput.placeholder = 'พิมพ์คำตอบที่นี่';
+            answerInput.disabled = false;
+            submitAnswerBtn.disabled = false;
+            hintBtn.disabled = false;
+            
+            const currentWord = words[currentWordIndex];
+            const progress = ((currentWordIndex + 1) / words.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            wordImage.src = `https://placehold.co/600x400/e9d5ff/4c1d95?text=${encodeURIComponent(currentWord.th_hint)}`;
+            wordImage.alt = currentWord.th_hint;
+            
+            wordImage.classList.add('animate-wobble');
+            wordImage.addEventListener('animationend', () => {
+                wordImage.classList.remove('animate-wobble');
+            }, { once: true });
+
+            setTimeout(() => speakText(currentWord.en), 500);
+        }
+        
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = words[currentWordIndex].en;
+            
+            answerInput.disabled = true;
+            submitAnswerBtn.disabled = true;
+            hintBtn.disabled = true;
+
+            let isCorrect = userAnswer === correctAnswer;
+
+            if (isCorrect) {
+                playSound('C5');
+                const randomCorrectPhrase = correctFeedbackPhrases[Math.floor(Math.random() * correctFeedbackPhrases.length)];
+                setTimeout(() => speakText(randomCorrectPhrase, 'th-TH'), 200);
+                createStarParticles();
+                feedbackTitle.textContent = 'ถูกต้อง!';
+                feedbackTitle.className = 'text-4xl font-bold mb-4 text-green-500';
+                if (!isHintUsed) {
+                    score++;
+                }
+            } else {
+                playSound('C3', '4n');
+                const randomIncorrectPhrase = incorrectFeedbackPhrases[Math.floor(Math.random() * incorrectFeedbackPhrases.length)];
+                setTimeout(() => speakText(randomIncorrectPhrase, 'th-TH'), 200);
+                feedbackTitle.textContent = `ผิดจ้า! คำตอบคือ: ${correctAnswer}`;
+                feedbackTitle.className = 'text-3xl font-bold mb-4 text-red-500';
+                if (score > 0) {
+                    score--;
                 }
             }
             
-            function showExampleAndProceed() {
-                const currentWordData = shuffledWords[currentWordIndex];
-                feedbackEl.innerHTML = `<div class="space-y-2 text-center animate-fade-in"><div class="flex items-center justify-center gap-2"><p class="text-xl text-blue-600">${currentWordData.sentence}</p><button onclick="speak('${currentWordData.sentence.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></button></div><p class="text-lg text-gray-500">"${currentWordData.translation}"</p></div>`;
-                speak(currentWordData.sentence);
-                setTimeout(() => {
-                    currentWordIndex++;
-                    displayQuestion();
-                }, 4000);
-            }
+            scoreDisplay.textContent = score;
+            showFeedbackModal();
+        }
 
-            function handleCorrectAnswer() {
-                if (!hintUsed) { score++; }
-                playCorrectSound();
-                let correctMessage = hintUsed ? `ถูกต้อง! (ไม่ได้คะแนน)` : `ถูกต้อง!`;
-                feedbackEl.innerHTML = `<div class="flex items-center gap-2 text-2xl text-green-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>${correctMessage}</span></div>`;
-                setTimeout(showExampleAndProceed, 1500);
-            }
+        function showFeedbackModal() {
+            const currentWord = words[currentWordIndex];
+            exampleSentenceEn.textContent = currentWord.sentence_en;
+            exampleSentenceTh.textContent = currentWord.sentence_th;
+            
+            feedbackModal.classList.remove('hidden');
 
-            function handleIncorrectAnswer() {
-                const correctAnswer = shuffledWords[currentWordIndex].word;
-                playIncorrectSound();
-                feedbackEl.innerHTML = `<div class="flex flex-col items-center gap-1 text-2xl text-red-500"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>ผิดจ้า!</span></div><span class="text-lg">คำตอบคือ: "${correctAnswer}"</span></div>`;
-                if (score > 0) score--;
-                answerInput.classList.remove('border-pink-200');
-                answerInput.classList.add('border-red-400', 'shake');
-                setTimeout(showExampleAndProceed, 2000);
+            setTimeout(() => {
+                feedbackModal.classList.add('hidden');
+                nextQuestion();
+            }, 4000);
+        }
+
+        function useHint() {
+            if (isHintUsed) return;
+            isHintUsed = true;
+            playSound('E5', '16n');
+            const firstLetter = words[currentWordIndex].en.charAt(0);
+            answerInput.value = firstLetter;
+            hintBtn.disabled = true;
+            answerInput.focus();
+        }
+
+        function endGame() {
+            if (Tone.Transport.state === 'started') {
+                Tone.Transport.stop();
             }
             
-            function updateProgress() {
-                scoreEl.textContent = `คะแนน: ${score}`;
-                progressTextEl.textContent = `ข้อที่ ${currentWordIndex >= words.length ? words.length : currentWordIndex + 1}/${words.length}`;
-                const progressPercentage = ((currentWordIndex + 1) / words.length) * 100;
-                progressBarEl.style.width = `${progressPercentage > 100 ? 100 : progressPercentage}%`;
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+
+            const finalPercentage = score / words.length;
+            let stars = '';
+            let message = '';
+            let endSpeech = '';
+
+            if (finalPercentage >= 0.8) {
+                stars = '⭐⭐⭐';
+                message = 'เก่งมากเลย!';
+                endSpeech = 'สุดยอดไปเลย! ได้สามดาวแน่ะ';
+            } else if (finalPercentage >= 0.5) {
+                stars = '⭐⭐';
+                message = 'เยี่ยมไปเลย!';
+                endSpeech = 'เก่งมากจ้ะ! ได้ตั้งสองดาว';
+            } else {
+                stars = '⭐';
+                message = 'พยายามอีกหน่อยนะ!';
+                endSpeech = 'พยายามได้ดีมากเลยนะ!';
             }
+            
+            starRating.innerHTML = stars.replace(/⭐/g, '<span class="star-filled">⭐</span>').padEnd(9, '<span class="star-empty">⭐</span>');
+            endMessage.textContent = message;
+            finalScore.textContent = `คะแนนของคุณ: ${score}/${words.length}`;
+            
+            setTimeout(() => speakText(endSpeech, 'th-TH'), 500);
 
-            function endGame() {
-                saveHighScore(playerName, score);
-                let starCount = 0;
-                if (score >= 8) {
-                    starCount = 3;
-                    endGameTitleEl.textContent = 'สุดยอดไปเลย!';
-                    endGameMessageEl.textContent = 'เก่งมากๆ เลยนะ ลองเล่นอีกครั้งไหม?';
-                } else if (score >= 5) {
-                    starCount = 2;
-                    endGameTitleEl.textContent = 'เก่งมากจ้า!';
-                    endGameMessageEl.textContent = 'เยี่ยมมาก! พยายามอีกนิดเพื่อ 3 ดาวนะ';
-                } else {
-                    starCount = 1;
-                    endGameTitleEl.textContent = 'พยายามได้ดีมาก!';
-                    endGameMessageEl.textContent = 'สู้ๆ นะ ลองเล่นอีกครั้งดูสิ!';
-                }
-                
-                let starsHtml = '';
-                const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
-                for (let i = 0; i < 3; i++) {
-                    starsHtml += `<span class="${i < starCount ? 'text-yellow-400' : 'text-gray-300'}">${starSvg}</span>`;
-                }
-                starRatingEl.innerHTML = starsHtml;
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('th-TH', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            highScores.push({ name: playerName, score: score, date: formattedDate });
+            saveHighScores();
+            renderHighScores(highScoresEnd);
+        }
 
-                finalScoreEl.textContent = `คะแนนของคุณ: ${score}/${words.length}`;
-                
-                gameContainer.classList.add('hidden');
-                endGameModal.classList.remove('hidden');
-                loadHighScores(endGameHighscoreListEl);
-                setTimeout(() => { modalContent.classList.add('bounce-in'); }, 50);
-            }
-
-            function resetToStartScreen() {
-                endGameModal.classList.add('hidden');
-                startScreen.classList.remove('hidden');
-                loadHighScores(highscoreListEl);
-            }
-
-            // --- Event Listeners ---
-            startGameBtn.addEventListener('click', handleStartGame);
-            playerNameInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleStartGame(); });
-            listenAgainBtn.addEventListener('click', () => { if (currentWordIndex < shuffledWords.length) speak(shuffledWords[currentWordIndex].word); });
-            checkBtn.addEventListener('click', checkAnswer);
-            hintBtn.addEventListener('click', showHint);
-            answerInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
-            playAgainBtn.addEventListener('click', resetToStartScreen);
-            musicToggleBtn.addEventListener('click', toggleMusic);
-
-            // --- Initialisation ---
-            window.speechSynthesis.onvoiceschanged = () => { const voices = window.speechSynthesis.getVoices(); const englishVoice = voices.find(voice => voice.lang === 'en-US' || voice.lang.startsWith('en-')); if (englishVoice) speech.voice = englishVoice; };
-            window.speak = speak;
-            loadHighScores(highscoreListEl);
+        // --- Event Listeners ---
+        startGameBtn.addEventListener('click', startGame);
+        playAgainBtn.addEventListener('click', () => {
+            endScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            loadHighScores();
+            renderHighScores(highScoresStart);
         });
+
+        submitAnswerBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        hintBtn.addEventListener('click', useHint);
+        replayWordAudioBtn.addEventListener('click', () => {
+            speakText(words[currentWordIndex].en);
+        });
+        replaySentenceAudioBtn.addEventListener('click', () => {
+            speakText(words[currentWordIndex].sentence_en);
+        });
+        
+        musicToggleBtn.addEventListener('click', toggleMusic);
+
+        // --- Initial Load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('funVocabPlayerName');
+            if (savedName) {
+                playerNameInput.value = savedName;
+            }
+            
+            loadHighScores();
+            renderHighScores(highScoresStart);
+            musicOnIcon.classList.remove('hidden');
+            musicOffIcon.classList.add('hidden');
+        });
+
     </script>
 </body>
 </html>
