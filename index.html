@@ -17,14 +17,53 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
     <style>
+        :root {
+            --bg-color: #fdf2f8; /* pink-50 */
+            --primary-color: #d8b4fe; /* purple-300 */
+            --primary-hover-color: #c084fc; /* purple-400 */
+            --primary-text-color: #581c87; /* purple-900 */
+            --container-bg: white;
+            --progress-bar-bg: #e9d5ff; /* purple-200 */
+            --progress-bar-fill: #a855f7; /* purple-500 */
+        }
+
+        .theme-space {
+            --bg-color: #1e293b; /* slate-800 */
+            --primary-color: #facc15; /* yellow-400 */
+            --primary-hover-color: #fde047; /* yellow-300 */
+            --primary-text-color: #1e293b; /* slate-800 */
+            --container-bg: #334155; /* slate-700 */
+            --progress-bar-bg: #475569; /* slate-600 */
+            --progress-bar-fill: #facc15; /* yellow-400 */
+        }
+        .theme-sea {
+            --bg-color: #ecfeff; /* cyan-50 */
+            --primary-color: #67e8f9; /* cyan-300 */
+            --primary-hover-color: #22d3ee; /* cyan-400 */
+            --primary-text-color: #164e63; /* cyan-900 */
+            --container-bg: white;
+            --progress-bar-bg: #a5f3fc; /* cyan-200 */
+            --progress-bar-fill: #06b6d4; /* cyan-500 */
+        }
+        .theme-zoo {
+            --bg-color: #f0fdf4; /* green-50 */
+            --primary-color: #fdba74; /* orange-300 */
+            --primary-hover-color: #fb923c; /* orange-400 */
+            --primary-text-color: #7c2d12; /* orange-900 */
+            --container-bg: white;
+            --progress-bar-bg: #d9f99d; /* lime-200 */
+            --progress-bar-fill: #84cc16; /* lime-500 */
+        }
+
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: #fdf2f8; /* bg-pink-50 */
+            background-color: var(--bg-color);
+            transition: background-color 0.5s ease;
         }
-        .game-container {
-            background: white;
-            border-radius: 1.5rem; /* rounded-3xl */
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
+        .game-container, .modal-content {
+            background: var(--container-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             width: 100%;
             transition: all 0.3s ease-in-out;
         }
@@ -32,53 +71,76 @@
             transition: all 0.2s ease;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+        }
+        .btn:disabled {
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            opacity: 0.7;
         }
         .btn-primary {
-            background-color: #d8b4fe; /* bg-purple-300 */
-            color: #581c87; /* text-purple-900 */
+            background-color: var(--primary-color);
+            color: var(--primary-text-color);
             font-weight: 600;
         }
-        .btn-primary:hover {
-            background-color: #c084fc; /* bg-purple-400 */
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover-color);
+        }
+        .progress-bar {
+            background-color: var(--progress-bar-bg);
+            overflow: hidden; /* For shimmer effect */
         }
         .progress-bar-inner {
+            background-color: var(--progress-bar-fill);
             transition: width 0.5s ease-in-out;
+            position: relative;
         }
-        .star-filled {
-            color: #facc15; /* yellow-400 */
-        }
-        .star-empty {
-            color: #d1d5db; /* gray-300 */
-        }
-
-        /* --- Animation Keyframes --- */
-        @keyframes wobble {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(3deg); }
-            50% { transform: rotate(-3deg); }
-            75% { transform: rotate(1deg); }
-        }
-        .animate-wobble {
-            animation: wobble 0.5s ease-in-out;
-        }
-
-        @keyframes fly-out {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
-        }
-        .particle {
+        /* Shimmer effect for progress bar */
+        .progress-bar-inner::after {
+            content: '';
             position: absolute;
-            left: 50%;
-            top: 40%; /* Start near the title */
-            width: 15px;
-            height: 15px;
-            background: #facc15; /* yellow-400 */
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            animation: fly-out 1.2s ease-out forwards;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
         }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Mascot styles */
+        #dino-mascot { transition: all 0.3s ease; }
+        .dino-happy { transform: translateY(-10px) rotate(5deg) scale(1.05); }
+        .dino-sad { transform: translateY(5px) rotate(-2deg) scale(0.95); }
+        #dino-mascot .eye { transition: all 0.2s ease; }
+        .dino-sad #dino-mascot .eye { transform: scaleY(0.1) translateY(10px); }
+
+        /* Modal bounce-in animation */
+        @keyframes bounce-in {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .modal-content { animation: bounce-in 0.4s ease-out; }
+
+        .theme-selector-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px var(--primary-color);
+        }
+        
+        /* Custom slider styles */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; margin-top: -8px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        input[type=range]::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
+        input[type=range]::-moz-range-thumb { height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
@@ -88,26 +150,30 @@
         <!-- Start Screen -->
         <div id="start-screen" class="game-container text-center p-6 sm:p-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-2">เกมทายศัพท์หรรษา</h1>
-            <p class="text-gray-500 mb-4 sm:mb-6">มาทบทวนคำศัพท์ภาษาอังกฤษกันเถอะ!</p>
+            <p class="text-gray-500 mb-4">เลือกธีมที่ชอบ แล้วมาสนุกกัน!</p>
             
+            <div id="theme-selector" class="flex justify-center gap-4 my-6">
+                <button class="theme-selector-btn p-3 rounded-full bg-pink-200 border-2 border-transparent" data-theme="default" title="ธีมปกติ">🌸</button>
+                <button class="theme-selector-btn p-3 rounded-full bg-indigo-900 border-2 border-transparent" data-theme="space" title="ธีมอวกาศ">🚀</button>
+                <button class="theme-selector-btn p-3 rounded-full bg-cyan-200 border-2 border-transparent" data-theme="sea" title="ธีมใต้ทะเล">🐠</button>
+                <button class="theme-selector-btn p-3 rounded-full bg-green-500 border-2 border-transparent" data-theme="zoo" title="ธีมสวนสัตว์">🦁</button>
+            </div>
+
             <div class="mb-4">
                 <label for="player-name" class="block text-left text-gray-700 mb-1">ใส่ชื่อของคุณ:</label>
                 <input type="text" id="player-name" class="w-full p-3 border-2 border-purple-200 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-lg">
             </div>
 
-            <button id="start-game-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl">เริ่มเกม!</button>
-            
+            <div class="flex gap-2">
+                <button id="start-game-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl">เริ่มเกม!</button>
+                <button id="review-mode-btn" class="p-3 rounded-lg btn bg-blue-300 text-blue-800" title="ทบทวนคำที่เคยตอบผิด">🧠</button>
+                <button id="sticker-book-btn" class="p-3 rounded-lg btn bg-yellow-300 text-yellow-800" title="สมุดสะสมสติกเกอร์">📒</button>
+                <button id="settings-btn" class="p-3 rounded-lg btn bg-gray-300 text-gray-800" title="ตั้งค่า">⚙️</button>
+            </div>
+
             <div class="mt-8">
                 <h2 class="text-xl sm:text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
-                <div id="high-scores-start" class="space-y-2 text-left">
-                    <div class="flex justify-center items-center py-4">
-                        <svg class="animate-spin h-8 w-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-500">กำลังโหลดคะแนน...</span>
-                    </div>
-                </div>
+                <div id="high-scores-start" class="space-y-2 text-left"></div>
             </div>
         </div>
 
@@ -115,30 +181,39 @@
         <div id="game-screen" class="game-container hidden p-6 sm:p-8">
             <div class="flex justify-between items-center mb-4">
                 <div class="text-lg sm:text-xl font-bold text-purple-700">คะแนน: <span id="score">0</span></div>
+                <div id="dino-container" class="relative w-20 h-20">
+                    <svg id="dino-mascot" viewBox="0 0 100 100" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-28">
+                        <g>
+                            <path d="M63.2,73.4c-3.1-1.2-6.5-1-9.5,0.5c-3,1.5-5.6,4.1-7.3,7.2c-0.6,1.1-1,2.3-1.4,3.5c-0.4,1.2-1.2,2.9-2.5,3.2 c-1.3,0.3-2.6-0.7-3.2-1.9c-0.6-1.2-0.6-2.6,0-3.8c1.1-2.3,2.8-4.3,4.9-5.8c4.2-3,9.5-4.5,14.7-3.4c5.2,1.1,9.8,4.5,12.8,8.8 c1.5,2.1,2.4,4.6,2.8,7.1c0.1,1.4-0.8,2.7-2.1,2.9c-1.3,0.2-2.6-0.6-2.9-1.9C71.3,84.4,68.4,76.5,63.2,73.4z" fill="#A3E635"/>
+                            <path d="M98.9,58.3c-0.1-0.1-0.1-0.2-0.2-0.3c-2-2.5-4.6-4.4-7.5-5.6c-5.7-2.3-12.1-1-17.1,3.2 c-0.1,0.1-0.2,0.2-0.3,0.2c-0.8,0.7-1.5,1.5-2.2,2.3c-4.4,5.4-6,12.5-4.4,19.3c0.1,0.4,0.2,0.8,0.4,1.2c1.3,3.7,3.9,6.7,7.3,8.4 c0.5,0.2,1,0.4,1.5,0.6c7.5,2.9,15.8,0.4,20.8-6.1c0.1-0.1,0.1-0.2,0.2-0.3c4.9-6.4,6.2-14.5,3.4-21.6 C99.9,59.9,99.5,59.1,98.9,58.3z" fill="#84CC16"/>
+                            <path d="M68.7,56.7c-0.7,0-1.4-0.1-2.1-0.2c-0.8-0.2-1.6-0.4-2.4-0.7c-2.4-0.9-4.6-2.4-6.4-4.3 c-2-2.1-3.4-4.7-4.1-7.6c-0.1-0.5-0.2-1-0.3-1.5c-0.4-2.5-0.1-5.1,0.9-7.5c1-2.4,2.6-4.5,4.7-6.1c4.2-3.2,9.8-4.2,14.9-2.6 c5.1,1.6,9.1,5.3,11,10.2c0.3,0.7,0.5,1.4,0.7,2.1c1.2,4.1,0.7,8.6-1.4,12.4c-2.1,3.8-5.6,6.6-9.8,7.6 C71.3,56.5,70,56.7,68.7,56.7z" fill="#A3E635"/>
+                            <circle class="eye" cx="70.5" cy="41.9" r="3.5" fill="#1E293B"/>
+                            <path d="M34.3,71.2c-0.9,0-1.8-0.1-2.7-0.2c-5.9-0.9-11.1-4.7-13.8-9.9c-2.7-5.2-2.4-11.3,0.7-16.2 c3.1-4.9,8.4-8.1,14.2-8.4c5.8-0.3,11.4,2.1,15,6.5c3.6,4.4,4.8,10.2,3.2,15.5c-1.6,5.3-5.8,9.4-11.2,11.1 C38.1,70.9,36.2,71.2,34.3,71.2z" fill="#A3E635"/>
+                            <circle class="eye" cx="34.5" cy="56.9" r="3.5" fill="#1E293B"/>
+                        </g>
+                    </svg>
+                </div>
                 <button id="music-toggle-btn" class="p-3 rounded-full hover:bg-purple-100">
                     <svg id="music-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /></svg>
                     <svg id="music-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15.586a1 1 0 01.02-1.413l7.414-7.414a1 1 0 011.414 0l.02.02a1 1 0 010 1.414l-7.414 7.414a1 1 0 01-1.414-.02zM9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /><line x1="1" y1="1" x2="23" y2="23" stroke-width="2.5" /></svg>
                 </button>
             </div>
 
-            <div class="w-full bg-purple-100 rounded-full h-4 mb-6">
-                <div id="progress-bar" class="bg-purple-400 h-4 rounded-full" style="width: 0%"></div>
+            <div class="w-full progress-bar rounded-full h-4 mb-6">
+                <div id="progress-bar" class="progress-bar-inner h-4 rounded-full" style="width: 0%"></div>
             </div>
 
             <div class="text-center">
                 <img id="word-image" src="" alt="คำใบ้รูปภาพ" class="w-full h-40 sm:h-52 object-contain rounded-lg mb-4 bg-purple-50 border-2 border-purple-200">
-                
                 <button id="replay-word-audio-btn" class="mb-4 p-4 rounded-full bg-pink-200 hover:bg-pink-300 btn">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 15.536a5 5 0 010-7.072m-2.828 9.9a9 9 0 010-12.728" /></svg>
                 </button>
-
                 <div class="relative flex items-center">
                     <input type="text" id="answer-input" class="w-full p-4 text-xl sm:text-2xl tracking-widest text-center border-2 border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="พิมพ์คำตอบที่นี่">
                     <button id="hint-btn" class="absolute right-2 p-3 rounded-full hover:bg-yellow-200" title="ใช้คำใบ้ (ไม่ได้คะแนน)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM9 12a1 1 0 012 0v5a1 1 0 11-2 0v-5zM4.343 5.757a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM1 11a1 1 0 100 2h1a1 1 0 100-2H1zM12 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM5.05 14.95a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zM19 11a1 1 0 100 2h-1a1 1 0 100-2h1zM14.95 14.95a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z" /><path d="M10 7a3 3 0 100 6 3 3 0 000-6z" /></svg>
                     </button>
                 </div>
-                
                 <button id="submit-answer-btn" class="w-full mt-4 py-4 px-6 rounded-lg btn btn-primary text-xl">ส่งคำตอบ</button>
             </div>
         </div>
@@ -146,27 +221,24 @@
         <!-- End Screen -->
         <div id="end-screen" class="game-container text-center hidden p-6 sm:p-8">
             <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-4">จบเกมแล้วจ้า!</h2>
-            
-            <div id="star-rating" class="text-4xl sm:text-5xl mb-4">
-                <!-- Stars will be populated here -->
-            </div>
-            
+            <div id="star-rating" class="text-4xl sm:text-5xl mb-4"></div>
             <p id="end-message" class="text-xl text-gray-700 mb-2"></p>
             <p id="final-score" class="text-2xl font-semibold bg-purple-100 text-purple-800 rounded-lg py-2 px-4 inline-block mb-6"></p>
-
-            <button id="play-again-btn" class="w-full py-4 px-6 rounded-lg btn btn-primary text-xl mb-6">เล่นอีกครั้ง</button>
-
-            <div>
+            <div class="flex gap-2">
+                <button id="play-again-btn" class="w-full py-4 px-6 rounded-lg btn btn-primary text-xl">เล่นอีกครั้ง</button>
+                <button id="share-btn" class="p-4 rounded-lg btn bg-green-300 text-green-800" title="แชร์ผลลัพธ์">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </button>
+            </div>
+            <div class="mt-8">
                 <h2 class="text-xl sm:text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
-                <div id="high-scores-end" class="space-y-2 text-left">
-                    <!-- High scores will be populated here -->
-                </div>
+                <div id="high-scores-end" class="space-y-2 text-left"></div>
             </div>
         </div>
         
-        <!-- Feedback Modal -->
+        <!-- Modals -->
         <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div class="game-container text-center relative p-6 sm:p-8">
+            <div class="modal-content text-center relative p-6 sm:p-8">
                 <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
                 <h3 id="feedback-title" class="text-3xl sm:text-4xl font-bold mb-4"></h3>
                 <div id="feedback-details" class="text-left bg-purple-50 p-4 rounded-lg">
@@ -186,6 +258,47 @@
             </div>
         </div>
 
+        <div id="sticker-book-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div class="modal-content text-center relative p-6 sm:p-8 w-full max-w-2xl">
+                <button id="close-sticker-book-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-4">สมุดสะสมสติกเกอร์</h2>
+                <div id="sticker-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 bg-gray-100 p-4 rounded-lg min-h-[200px]"></div>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div class="modal-content text-center relative p-6 sm:p-8 w-full max-w-md">
+                <button id="close-settings-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-6">ตั้งค่า</h2>
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label for="music-volume" class="font-semibold text-gray-700">เสียงเพลง</label>
+                        <input type="range" id="music-volume" min="0" max="1" step="0.1" class="w-full">
+                    </div>
+                    <div>
+                        <label for="sfx-volume" class="font-semibold text-gray-700">เสียงเอฟเฟกต์</label>
+                        <input type="range" id="sfx-volume" min="0" max="1" step="0.1" class="w-full">
+                    </div>
+                </div>
+                <button id="clear-data-btn" class="w-full mt-8 py-3 px-6 rounded-lg btn bg-red-500 text-white text-lg">ล้างข้อมูลทั้งหมด</button>
+            </div>
+        </div>
+        
+        <div id="sticker-award-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div class="modal-content text-center relative p-8 w-full max-w-sm">
+                 <div id="sticker-award-particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                <h2 class="text-2xl font-bold text-yellow-500 mb-2">ยินดีด้วย!</h2>
+                <p class="text-gray-600 mb-4">คุณได้รับสติกเกอร์ใหม่!</p>
+                <div id="awarded-sticker-display" class="text-8xl my-4"></div>
+                <p id="awarded-sticker-name" class="text-xl font-semibold"></p>
+                <button id="close-sticker-award-btn" class="w-full mt-6 py-3 px-6 rounded-lg btn btn-primary text-lg">สุดยอดเลย!</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -193,388 +306,314 @@
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyE7z5ELBLTeJdnZJhwqyOMWGzHN31jcYatPJYLWpN_KopcDOLS-P3W_IsiE0QJYGG_QA/exec';
 
         // --- DOM Elements ---
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const endScreen = document.getElementById('end-screen');
-        const playerNameInput = document.getElementById('player-name');
-        const startGameBtn = document.getElementById('start-game-btn');
-        const scoreDisplay = document.getElementById('score');
-        const progressBar = document.getElementById('progress-bar');
-        const wordImage = document.getElementById('word-image');
-        const replayWordAudioBtn = document.getElementById('replay-word-audio-btn');
-        const answerInput = document.getElementById('answer-input');
-        const hintBtn = document.getElementById('hint-btn');
-        const submitAnswerBtn = document.getElementById('submit-answer-btn');
-        const starRating = document.getElementById('star-rating');
-        const endMessage = document.getElementById('end-message');
-        const finalScore = document.getElementById('final-score');
-        const playAgainBtn = document.getElementById('play-again-btn');
-        const highScoresStart = document.getElementById('high-scores-start');
-        const highScoresEnd = document.getElementById('high-scores-end');
-        const musicToggleBtn = document.getElementById('music-toggle-btn');
-        const musicOnIcon = document.getElementById('music-on-icon');
-        const musicOffIcon = document.getElementById('music-off-icon');
-        const feedbackModal = document.getElementById('feedback-modal');
-        const feedbackTitle = document.getElementById('feedback-title');
-        const feedbackDetails = document.getElementById('feedback-details');
-        const exampleSentenceEn = document.getElementById('example-sentence-en');
-        const exampleSentenceTh = document.getElementById('example-sentence-th');
-        const replaySentenceAudioBtn = document.getElementById('replay-sentence-audio-btn');
-        const particleContainer = document.getElementById('particle-container');
-        const nextQuestionBtn = document.getElementById('next-question-btn');
-        const userAnswerFeedback = document.getElementById('user-answer-feedback');
-        const userAnswerDisplay = document.getElementById('user-answer-display');
+        const allDOMElements = {
+            mainContainer: document.getElementById('main-container'),
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            playerNameInput: document.getElementById('player-name'),
+            startGameBtn: document.getElementById('start-game-btn'),
+            scoreDisplay: document.getElementById('score'),
+            progressBar: document.getElementById('progress-bar'),
+            wordImage: document.getElementById('word-image'),
+            replayWordAudioBtn: document.getElementById('replay-word-audio-btn'),
+            answerInput: document.getElementById('answer-input'),
+            hintBtn: document.getElementById('hint-btn'),
+            submitAnswerBtn: document.getElementById('submit-answer-btn'),
+            starRating: document.getElementById('star-rating'),
+            endMessage: document.getElementById('end-message'),
+            finalScore: document.getElementById('final-score'),
+            playAgainBtn: document.getElementById('play-again-btn'),
+            highScoresStart: document.getElementById('high-scores-start'),
+            highScoresEnd: document.getElementById('high-scores-end'),
+            musicToggleBtn: document.getElementById('music-toggle-btn'),
+            musicOnIcon: document.getElementById('music-on-icon'),
+            musicOffIcon: document.getElementById('music-off-icon'),
+            feedbackModal: document.getElementById('feedback-modal'),
+            feedbackTitle: document.getElementById('feedback-title'),
+            exampleSentenceEn: document.getElementById('example-sentence-en'),
+            exampleSentenceTh: document.getElementById('example-sentence-th'),
+            replaySentenceAudioBtn: document.getElementById('replay-sentence-audio-btn'),
+            particleContainer: document.getElementById('particle-container'),
+            nextQuestionBtn: document.getElementById('next-question-btn'),
+            userAnswerFeedback: document.getElementById('user-answer-feedback'),
+            userAnswerDisplay: document.getElementById('user-answer-display'),
+            themeSelector: document.getElementById('theme-selector'),
+            dinoMascot: document.getElementById('dino-mascot'),
+            stickerBookBtn: document.getElementById('sticker-book-btn'),
+            stickerBookModal: document.getElementById('sticker-book-modal'),
+            closeStickerBookBtn: document.getElementById('close-sticker-book-btn'),
+            stickerGrid: document.getElementById('sticker-grid'),
+            reviewModeBtn: document.getElementById('review-mode-btn'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsModal: document.getElementById('settings-modal'),
+            closeSettingsBtn: document.getElementById('close-settings-btn'),
+            musicVolumeSlider: document.getElementById('music-volume'),
+            sfxVolumeSlider: document.getElementById('sfx-volume'),
+            clearDataBtn: document.getElementById('clear-data-btn'),
+            shareBtn: document.getElementById('share-btn'),
+            stickerAwardModal: document.getElementById('sticker-award-modal'),
+            awardedStickerDisplay: document.getElementById('awarded-sticker-display'),
+            awardedStickerName: document.getElementById('awarded-sticker-name'),
+            closeStickerAwardBtn: document.getElementById('close-sticker-award-btn'),
+            stickerAwardParticleContainer: document.getElementById('sticker-award-particle-container'),
+        };
 
         // --- Game Data ---
-        const words = [
-            { en: 'running', th_hint: 'เด็กผู้หญิงกำลังวิ่ง', sentence_en: 'The girl is running in the park.', sentence_th: 'เด็กผู้หญิงกำลังวิ่งอยู่ในสวนสาธารณะ' },
-            { en: 'dancing', th_hint: 'เด็กผู้หญิงกำลังเต้น', sentence_en: 'She loves dancing to the music.', sentence_th: 'เธอชอบเต้นไปกับเสียงเพลง' },
-            { en: 'cycling', th_hint: 'เด็กผู้ชายกำลังปั่นจักรยาน', sentence_en: 'He is cycling to school.', sentence_th: 'เขากำลังปั่นจักรยานไปโรงเรียน' },
-            { en: 'standing', th_hint: 'เด็กผู้ชายกำลังยืน', sentence_en: 'The boy is standing near the tree.', sentence_th: 'เด็กผู้ชายกำลังยืนอยู่ใกล้ต้นไม้' },
-            { en: 'touching', th_hint: 'เด็กกำลังสัมผัสแมว', sentence_en: 'She is touching the soft cat.', sentence_th: 'เธอกำลังสัมผัสแมวที่นุ่มนิ่ม' },
-            { en: 'nodding', th_hint: 'ผู้ชายกำลังพยักหน้า', sentence_en: 'He is nodding his head to say yes.', sentence_th: 'เขากำลังพยักหน้าเพื่อบอกว่าใช่' },
-            { en: 'falling', th_hint: 'ใบไม้กำลังร่วงหล่น', sentence_en: 'The leaves are falling from the tree.', sentence_th: 'ใบไม้กำลังร่วงหล่นจากต้นไม้' },
-            { en: 'waving', th_hint: 'เด็กผู้หญิงกำลังโบกมือ', sentence_en: 'She is waving goodbye to her friend.', sentence_th: 'เธอกำลังโบกมือลาเพื่อนของเธอ' },
-            { en: 'hopping', th_hint: 'กระต่ายกำลังกระโดด', sentence_en: 'The rabbit is hopping in the garden.', sentence_th: 'กระต่ายกำลังกระโดดอยู่ในสวน' },
-            { en: 'clapping', th_hint: 'ผู้ชมกำลังปรบมือ', sentence_en: 'The audience is clapping their hands.', sentence_th: 'ผู้ชมกำลังปรบมือ' },
-        ];
-        
+        const words = [ { en: 'sun', th_hint: 'ดวงอาทิตย์', sentences: [{ en: 'The sun is very bright today.', th: 'วันนี้ดวงอาทิตย์สว่างมาก' }, { en: 'We get light from the sun.', th: 'เราได้รับแสงสว่างจากดวงอาทิตย์' }] }, { en: 'sky', th_hint: 'ท้องฟ้า', sentences: [{ en: 'The sky is blue and clear.', th: 'ท้องฟ้าเป็นสีฟ้าและแจ่มใส' }, { en: 'Birds fly in the sky.', th: 'นกบินอยู่บนท้องฟ้า' }] }, { en: 'shadow', th_hint: 'เงาของต้นไม้', sentences: [{ en: 'The tree casts a long shadow.', th: 'ต้นไม้ทอดเงายาว' }, { en: 'My shadow follows me.', th: 'เงาของฉันเดินตามฉัน' }] }, { en: 'low', th_hint: 'ลูกบอลอยู่ต่ำ', sentences: [{ en: 'The ball is on a low shelf.', th: 'ลูกบอลอยู่บนชั้นวางที่ต่ำ' }, { en: 'He spoke in a low voice.', th: 'เขาพูดด้วยน้ำเสียงที่เบา' }] }, { en: 'high', th_hint: 'ว่าวอยู่สูง', sentences: [{ en: 'The kite is flying high in the sky.', th: 'ว่าวกำลังลอยสูงอยู่บนท้องฟ้า' }, { en: 'That mountain is very high.', th: 'ภูเขาลูกนั้นสูงมาก' }] }, { en: 'morning', th_hint: 'พระอาทิตย์ขึ้นตอนเช้า', sentences: [{ en: 'I eat breakfast in the morning.', th: 'ฉันทานอาหารเช้าในตอนเช้า' }, { en: 'Good morning, teacher.', th: 'สวัสดีตอนเช้าค่ะ/ครับ คุณครู' }] }, { en: 'midday', th_hint: 'ทานอาหารตอนเที่ยง', sentences: [{ en: 'We have lunch at midday.', th: 'เราทานอาหารกลางวันตอนเที่ยง' }, { en: 'It is very hot at midday.', th: 'อากาศร้อนมากตอนเที่ยงวัน' }] }, { en: 'afternoon', th_hint: 'เด็กๆ เล่นตอนบ่าย', sentences: [{ en: 'I have a snack in the afternoon.', th: 'ฉันทานของว่างในตอนบ่าย' }, { en: 'Let\'s play this afternoon.', th: 'ไปเล่นกันเถอะตอนบ่ายนี้' }] }, { en: 'evening', th_hint: 'ดูดาวตอนเย็น', sentences: [{ en: 'We watch the stars in the evening.', th: 'เราดูดาวในตอนเย็น' }, { en: 'The sun sets in the evening.', th: 'พระอาทิตย์ตกในตอนเย็น' }] }, { en: 'night', th_hint: 'ดวงจันทร์ตอนกลางคืน', sentences: [{ en: 'The moon shines bright at night.', th: 'ดวงจันทร์ส่องสว่างในเวลากลางคืน' }, { en: 'I go to sleep at night.', th: 'ฉันเข้านอนตอนกลางคืน' }] }, ];
+        const stickers = [ { id: 1, name: 'สิงโต', emoji: '🦁' }, { id: 2, name: 'เสือ', emoji: '🐯' }, { id: 3, name: 'หมี', emoji: '🐻' }, { id: 4, name: 'แพนด้า', emoji: '🐼' }, { id: 5, name: 'จิ้งจอก', emoji: '🦊' }, { id: 6, name: 'แมว', emoji: '🐱' }, { id: 7, name: 'สุนัข', emoji: '🐶' }, { id: 8, name: 'หนู', emoji: '🐭' }, { id: 9, name: 'กระต่าย', emoji: '🐰' }, { id: 10, name: 'กบ', emoji: '🐸' }, { id: 11, name: 'ปลาหมึก', emoji: '🐙' }, { id: 12, name: 'ปู', emoji: '🦀' } ];
+        const themeMusic = { default: ['C4', 'E4', 'G4', 'B4'], space: ['A4', 'C5', 'E5', 'G5'], sea: ['D4', 'F4', 'A4', 'C5'], zoo: ['G3', 'B3', 'D4', 'F#4'] };
         const correctFeedbackPhrases = ['เก่งมากเลยจ้า!', 'ถูกต้องนะค้าบ!', 'เยี่ยมไปเลย!'];
         const incorrectFeedbackPhrases = ['อุ๊ย ผิดนิดเดียวเอง', 'ลองอีกทีนะ', 'ไม่เป็นไรนะ สู้ๆ'];
 
         // --- Game State ---
-        let currentWordIndex = -1;
-        let score = 0;
-        let playerName = '';
-        let highScores = [];
-        let isHintUsed = false;
-        let isMusicOn = true;
-        let synth, musicLoop;
-        let lastUserAnswer = '';
+        let currentWordIndex = -1, score = 0, playerName = '', highScores = [], collectedStickers = [], isHintUsed = false, isMusicOn = true, synth, musicLoop, lastUserAnswer = '', currentTheme = 'default', isReviewMode = false, currentGameWords = [], currentExampleSentence = {}, musicGain, sfxGain;
 
-        // --- Audio Functions ---
-        function initializeAudio() {
-            synth = new Tone.Synth({
-                oscillator: { type: 'sine' },
-                envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 }
-            }).toDestination();
-            
-            const musicNotes = ['C4', 'E4', 'G4', 'B4'];
-            let noteIndex = 0;
-            musicLoop = new Tone.Loop(time => {
-                synth.triggerAttackRelease(musicNotes[noteIndex % musicNotes.length], '8n', time);
-                noteIndex++;
-            }, '2n').start(0);
-        }
-
-        function speakText(text, lang = 'en-US') {
-            if (typeof SpeechSynthesisUtterance === 'undefined') {
-                console.warn('Web Speech API is not supported in this browser.');
-                return;
-            }
-            speechSynthesis.cancel(); 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            utterance.rate = 0.9;
-            speechSynthesis.speak(utterance);
-        }
-
-        function playSound(note, duration = '8n') {
-            if(synth) synth.triggerAttackRelease(note, duration);
-        }
-
-        function toggleMusic() {
-            isMusicOn = !isMusicOn;
-            if (isMusicOn) {
-                Tone.Transport.start();
-                musicOnIcon.classList.remove('hidden');
-                musicOffIcon.classList.add('hidden');
-            } else {
-                Tone.Transport.pause();
-                musicOnIcon.classList.add('hidden');
-                musicOffIcon.classList.remove('hidden');
-            }
-        }
+        // --- Audio & Theme ---
+        function initializeAudio() { if (synth) return; musicGain = new Tone.Gain(0.5).toDestination(); sfxGain = new Tone.Gain(0.8).toDestination(); synth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).connect(sfxGain); musicLoop = new Tone.Loop(time => { const notes = themeMusic[currentTheme] || themeMusic.default; const note = notes[Math.floor(Math.random() * notes.length)]; new Tone.Synth().toDestination().triggerAttackRelease(note, '8n', time).connect(musicGain); }, '1n').start(0); loadSettings(); }
+        function applyTheme(themeName) { document.body.className = `flex items-center justify-center min-h-screen p-4 sm:p-6 theme-${themeName}`; currentTheme = themeName; localStorage.setItem('funVocabTheme', themeName); allDOMElements.themeSelector.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn.dataset.theme === themeName)); }
         
-        // --- Animation Function ---
-        function createStarParticles() {
-            particleContainer.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                const x = (Math.random() - 0.5) * 400;
-                const y = (Math.random() - 0.5) * 400;
-                particle.style.setProperty('--x', `${x}px`);
-                particle.style.setProperty('--y', `${y}px`);
-                particleContainer.appendChild(particle);
+        // --- Settings ---
+        function loadSettings() {
+            const musicVol = localStorage.getItem('funVocabMusicVol') || 0.5;
+            const sfxVol = localStorage.getItem('funVocabSfxVol') || 0.8;
+            allDOMElements.musicVolumeSlider.value = musicVol;
+            allDOMElements.sfxVolumeSlider.value = sfxVol;
+            if (musicGain) musicGain.gain.value = musicVol;
+            if (sfxGain) sfxGain.gain.value = sfxVol;
+        }
+        function clearAllData() {
+            if (confirm('คุณแน่ใจหรือไม่ว่าจะล้างข้อมูลทั้งหมด? (คะแนน, สติกเกอร์, และคำที่เคยตอบผิดจะหายไปทั้งหมด)')) {
+                localStorage.removeItem('funVocabPlayerName');
+                localStorage.removeItem('funVocabTheme');
+                localStorage.removeItem('funVocabStickers');
+                localStorage.removeItem('funVocabIncorrectWords');
+                localStorage.removeItem('funVocabMusicVol');
+                localStorage.removeItem('funVocabSfxVol');
+                window.location.reload();
             }
         }
 
-        // --- High Score Functions (using Google Sheets API) ---
-        async function loadHighScores() {
-            try {
-                const response = await fetch(WEB_APP_URL);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
+        // --- Sticker Functions ---
+        function loadStickers() { const saved = localStorage.getItem('funVocabStickers'); collectedStickers = saved ? JSON.parse(saved) : []; }
+        function saveStickers() { localStorage.setItem('funVocabStickers', JSON.stringify(collectedStickers)); }
+        function awardSticker() {
+            const uncollected = stickers.filter(s => !collectedStickers.includes(s.id));
+            if (uncollected.length > 0) {
+                const newSticker = uncollected[Math.floor(Math.random() * uncollected.length)];
+                collectedStickers.push(newSticker.id);
+                saveStickers();
                 
-                if (Array.isArray(data)) {
-                    highScores = data;
-                } else {
-                    console.warn("Received non-array data from high scores API, treating as empty.", data);
-                    highScores = [];
+                allDOMElements.awardedStickerDisplay.textContent = newSticker.emoji;
+                allDOMElements.awardedStickerName.textContent = newSticker.name;
+                allDOMElements.stickerAwardModal.classList.remove('hidden');
+                // A simple particle effect for the award modal
+                allDOMElements.stickerAwardParticleContainer.innerHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const x = (Math.random() - 0.5) * 500;
+                    const y = (Math.random() - 0.5) * 500;
+                    p.style.setProperty('--x', `${x}px`);
+                    p.style.setProperty('--y', `${y}px`);
+                    allDOMElements.stickerAwardParticleContainer.appendChild(p);
                 }
-
-                renderHighScores(highScoresStart);
-                renderHighScores(highScoresEnd);
-            } catch (error) {
-                console.error('Failed to load high scores:', error);
-                highScoresStart.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>';
-                highScoresEnd.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>';
-                highScores = [];
             }
         }
+        function renderStickerBook() { allDOMElements.stickerGrid.innerHTML = ''; if (collectedStickers.length === 0) { allDOMElements.stickerGrid.innerHTML = '<p class="col-span-full text-center text-gray-500">ยังไม่มีสติกเกอร์เลย<br>เล่นเกมให้ได้ 3 ดาวเพื่อสะสมนะ!</p>'; return; } stickers.forEach(sticker => { const isCollected = collectedStickers.includes(sticker.id); const stickerEl = document.createElement('div'); stickerEl.className = `flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-300 ${isCollected ? 'bg-yellow-100' : 'bg-gray-200'}`; stickerEl.innerHTML = `<div class="text-5xl ${isCollected ? '' : 'opacity-20'}">${sticker.emoji}</div><span class="mt-2 text-sm font-semibold ${isCollected ? 'text-yellow-800' : 'text-gray-400'}">${isCollected ? sticker.name : '?'}</span>`; allDOMElements.stickerGrid.appendChild(stickerEl); }); }
 
-        async function saveHighScore(scoreData) {
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', 
-                    },
-                    body: JSON.stringify(scoreData)
-                });
-            } catch (error) {
-                console.error('Failed to save high score:', error);
+        // --- Core Game Logic ---
+        function updateMascot(state) { allDOMElements.dinoMascot.classList.remove('dino-happy', 'dino-sad'); if (state === 'happy') { allDOMElements.dinoMascot.classList.add('dino-happy'); } else if (state === 'sad') { allDOMElements.dinoMascot.classList.add('dino-sad'); } }
+        function speakText(text, lang = 'en-US') { if (typeof SpeechSynthesisUtterance === 'undefined') return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 0.9; speechSynthesis.speak(u); }
+        function playSound(note, duration = '8n') { if(synth) synth.triggerAttackRelease(note, duration); }
+        function toggleMusic() { isMusicOn = !isMusicOn; if (isMusicOn) { Tone.Transport.start(); allDOMElements.musicOnIcon.classList.remove('hidden'); allDOMElements.musicOffIcon.classList.add('hidden'); } else { Tone.Transport.pause(); allDOMElements.musicOnIcon.classList.add('hidden'); allDOMElements.musicOffIcon.classList.remove('hidden'); } }
+        function createStarParticles() { allDOMElements.particleContainer.innerHTML = ''; for (let i = 0; i < 20; i++) { const p = document.createElement('div'); p.className = 'particle'; const x = (Math.random() - 0.5) * 400; const y = (Math.random() - 0.5) * 400; p.style.setProperty('--x', `${x}px`); p.style.setProperty('--y', `${y}px`); allDOMElements.particleContainer.appendChild(p); } }
+        async function loadHighScores() { try { const r = await fetch(WEB_APP_URL); if (!r.ok) throw new Error('Network response was not ok'); const d = await r.json(); highScores = Array.isArray(d) ? d : []; renderHighScores(allDOMElements.highScoresStart); renderHighScores(allDOMElements.highScoresEnd); } catch (e) { console.error('Failed to load high scores:', e); allDOMElements.highScoresStart.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>'; allDOMElements.highScoresEnd.innerHTML = '<p class="text-red-500">ไม่สามารถโหลดคะแนนได้</p>'; highScores = []; } }
+        async function saveHighScore(d) { try { await fetch(WEB_APP_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(d) }); } catch (e) { console.error('Failed to save high score:', e); } }
+        function renderHighScores(c) { c.innerHTML = ''; if (!Array.isArray(highScores) || highScores.length === 0) { c.innerHTML = '<p class="text-gray-400">ยังไม่มีใครเล่นเลย!</p>'; return; } highScores.forEach((e, i) => { const s = document.createElement('div'); s.className = 'flex justify-between items-center p-2 rounded-lg hover:bg-purple-50'; s.innerHTML = `<div class="flex flex-col"><span class="font-semibold ${i === 0 ? 'text-purple-700' : 'text-gray-800'}">${i + 1}. ${e.name}</span><span class="text-xs text-gray-400">${e.date}</span></div><span class="font-bold text-lg ${i === 0 ? 'text-purple-700' : 'text-gray-600'}">${e.score} คะแนน</span>`; c.appendChild(s); }); }
+        function getIncorrectWords() { return JSON.parse(localStorage.getItem('funVocabIncorrectWords') || '[]'); }
+        function saveIncorrectWords(arr) { localStorage.setItem('funVocabIncorrectWords', JSON.stringify(arr)); }
+        function addIncorrectWord(word) { const incorrect = getIncorrectWords(); if (!incorrect.includes(word)) { incorrect.push(word); saveIncorrectWords(incorrect); } }
+        function removeIncorrectWord(word) { let incorrect = getIncorrectWords(); incorrect = incorrect.filter(w => w !== word); saveIncorrectWords(incorrect); }
+        function updateReviewButtonState() { const count = getIncorrectWords().length; allDOMElements.reviewModeBtn.disabled = count === 0; allDOMElements.reviewModeBtn.title = count > 0 ? `ทบทวนคำที่เคยตอบผิด (${count} คำ)` : 'ยังไม่มีคำที่ต้องทบทวน'; }
+
+        function startGame(mode = 'normal') {
+            isReviewMode = mode === 'review';
+            if (isReviewMode) {
+                const incorrect = getIncorrectWords();
+                if (incorrect.length === 0) { alert('เก่งมาก! ไม่มีคำที่ต้องทบทวนแล้วจ้า'); return; }
+                currentGameWords = words.filter(word => incorrect.includes(word.en));
+            } else {
+                currentGameWords = [...words];
             }
-        }
-
-        function renderHighScores(container) {
-            container.innerHTML = '';
-            if (!Array.isArray(highScores) || highScores.length === 0) {
-                container.innerHTML = '<p class="text-gray-400">ยังไม่มีใครเล่นเลย!</p>';
-                return;
-            }
-            highScores.forEach((entry, index) => {
-                const scoreElement = document.createElement('div');
-                scoreElement.className = 'flex justify-between items-center p-2 rounded-lg hover:bg-purple-50';
-                scoreElement.innerHTML = `
-                    <div class="flex flex-col">
-                        <span class="font-semibold ${index === 0 ? 'text-purple-700' : 'text-gray-800'}">${index + 1}. ${entry.name}</span>
-                        <span class="text-xs text-gray-400">${entry.date}</span>
-                    </div>
-                    <span class="font-bold text-lg ${index === 0 ? 'text-purple-700' : 'text-gray-600'}">${entry.score} คะแนน</span>
-                `;
-                container.appendChild(scoreElement);
-            });
-        }
-
-        // --- Game Flow Functions ---
-        function startGame() {
-            playerName = playerNameInput.value.trim() || 'ผู้เล่นนิรนาม';
+            playerName = allDOMElements.playerNameInput.value.trim() || 'ผู้เล่นนิรนาม';
             localStorage.setItem('funVocabPlayerName', playerName);
-            
             score = 0;
             currentWordIndex = -1;
-            
-            startScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-
-            scoreDisplay.textContent = score;
-            
-            Tone.start().then(() => {
-                if(!synth) initializeAudio();
-                if (isMusicOn) {
-                    Tone.Transport.start();
-                } else {
-                    Tone.Transport.pause();
-                }
-            });
-
+            allDOMElements.startScreen.classList.add('hidden');
+            allDOMElements.gameScreen.classList.remove('hidden');
+            allDOMElements.scoreDisplay.textContent = score;
+            Tone.start().then(() => { initializeAudio(); if (isMusicOn) Tone.Transport.start(); });
             nextQuestion();
         }
 
         function nextQuestion() {
+            updateMascot('neutral');
             currentWordIndex++;
-            if (currentWordIndex >= words.length) {
-                endGame();
-                return;
-            }
-
+            if (currentWordIndex >= currentGameWords.length) { endGame(); return; }
             isHintUsed = false;
-            answerInput.value = '';
-            answerInput.placeholder = 'พิมพ์คำตอบที่นี่';
-            answerInput.disabled = false;
-            submitAnswerBtn.disabled = false;
-            hintBtn.disabled = false;
-            userAnswerFeedback.classList.add('hidden'); // Hide user answer feedback
-            
-            const currentWord = words[currentWordIndex];
-            const progress = ((currentWordIndex + 1) / words.length) * 100;
-            progressBar.style.width = `${progress}%`;
-            
-            wordImage.src = `https://placehold.co/600x400/e9d5ff/4c1d95?text=${encodeURIComponent(currentWord.th_hint)}`;
-            wordImage.alt = currentWord.th_hint;
-            
-            wordImage.classList.add('animate-wobble');
-            wordImage.addEventListener('animationend', () => {
-                wordImage.classList.remove('animate-wobble');
-            }, { once: true });
-
+            ['answerInput', 'submitAnswerBtn', 'hintBtn'].forEach(el => allDOMElements[el].disabled = false);
+            allDOMElements.answerInput.value = '';
+            allDOMElements.answerInput.placeholder = 'พิมพ์คำตอบที่นี่';
+            allDOMElements.userAnswerFeedback.classList.add('hidden');
+            const currentWord = currentGameWords[currentWordIndex];
+            allDOMElements.progressBar.style.width = `${((currentWordIndex + 1) / currentGameWords.length) * 100}%`;
+            allDOMElements.wordImage.src = `https://placehold.co/600x400/e9d5ff/4c1d95?text=${encodeURIComponent(currentWord.th_hint)}`;
+            allDOMElements.wordImage.alt = currentWord.th_hint;
+            allDOMElements.wordImage.classList.add('animate-wobble');
+            allDOMElements.wordImage.addEventListener('animationend', () => allDOMElements.wordImage.classList.remove('animate-wobble'), { once: true });
             setTimeout(() => speakText(currentWord.en), 500);
         }
         
         function checkAnswer() {
-            const userAnswer = answerInput.value.trim().toLowerCase();
-            lastUserAnswer = userAnswer; // Store user's answer
-            const correctAnswer = words[currentWordIndex].en;
-            
-            answerInput.disabled = true;
-            submitAnswerBtn.disabled = true;
-            hintBtn.disabled = true;
-
-            let isCorrect = userAnswer === correctAnswer;
-
+            const userAnswer = allDOMElements.answerInput.value.trim().toLowerCase();
+            lastUserAnswer = userAnswer;
+            const correctAnswer = currentGameWords[currentWordIndex].en;
+            ['answerInput', 'submitAnswerBtn', 'hintBtn'].forEach(el => allDOMElements[el].disabled = true);
+            const isCorrect = userAnswer === correctAnswer;
             if (isCorrect) {
                 playSound('C5');
-                const randomCorrectPhrase = correctFeedbackPhrases[Math.floor(Math.random() * correctFeedbackPhrases.length)];
-                setTimeout(() => speakText(randomCorrectPhrase, 'th-TH'), 200);
+                const phrase = correctFeedbackPhrases[Math.floor(Math.random() * correctFeedbackPhrases.length)];
+                setTimeout(() => speakText(phrase, 'th-TH'), 200);
                 createStarParticles();
-                feedbackTitle.textContent = 'ถูกต้อง!';
-                feedbackTitle.className = 'text-3xl sm:text-4xl font-bold mb-4 text-green-500';
-                userAnswerFeedback.classList.add('hidden'); // Ensure it's hidden on correct
-                if (!isHintUsed) {
-                    score++;
-                }
+                updateMascot('happy');
+                allDOMElements.feedbackTitle.textContent = 'ถูกต้อง!';
+                allDOMElements.feedbackTitle.className = 'text-3xl sm:text-4xl font-bold mb-4 text-green-500';
+                allDOMElements.userAnswerFeedback.classList.add('hidden');
+                if (!isHintUsed) score++;
+                if (isReviewMode) removeIncorrectWord(correctAnswer);
             } else {
                 playSound('C3', '4n');
-                const randomIncorrectPhrase = incorrectFeedbackPhrases[Math.floor(Math.random() * incorrectFeedbackPhrases.length)];
-                setTimeout(() => speakText(randomIncorrectPhrase, 'th-TH'), 200);
-                feedbackTitle.textContent = `ผิดจ้า! คำตอบคือ: ${correctAnswer}`;
-                feedbackTitle.className = 'text-2xl sm:text-3xl font-bold mb-4 text-red-500';
-                
-                // Show the incorrect answer
-                userAnswerDisplay.textContent = lastUserAnswer || '(ไม่ได้ตอบ)';
-                userAnswerFeedback.classList.remove('hidden');
-
-                if (score > 0) {
-                    score--;
-                }
+                const phrase = incorrectFeedbackPhrases[Math.floor(Math.random() * incorrectFeedbackPhrases.length)];
+                setTimeout(() => speakText(phrase, 'th-TH'), 200);
+                updateMascot('sad');
+                allDOMElements.feedbackTitle.textContent = `ผิดจ้า! คำตอบคือ: ${correctAnswer}`;
+                allDOMElements.feedbackTitle.className = 'text-2xl sm:text-3xl font-bold mb-4 text-red-500';
+                allDOMElements.userAnswerDisplay.textContent = lastUserAnswer || '(ไม่ได้ตอบ)';
+                allDOMElements.userAnswerFeedback.classList.remove('hidden');
+                if (!isReviewMode) addIncorrectWord(correctAnswer);
             }
-            
-            scoreDisplay.textContent = score;
+            allDOMElements.scoreDisplay.textContent = score;
             showFeedbackModal();
         }
 
         function showFeedbackModal() {
-            const currentWord = words[currentWordIndex];
-            exampleSentenceEn.textContent = currentWord.sentence_en;
-            exampleSentenceTh.textContent = currentWord.sentence_th;
-            
-            feedbackModal.classList.remove('hidden');
+            const currentWord = currentGameWords[currentWordIndex];
+            const sentences = currentWord.sentences;
+            const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
+            currentExampleSentence = randomSentence;
+            allDOMElements.exampleSentenceEn.textContent = currentExampleSentence.en;
+            allDOMElements.exampleSentenceTh.textContent = currentExampleSentence.th;
+            allDOMElements.feedbackModal.classList.remove('hidden');
         }
 
         function useHint() {
             if (isHintUsed) return;
             isHintUsed = true;
             playSound('E5', '16n');
-            const firstLetter = words[currentWordIndex].en.charAt(0);
-            answerInput.value = firstLetter;
-            hintBtn.disabled = true;
-            answerInput.focus();
+            allDOMElements.answerInput.value = currentGameWords[currentWordIndex].en.charAt(0);
+            allDOMElements.hintBtn.disabled = true;
+            allDOMElements.answerInput.focus();
         }
 
         async function endGame() {
-            if (Tone.Transport.state === 'started') {
-                Tone.Transport.stop();
-            }
+            if (Tone.Transport.state === 'started') Tone.Transport.stop();
+            allDOMElements.gameScreen.classList.add('hidden');
+            allDOMElements.endScreen.classList.remove('hidden');
+            updateReviewButtonState();
             
-            gameScreen.classList.add('hidden');
-            endScreen.classList.remove('hidden');
+            allDOMElements.shareBtn.style.display = 'none'; // Hide share button by default
+            if (isReviewMode) {
+                allDOMElements.endMessage.textContent = 'ทบทวนเสร็จแล้ว เยี่ยมมาก!';
+                allDOMElements.finalScore.textContent = `ตอบถูก ${score}/${currentGameWords.length} คำ`;
+                allDOMElements.starRating.innerHTML = '';
+                return;
+            }
 
-            const finalPercentage = score / words.length;
-            let stars = '';
+            allDOMElements.shareBtn.style.display = 'block'; // Show for normal mode
+            const finalPercentage = score / currentGameWords.length;
+            let stars = 0;
             let message = '';
             let endSpeech = '';
-
-            if (finalPercentage >= 0.8) {
-                stars = '⭐⭐⭐';
-                message = 'เก่งมากเลย!';
-                endSpeech = 'สุดยอดไปเลย! ได้สามดาวแน่ะ';
-            } else if (finalPercentage >= 0.5) {
-                stars = '⭐⭐';
-                message = 'เยี่ยมไปเลย!';
-                endSpeech = 'เก่งมากจ้ะ! ได้ตั้งสองดาว';
-            } else {
-                stars = '⭐';
-                message = 'พยายามอีกหน่อยนะ!';
-                endSpeech = 'พยายามได้ดีมากเลยนะ!';
-            }
-            
-            starRating.innerHTML = stars.replace(/⭐/g, '<span class="star-filled">⭐</span>').padEnd(9, '<span class="star-empty">⭐</span>');
-            endMessage.textContent = message;
-            finalScore.textContent = `คะแนนของคุณ: ${score}/${words.length}`;
-            
+            if (finalPercentage >= 0.8) { stars = 3; message = 'เก่งมากเลย!'; endSpeech = 'สุดยอดไปเลย! ได้สามดาวแน่ะ'; }
+            else if (finalPercentage >= 0.5) { stars = 2; message = 'เยี่ยมไปเลย!'; endSpeech = 'เก่งมากจ้ะ! ได้ตั้งสองดาว'; }
+            else { stars = 1; message = 'พยายามอีกหน่อยนะ!'; endSpeech = 'พยายามได้ดีมากเลยนะ!'; }
+            allDOMElements.starRating.innerHTML = '⭐'.repeat(stars).padEnd(3, '☆').replace(/⭐/g, '<span class="star-filled">⭐</span>').replace(/☆/g, '<span class="star-empty">☆</span>');
+            allDOMElements.endMessage.textContent = message;
+            allDOMElements.finalScore.textContent = `คะแนนของคุณ: ${score}/${currentGameWords.length}`;
             setTimeout(() => speakText(endSpeech, 'th-TH'), 500);
-
-            const today = new Date();
-            const utcTimestamp = today.toISOString();
-            
+            if (stars === 3) awardSticker();
+            const utcTimestamp = new Date().toISOString();
             const scoreData = { name: playerName, score: score, timestamp: utcTimestamp };
             await saveHighScore(scoreData);
-            await loadHighScores(); // Reload scores to show the latest
+            await loadHighScores();
+        }
+
+        function shareResult() {
+            const shareText = `เราได้ ${score}/${currentGameWords.length} คะแนนในเกมทายศัพท์หรรษา! มาเล่นด้วยกันนะ! ${window.location.href}`;
+            const textArea = document.createElement("textarea");
+            textArea.value = shareText;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('คัดลอกข้อความสำหรับแชร์แล้ว!');
+            } catch (err) {
+                console.error('ไม่สามารถคัดลอกได้', err);
+            }
+            document.body.removeChild(textArea);
         }
 
         // --- Event Listeners ---
-        startGameBtn.addEventListener('click', startGame);
-        
-        playAgainBtn.addEventListener('click', async () => {
-            endScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            highScoresStart.innerHTML = `<div class="flex justify-center items-center py-4">
-                        <svg class="animate-spin h-8 w-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-500">กำลังโหลดคะแนน...</span>
-                    </div>`;
+        allDOMElements.startGameBtn.addEventListener('click', () => startGame('normal'));
+        allDOMElements.reviewModeBtn.addEventListener('click', () => startGame('review'));
+        allDOMElements.playAgainBtn.addEventListener('click', async () => {
+            allDOMElements.endScreen.classList.add('hidden');
+            allDOMElements.startScreen.classList.remove('hidden');
+            allDOMElements.highScoresStart.innerHTML = `<div class="flex justify-center items-center py-4"><svg class="animate-spin h-8 w-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="ml-3 text-gray-500">กำลังโหลดคะแนน...</span></div>`;
             await loadHighScores();
         });
-
-        submitAnswerBtn.addEventListener('click', checkAnswer);
-        answerInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                checkAnswer();
-            }
-        });
-
-        hintBtn.addEventListener('click', useHint);
-        replayWordAudioBtn.addEventListener('click', () => {
-            speakText(words[currentWordIndex].en);
-        });
-        replaySentenceAudioBtn.addEventListener('click', () => {
-            speakText(words[currentWordIndex].sentence_en);
-        });
+        allDOMElements.submitAnswerBtn.addEventListener('click', checkAnswer);
+        allDOMElements.answerInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') checkAnswer(); });
+        allDOMElements.hintBtn.addEventListener('click', useHint);
+        allDOMElements.replayWordAudioBtn.addEventListener('click', () => speakText(currentGameWords[currentWordIndex].en));
+        allDOMElements.replaySentenceAudioBtn.addEventListener('click', () => speakText(currentExampleSentence.en));
+        allDOMElements.musicToggleBtn.addEventListener('click', toggleMusic);
+        allDOMElements.nextQuestionBtn.addEventListener('click', () => { allDOMElements.feedbackModal.classList.add('hidden'); nextQuestion(); });
+        allDOMElements.themeSelector.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') applyTheme(e.target.dataset.theme); });
+        allDOMElements.stickerBookBtn.addEventListener('click', () => { renderStickerBook(); allDOMElements.stickerBookModal.classList.remove('hidden'); });
+        allDOMElements.closeStickerBookBtn.addEventListener('click', () => { allDOMElements.stickerBookModal.classList.add('hidden'); });
+        allDOMElements.settingsBtn.addEventListener('click', () => allDOMElements.settingsModal.classList.remove('hidden'));
+        allDOMElements.closeSettingsBtn.addEventListener('click', () => allDOMElements.settingsModal.classList.add('hidden'));
+        allDOMElements.musicVolumeSlider.addEventListener('input', (e) => { if(musicGain) musicGain.gain.value = e.target.value; localStorage.setItem('funVocabMusicVol', e.target.value); });
+        allDOMElements.sfxVolumeSlider.addEventListener('input', (e) => { if(sfxGain) sfxGain.gain.value = e.target.value; localStorage.setItem('funVocabSfxVol', e.target.value); });
+        allDOMElements.clearDataBtn.addEventListener('click', clearAllData);
+        allDOMElements.shareBtn.addEventListener('click', shareResult);
+        allDOMElements.closeStickerAwardBtn.addEventListener('click', () => allDOMElements.stickerAwardModal.classList.add('hidden'));
         
-        musicToggleBtn.addEventListener('click', toggleMusic);
-
-        nextQuestionBtn.addEventListener('click', () => {
-            feedbackModal.classList.add('hidden');
-            nextQuestion();
-        });
-
         // --- Initial Load ---
         window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('funVocabPlayerName');
-            if (savedName) {
-                playerNameInput.value = savedName;
-            }
-            
+            if (savedName) allDOMElements.playerNameInput.value = savedName;
+            const savedTheme = localStorage.getItem('funVocabTheme') || 'default';
+            applyTheme(savedTheme);
+            loadStickers();
+            updateReviewButtonState();
+            allDOMElements.highScoresStart.innerHTML = `<div class="flex justify-center items-center py-4"><svg class="animate-spin h-8 w-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="ml-3 text-gray-500">กำลังโหลดคะแนน...</span></div>`;
             await loadHighScores();
-            musicOnIcon.classList.remove('hidden');
-            musicOffIcon.classList.add('hidden');
+            allDOMElements.musicOnIcon.classList.remove('hidden');
+            allDOMElements.musicOffIcon.classList.add('hidden');
         });
 
     </script>
