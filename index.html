@@ -13,8 +13,138 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Tone.js for audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #fdf2f8; /* pink-50 */
+            --primary-color: #d8b4fe; /* purple-300 */
+            --primary-hover-color: #c084fc; /* purple-400 */
+            --primary-text-color: #581c87; /* purple-900 */
+            --container-bg: white;
+            --progress-bar-bg: #e9d5ff; /* purple-200 */
+            --progress-bar-fill: #a855f7; /* purple-500 */
+        }
+
+        .theme-space {
+            --bg-color: #1e293b; /* slate-800 */
+            --primary-color: #facc15; /* yellow-400 */
+            --primary-hover-color: #fde047; /* yellow-300 */
+            --primary-text-color: #1e293b; /* slate-800 */
+            --container-bg: #334155; /* slate-700 */
+            --progress-bar-bg: #475569; /* slate-600 */
+            --progress-bar-fill: #facc15; /* yellow-400 */
+        }
+        .theme-sea {
+            --bg-color: #ecfeff; /* cyan-50 */
+            --primary-color: #67e8f9; /* cyan-300 */
+            --primary-hover-color: #22d3ee; /* cyan-400 */
+            --primary-text-color: #164e63; /* cyan-900 */
+            --container-bg: white;
+            --progress-bar-bg: #a5f3fc; /* cyan-200 */
+            --progress-bar-fill: #06b6d4; /* cyan-500 */
+        }
+        .theme-zoo {
+            --bg-color: #f0fdf4; /* green-50 */
+            --primary-color: #fdba74; /* orange-300 */
+            --primary-hover-color: #fb923c; /* orange-400 */
+            --primary-text-color: #7c2d12; /* orange-900 */
+            --container-bg: white;
+            --progress-bar-bg: #d9f99d; /* lime-200 */
+            --progress-bar-fill: #84cc16; /* lime-500 */
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-color);
+            transition: background-color 0.5s ease;
+            overflow: hidden;
+        }
+        .game-container, .modal-content {
+            background: var(--container-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+        }
+        .btn:disabled {
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--primary-text-color);
+            font-weight: 600;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover-color);
+        }
+        .progress-bar {
+            background-color: var(--progress-bar-bg);
+            overflow: hidden;
+        }
+        .progress-bar-inner {
+            background-color: var(--progress-bar-fill);
+            transition: width 0.5s ease-in-out;
+            position: relative;
+        }
+        .progress-bar-inner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        #dino-mascot { transition: all 0.3s ease; }
+        .dino-happy { transform: translateY(-10px) rotate(5deg) scale(1.05); }
+        .dino-sad { transform: translateY(5px) rotate(-2deg) scale(0.95); }
+        #dino-mascot .eye { transition: all 0.2s ease; }
+        .dino-sad #dino-mascot .eye { transform: scaleY(0.1) translateY(10px); }
+        
+        .dino-body path { transition: fill 0.3s ease; }
+
+        @keyframes bounce-in { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        .modal-content { animation: bounce-in 0.4s ease-out; }
+
+        .theme-selector-btn.active { transform: scale(1.1); box-shadow: 0 0 0 3px var(--primary-color); }
+        
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; margin-top: -8px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        input[type=range]::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
+        input[type=range]::-moz-range-thumb { height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; }
+
+        .particle { position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; background: #facc15; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); animation: fly-out 1.2s ease-out forwards; }
+        @keyframes fly-out { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
+
+        #background-animations { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-anim { position: absolute; animation-iteration-count: infinite; animation-timing-function: linear; }
+        .shooting-star { width: 2px; height: 80px; background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent); animation-name: fall; }
+        .bubble { width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); animation-name: rise; }
+        .leaf { width: 25px; height: 25px; background-color: #4ade80; border-radius: 0 50% 0 50%; animation-name: fall-rotate; }
+        @keyframes fall { 0% { transform: translateY(-100px) translateX(var(--x-start)); } 100% { transform: translateY(100vh) translateX(var(--x-end)); } }
+        @keyframes rise { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+        @keyframes fall-rotate { 0% { transform: translateY(-100px) rotate(0deg); } 100% { transform: translateY(100vh) rotate(720deg); } }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+        .shake { animation: shake 0.5s ease-in-out; }
+    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
 
