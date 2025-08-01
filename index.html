@@ -21,8 +21,12 @@
     <div id="main-container" class="w-full max-w-lg">
 
         <!-- Start Screen -->
-        <div id="start-screen" class="game-container text-center p-6 sm:p-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-2">เกมทายศัพท์หรรษา</h1>
+        <div id="start-screen" class="game-container relative text-center p-6 sm:p-8">
+            <button id="settings-btn" class="absolute top-4 right-4 p-3 rounded-full btn bg-gray-200 text-gray-600 hover:bg-gray-300" title="ตั้งค่า">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+            
+            <h1 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-2 mt-8 sm:mt-0">เกมทายศัพท์หรรษา</h1>
             <p class="text-gray-500 mb-4">เลือกธีมที่ชอบ แล้วมาสนุกกัน!</p>
             
             <div id="theme-selector" class="flex justify-center gap-4 my-6">
@@ -37,11 +41,12 @@
                 <input type="text" id="player-name" class="w-full p-3 border-2 border-purple-200 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-lg">
             </div>
 
-            <div class="flex gap-2">
+            <div class="space-y-3">
                 <button id="start-game-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl">เริ่มเกม!</button>
-                <button id="review-mode-btn" class="p-3 rounded-lg btn bg-blue-300 text-blue-800" title="ทบทวนคำที่เคยตอบผิด">🧠</button>
-                <button id="sticker-book-btn" class="p-3 rounded-lg btn bg-yellow-300 text-yellow-800" title="สมุดสะสมสติกเกอร์">📒</button>
-                <button id="settings-btn" class="p-3 rounded-lg btn bg-gray-300 text-gray-800" title="ตั้งค่า">⚙️</button>
+                <div class="flex gap-3">
+                    <button id="review-mode-btn" class="w-full py-3 rounded-lg btn bg-blue-300 text-blue-800 flex items-center justify-center gap-2">🧠<span class="hidden sm:inline">ทบทวน</span></button>
+                    <button id="sticker-book-btn" class="w-full py-3 rounded-lg btn bg-yellow-300 text-yellow-800 flex items-center justify-center gap-2">📒<span class="hidden sm:inline">สติกเกอร์</span></button>
+                </div>
             </div>
 
             <div class="mt-8">
