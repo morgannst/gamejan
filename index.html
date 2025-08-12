@@ -3,331 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมทายศัพท์หรรษา</title>
-    
-    <!-- Google Fonts (Kanit for a friendly look) -->
+    <title>เกมทายศัพท์อังกฤษแสนสนุก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tone.js for audio -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #fdf2f8; /* pink-50 */
-            --primary-color: #d8b4fe; /* purple-300 */
-            --primary-hover-color: #c084fc; /* purple-400 */
-            --primary-text-color: #581c87; /* purple-900 */
-            --container-bg: white;
-            --progress-bar-bg: #e9d5ff; /* purple-200 */
-            --progress-bar-fill: #a855f7; /* purple-500 */
-        }
-
-        .theme-space {
-            --bg-color: #1e293b; /* slate-800 */
-            --primary-color: #facc15; /* yellow-400 */
-            --primary-hover-color: #fde047; /* yellow-300 */
-            --primary-text-color: #1e293b; /* slate-800 */
-            --container-bg: #334155; /* slate-700 */
-            --progress-bar-bg: #475569; /* slate-600 */
-            --progress-bar-fill: #facc15; /* yellow-400 */
-        }
-        .theme-sea {
-            --bg-color: #ecfeff; /* cyan-50 */
-            --primary-color: #67e8f9; /* cyan-300 */
-            --primary-hover-color: #22d3ee; /* cyan-400 */
-            --primary-text-color: #164e63; /* cyan-900 */
-            --container-bg: white;
-            --progress-bar-bg: #a5f3fc; /* cyan-200 */
-            --progress-bar-fill: #06b6d4; /* cyan-500 */
-        }
-        .theme-zoo {
-            --bg-color: #f0fdf4; /* green-50 */
-            --primary-color: #fdba74; /* orange-300 */
-            --primary-hover-color: #fb923c; /* orange-400 */
-            --primary-text-color: #7c2d12; /* orange-900 */
-            --container-bg: white;
-            --progress-bar-bg: #d9f99d; /* lime-200 */
-            --progress-bar-fill: #84cc16; /* lime-500 */
-        }
-
         body {
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--bg-color);
-            transition: background-color 0.5s ease;
-            overflow: hidden;
+            font-family: 'Itim', cursive;
+            background: linear-gradient(135deg, #fce7f3, #e9d5ff);
         }
-        .game-container, .modal-content {
-            background: var(--container-bg);
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            width: 100%;
-            transition: all 0.3s ease-in-out;
+        .card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
         .btn {
+            color: white;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: none;
+            cursor: pointer;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
         .btn:active {
-            transform: translateY(-1px) scale(0.98);
-            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .btn:disabled {
-            filter: grayscale(80%);
+            opacity: 0.6;
             cursor: not-allowed;
-            opacity: 0.7;
+            transform: translateY(0);
         }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--primary-text-color);
-            font-weight: 600;
+        .btn-pink { background-color: #f472b6; }
+        .btn-purple { background-color: #c084fc; }
+        .btn-green { background-color: #34d399; }
+        .btn-blue { background-color: #60a5fa; }
+
+        .correct-animation { animation: correct 0.5s ease-in-out; }
+        @keyframes correct {
+            50% { transform: scale(1.1); color: #10b981; }
         }
-        .btn-primary:hover:not(:disabled) {
-            background-color: var(--primary-hover-color);
+        .incorrect-animation { animation: incorrect 0.5s ease-in-out; }
+        @keyframes incorrect {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
-        .progress-bar {
-            background-color: var(--progress-bar-bg);
-            overflow: hidden;
+        .svg-icon {
+            width: 100%; height: 100%; max-width: 180px; max-height: 180px;
+            margin: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
         }
-        .progress-bar-inner {
-            background-color: var(--progress-bar-fill);
-            transition: width 0.5s ease-in-out;
-            position: relative;
+        #confetti-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 100;
         }
-        .progress-bar-inner::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-            animation: shimmer 2s infinite;
+        #score-container {
+            position: absolute; top: 16px; right: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: #ec4899;
         }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        #dino-mascot { transition: all 0.3s ease; }
-        .dino-happy { transform: translateY(-10px) rotate(5deg) scale(1.05); }
-        .dino-sad { transform: translateY(5px) rotate(-2deg) scale(0.95); }
-        #dino-mascot .eye { transition: all 0.2s ease; }
-        .dino-sad #dino-mascot .eye { transform: scaleY(0.1) translateY(10px); }
-        
-        .dino-body path { transition: fill 0.3s ease; }
-
-        @keyframes bounce-in { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .modal-content { animation: bounce-in 0.4s ease-out; }
-
-        .theme-selector-btn.active { transform: scale(1.1); box-shadow: 0 0 0 3px var(--primary-color); }
-        
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; margin-top: -8px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        input[type=range]::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: var(--progress-bar-bg); border-radius: 5px; }
-        input[type=range]::-moz-range-thumb { height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer; }
-
-        .particle { position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; background: #facc15; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); animation: fly-out 1.2s ease-out forwards; }
-        @keyframes fly-out { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
-
-        #background-animations { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .bg-anim { position: absolute; animation-iteration-count: infinite; animation-timing-function: linear; }
-        .shooting-star { width: 2px; height: 80px; background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent); animation-name: fall; }
-        .bubble { width: 20px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); animation-name: rise; }
-        .leaf { width: 25px; height: 25px; background-color: #4ade80; border-radius: 0 50% 0 50%; animation-name: fall-rotate; }
-        @keyframes fall { 0% { transform: translateY(-100px) translateX(var(--x-start)); } 100% { transform: translateY(100vh) translateX(var(--x-end)); } }
-        @keyframes rise { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
-        @keyframes fall-rotate { 0% { transform: translateY(-100px) rotate(0deg); } 100% { transform: translateY(100vh) rotate(720deg); } }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
-        .shake { animation: shake 0.5s ease-in-out; }
+        #score-heart {
+            width: 70px; height: 70px;
+            position: absolute; z-index: 1;
+            fill: #fdf2f8;
+            stroke: #fce7f3;
+            stroke-width: 2px;
+        }
+        #score {
+            position: relative; z-index: 2; font-size: 1.5rem;
+            font-weight: bold;
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-gray-700">
 
-    <div id="background-animations"></div>
-
-    <div id="main-container" class="w-full max-w-lg z-10">
-
-        <!-- Start Screen -->
-        <div id="start-screen" class="game-container relative text-center p-6 sm:p-8">
-            <button id="settings-btn" class="absolute top-4 right-4 p-3 rounded-full btn bg-gray-200 text-gray-600 hover:bg-gray-300" title="ตั้งค่า">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            </button>
-            
-            <h1 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-2 mt-8 sm:mt-0">เกมทายศัพท์หรรษา</h1>
-            <p class="text-gray-500 mb-4">เลือกธีมที่ชอบ แล้วมาสนุกกัน!</p>
-            
-            <div id="theme-selector" class="flex justify-center gap-4 my-6">
-                <button class="theme-selector-btn p-3 rounded-full bg-pink-200 border-2 border-transparent" data-theme="default" title="ธีมปกติ">🌸</button>
-                <button class="theme-selector-btn p-3 rounded-full bg-indigo-900 border-2 border-transparent" data-theme="space" title="ธีมอวกาศ">🚀</button>
-                <button class="theme-selector-btn p-3 rounded-full bg-cyan-200 border-2 border-transparent" data-theme="sea" title="ธีมใต้ทะเล">🐠</button>
-                <button class="theme-selector-btn p-3 rounded-full bg-green-500 border-2 border-transparent" data-theme="zoo" title="ธีมสวนสัตว์">🦁</button>
-            </div>
-
-            <div class="mb-4">
-                <label for="player-name" class="block text-left text-gray-700 mb-1">ใส่ชื่อของคุณ:</label>
-                <input type="text" id="player-name" class="w-full p-3 border-2 border-purple-200 rounded-lg focus:ring-purple-500 focus:border-purple-500 text-lg">
-            </div>
-
-            <div class="space-y-3">
-                <button id="start-game-btn" class="w-full py-3 px-6 rounded-lg btn btn-primary text-xl">เริ่มเกม!</button>
-                <div class="flex gap-3">
-                    <button id="review-mode-btn" class="w-full py-3 rounded-lg btn bg-blue-300 text-blue-800 flex items-center justify-center gap-2">🧠<span class="hidden sm:inline">ทบทวน</span></button>
-                    <button id="sticker-book-btn" class="w-full py-3 rounded-lg btn bg-yellow-300 text-yellow-800 flex items-center justify-center gap-2">📒<span class="hidden sm:inline">สติกเกอร์</span></button>
-                </div>
-            </div>
-
-            <div class="mt-8">
-                <h2 class="text-xl sm:text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
-                <div id="high-scores-start" class="space-y-2 text-left"></div>
-            </div>
+    <div id="start-container" class="card w-full max-w-md p-8 rounded-2xl text-center">
+        <h1 class="text-5xl font-bold text-pink-500 mb-4">เกมทายศัพท์แสนสนุก</h1>
+        <h2 class="text-2xl mb-8">เลือกระดับความยากได้เลยจ้า</h2>
+        <div class="flex flex-col gap-4">
+            <button id="easy-btn" class="btn btn-green">ง่าย (มีรูปภาพ)</button>
+            <button id="hard-btn" class="btn btn-blue">ยาก (ไม่มีรูปภาพ)</button>
         </div>
-
-        <!-- Game Screen -->
-        <div id="game-screen" class="game-container hidden p-6 sm:p-8">
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-xl sm:text-2xl font-bold text-purple-700 w-1/3 text-left">คะแนน: <span id="score">0</span></div>
-                <div id="question-counter" class="text-xl sm:text-2xl font-bold text-gray-500 w-1/3 text-center"></div>
-                <div class="w-1/3 flex justify-end">
-                    <button id="music-toggle-btn" class="p-3 rounded-full hover:bg-purple-100">
-                        <svg id="music-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /></svg>
-                        <svg id="music-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15.586a1 1 0 01.02-1.413l7.414-7.414a1 1 0 011.414 0l.02.02a1 1 0 010 1.414l-7.414 7.414a1 1 0 01-1.414-.02zM9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-12v10c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /><line x1="1" y1="1" x2="23" y2="23" stroke-width="2.5" /></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex justify-center h-24 my-2">
-                <div id="dino-container" class="relative w-28 h-28">
-                    <svg id="dino-mascot" viewBox="0 0 100 100" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full">
-                        <g class="dino-body">
-                            <path d="M63.2,73.4c-3.1-1.2-6.5-1-9.5,0.5c-3,1.5-5.6,4.1-7.3,7.2c-0.6,1.1-1,2.3-1.4,3.5c-0.4,1.2-1.2,2.9-2.5,3.2 c-1.3,0.3-2.6-0.7-3.2-1.9c-0.6-1.2-0.6-2.6,0-3.8c1.1-2.3,2.8-4.3,4.9-5.8c4.2-3,9.5-4.5,14.7-3.4c5.2,1.1,9.8,4.5,12.8,8.8 c1.5,2.1,2.4,4.6,2.8,7.1c0.1,1.4-0.8,2.7-2.1,2.9c-1.3,0.2-2.6-0.6-2.9-1.9C71.3,84.4,68.4,76.5,63.2,73.4z" fill="#A3E635"/>
-                            <path d="M98.9,58.3c-0.1-0.1-0.1-0.2-0.2-0.3c-2-2.5-4.6-4.4-7.5-5.6c-5.7-2.3-12.1-1-17.1,3.2 c-0.1,0.1-0.2,0.2-0.3,0.2c-0.8,0.7-1.5,1.5-2.2,2.3c-4.4,5.4-6,12.5-4.4,19.3c0.1,0.4,0.2,0.8,0.4,1.2c1.3,3.7,3.9,6.7,7.3,8.4 c0.5,0.2,1,0.4,1.5,0.6c7.5,2.9,15.8,0.4,20.8-6.1c0.1-0.1,0.1-0.2,0.2-0.3c4.9-6.4,6.2-14.5,3.4-21.6 C99.9,59.9,99.5,59.1,98.9,58.3z" fill="#84CC16"/>
-                            <path d="M68.7,56.7c-0.7,0-1.4-0.1-2.1-0.2c-0.8-0.2-1.6-0.4-2.4-0.7c-2.4-0.9-4.6-2.4-6.4-4.3 c-2-2.1-3.4-4.7-4.1-7.6c-0.1-0.5-0.2-1-0.3-1.5c-0.4-2.5-0.1-5.1,0.9-7.5c1-2.4,2.6-4.5,4.7-6.1c4.2-3.2,9.8-4.2,14.9-2.6 c5.1,1.6,9.1,5.3,11,10.2c0.3,0.7,0.5,1.4,0.7,2.1c1.2,4.1,0.7,8.6-1.4,12.4c-2.1,3.8-5.6,6.6-9.8,7.6 C71.3,56.5,70,56.7,68.7,56.7z" fill="#A3E635"/>
-                            <path d="M34.3,71.2c-0.9,0-1.8-0.1-2.7-0.2c-5.9-0.9-11.1-4.7-13.8-9.9c-2.7-5.2-2.4-11.3,0.7-16.2 c3.1-4.9,8.4-8.1,14.2-8.4c5.8-0.3,11.4,2.1,15,6.5c3.6,4.4,4.8,10.2,3.2,15.5c-1.6,5.3-5.8,9.4-11.2,11.1 C38.1,70.9,36.2,71.2,34.3,71.2z" fill="#A3E635"/>
-                        </g>
-                        <circle class="eye" cx="70.5" cy="41.9" r="3.5" fill="#1E293B"/>
-                        <circle class="eye" cx="34.5" cy="56.9" r="3.5" fill="#1E293B"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="w-full progress-bar rounded-full h-4 mb-4">
-                <div id="progress-bar" class="progress-bar-inner h-4 rounded-full" style="width: 0%"></div>
-            </div>
-
-            <div class="text-center space-y-4">
-                <img id="word-image" src="" alt="คำใบ้รูปภาพ" class="w-full h-40 sm:h-52 object-contain rounded-lg bg-purple-50 border-2 border-purple-200">
-                <button id="replay-word-audio-btn" class="p-4 rounded-full bg-pink-200 hover:bg-pink-300 btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 15.536a5 5 0 010-7.072m-2.828 9.9a9 9 0 010-12.728" /></svg>
-                </button>
-                <div class="relative flex items-center">
-                    <input type="text" id="answer-input" class="w-full p-4 text-2xl sm:text-3xl tracking-widest text-center border-2 border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="พิมพ์คำตอบที่นี่">
-                    <button id="hint-btn" class="absolute right-2 p-3 rounded-full hover:bg-yellow-200" title="ใช้คำใบ้ (ไม่ได้คะแนน)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM9 12a1 1 0 012 0v5a1 1 0 11-2 0v-5zM4.343 5.757a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM1 11a1 1 0 100 2h1a1 1 0 100-2H1zM12 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM5.05 14.95a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zM19 11a1 1 0 100 2h-1a1 1 0 100-2h1zM14.95 14.95a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z" /><path d="M10 7a3 3 0 100 6 3 3 0 000-6z" /></svg>
-                    </button>
-                </div>
-                <button id="submit-answer-btn" class="w-full py-4 px-6 rounded-lg btn btn-primary text-2xl">ส่งคำตอบ</button>
-            </div>
-        </div>
-
-        <!-- End Screen -->
-        <div id="end-screen" class="game-container text-center hidden p-6 sm:p-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-4">จบเกมแล้วจ้า!</h2>
-            <div id="star-rating" class="text-4xl sm:text-5xl mb-4"></div>
-            <p id="end-message" class="text-xl text-gray-700 mb-2"></p>
-            <p id="final-score" class="text-2xl font-semibold bg-purple-100 text-purple-800 rounded-lg py-2 px-4 inline-block mb-6"></p>
-            <div class="flex gap-2">
-                <button id="play-again-btn" class="w-full py-4 px-6 rounded-lg btn btn-primary text-xl">เล่นอีกครั้ง</button>
-                <button id="share-btn" class="p-4 rounded-lg btn bg-green-300 text-green-800" title="แชร์ผลลัพธ์">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                </button>
-            </div>
-            <div class="mt-8">
-                <h2 class="text-xl sm:text-2xl font-semibold text-purple-500 mb-3">🏆 คะแนนสูงสุด 🏆</h2>
-                <div id="high-scores-end" class="space-y-2 text-left"></div>
-            </div>
-        </div>
-        
-        <!-- Modals -->
-        <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div class="modal-content text-center relative p-6 sm:p-8">
-                <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                <h3 id="feedback-title" class="text-3xl sm:text-4xl font-bold mb-4"></h3>
-                <div id="feedback-details" class="text-left bg-purple-50 p-4 rounded-lg">
-                    <div id="user-answer-feedback" class="hidden mb-3 border-b border-purple-200 pb-3">
-                        <p class="font-semibold text-gray-600">คุณตอบว่า:</p>
-                        <p id="user-answer-display" class="text-lg text-red-500 font-semibold break-all"></p>
-                    </div>
-                    <p class="font-semibold text-purple-800">ประโยคตัวอย่าง:</p>
-                    <p id="example-sentence-en" class="text-lg text-gray-700"></p>
-                    <p id="example-sentence-th" class="text-md text-gray-500 mb-3"></p>
-                    <button id="replay-sentence-audio-btn" class="flex items-center gap-2 text-purple-600 hover:text-purple-800 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
-                        ฟังเสียงประโยค
-                    </button>
-                </div>
-                <button id="next-question-btn" class="w-full mt-4 py-4 px-6 rounded-lg btn btn-primary text-xl">ข้อถัดไป</button>
-            </div>
-        </div>
-
-        <div id="sticker-book-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div class="modal-content text-center relative p-6 sm:p-8 w-full max-w-2xl">
-                <button id="close-sticker-book-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-                <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-4">สมุดสะสมสติกเกอร์</h2>
-                <div id="sticker-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 bg-gray-100 p-4 rounded-lg min-h-[200px]"></div>
-            </div>
-        </div>
-
-        <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div class="modal-content text-center relative p-6 sm:p-8 w-full max-w-md">
-                <button id="close-settings-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-                <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-6">ตั้งค่า</h2>
-                <div class="space-y-6 text-left">
-                    <div>
-                        <label for="music-volume" class="font-semibold text-gray-700">เสียงเพลง</label>
-                        <input type="range" id="music-volume" min="0" max="1" step="0.1" class="w-full">
-                    </div>
-                    <div>
-                        <label for="sfx-volume" class="font-semibold text-gray-700">เสียงเอฟเฟกต์</label>
-                        <input type="range" id="sfx-volume" min="0" max="1" step="0.1" class="w-full">
-                    </div>
-                    <div>
-                        <label class="font-semibold text-gray-700">สีน้องดีโน่</label>
-                        <div id="dino-color-selector" class="flex gap-3 mt-2">
-                            <button data-color="#A3E635" class="w-10 h-10 rounded-full border-2" style="background-color: #A3E635;"></button>
-                            <button data-color="#60A5FA" class="w-10 h-10 rounded-full border-2" style="background-color: #60A5FA;"></button>
-                            <button data-color="#F472B6" class="w-10 h-10 rounded-full border-2" style="background-color: #F472B6;"></button>
-                        </div>
-                    </div>
-                </div>
-                <button id="clear-data-btn" class="w-full mt-8 py-3 px-6 rounded-lg btn bg-red-500 text-white text-lg">ล้างข้อมูลทั้งหมด</button>
-            </div>
-        </div>
-        
-        <div id="sticker-award-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div class="modal-content text-center relative p-8 w-full max-w-sm">
-                 <div id="sticker-award-particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                <h2 class="text-2xl font-bold text-yellow-500 mb-2">ยินดีด้วย!</h2>
-                <p class="text-gray-600 mb-4">คุณได้รับสติกเกอร์ใหม่!</p>
-                <div id="awarded-sticker-display" class="text-8xl my-4"></div>
-                <p id="awarded-sticker-name" class="text-xl font-semibold"></p>
-                <button id="close-sticker-award-btn" class="w-full mt-6 py-3 px-6 rounded-lg btn btn-primary text-lg">สุดยอดเลย!</button>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Tone.js for audio -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <!-- Custom Script -->
-    <script src="script.js" defer></script>
+    <div id="game-container" class="hidden card w-full max-w-md p-6 rounded-2xl text-center relative">
+        <button id="back-button" title="กลับหน้าหลัก" class="absolute top-4 left-4 btn btn-purple !p-2 !rounded-full shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        </button>
+        <div id="score-container">
+            <svg id="score-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span id="score">0</span>
+        </div>
+        <h1 class="text-4xl font-bold text-pink-500 mb-2 mt-16 md:mt-0">ทายคำศัพท์กัน!</h1>
+        <p id="progress-text" class="text-lg mb-4">คำที่ 1 จาก 10</p>
+        <div id="image-container" class="h-48 w-full mb-4 flex items-center justify-center"></div>
+        <button id="speak-button" class="btn btn-purple inline-flex items-center gap-2 mb-4 !py-2 !px-4 !text-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            ฟังคำใบ้
+        </button>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="answer-input" placeholder="พิมพ์คำตอบที่นี่..." class="flex-grow p-3 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none transition text-xl">
+            <button id="submit-button" class="btn btn-pink">ส่งคำตอบ</button>
+        </div>
+        <div class="mt-4 h-12 flex items-center justify-center gap-2">
+            <div id="mascot-container" class="w-10 h-10"></div>
+            <p id="feedback-text" class="text-xl font-semibold"></p>
+        </div>
+    </div>
+
+    <div id="result-container" class="hidden card w-full max-w-md p-8 rounded-2xl text-center">
+        <h2 id="result-title" class="text-5xl font-bold text-pink-500 mb-2">จบเกมแล้วจ้า!</h2>
+        <p class="text-2xl mb-2">คะแนนรวม: <span id="final-score" class="font-bold"></span></p>
+        <p class="text-xl mb-6">ใช้เวลาไป: <span id="total-time" class="font-bold"></span></p>
+        <div id="review-section" class="hidden">
+            <h3 class="text-3xl font-semibold text-purple-500 mb-4">คำศัพท์ต้องทบทวน</h3>
+            <div id="review-list" class="space-y-3 max-h-52 overflow-y-auto p-3 bg-purple-50 rounded-xl"></div>
+        </div>
+        <button id="restart-button" class="btn btn-pink mt-8 !text-2xl !py-4">เล่นอีกครั้ง</button>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+    <footer class="mt-8 text-pink-800 text-lg font-semibold opacity-70">
+        เกมทายศัพท์อังกฤษแสนสนุก เพื่อพี่แจน โดย พ่อแกน
+    </footer>
+
+    <script>
+        const vocabGame = {
+            data: {
+                vocabulary: [
+                    { word: 'shapes', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="#f87171"/><circle cx="25" cy="25" r="20" fill="#60a5fa"/><rect x="60" y="60" width="30" height="30" fill="#facc15"/></svg>' },
+                    { word: 'circle', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#60a5fa"/></svg>' },
+                    { word: 'triangle', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><polygon points="50,10 95,90 5,90" fill="#34d399"/></svg>' },
+                    { word: 'square', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="#facc15"/></svg>' },
+                    { word: 'rectangle', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><rect x="5" y="25" width="90" height="50" fill="#c084fc"/></svg>' },
+                    { word: 'heart', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><path d="M50,90 C-20,40 20,-10 50,25 C80,-10 120,40 50,90" fill="#f472b6"/></svg>' },
+                    { word: 'star', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,87 50,70 21,87 32,57 5,35 39,35" fill="#fbbf24"/></svg>' },
+                    { word: 'row', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><circle cx="15" cy="50" r="10" fill="#a78bfa"/><circle cx="40" cy="50" r="10" fill="#a78bfa"/><circle cx="65" cy="50" r="10" fill="#a78bfa"/><circle cx="90" cy="50" r="10" fill="#a78bfa"/></svg>' },
+                    { word: 'column', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><circle cx="50" cy="15" r="10" fill="#7dd3fc"/><circle cx="50" cy="40" r="10" fill="#7dd3fc"/><circle cx="50" cy="65" r="10" fill="#7dd3fc"/><circle cx="50" cy="90" r="10" fill="#7dd3fc"/></svg>' },
+                    { word: 'measure', svg: '<svg class="svg-icon" viewBox="0 0 100 30"><rect x="0" y="0" width="100" height="20" fill="#fca5a5"/><line x1="10" y1="0" x2="10" y2="20" stroke="black" /><line x1="20" y1="0" x2="20" y2="15" stroke="black" /><line x1="30" y1="0" x2="30" y2="20" stroke="black" /><line x1="40" y1="0" x2="40" y2="15" stroke="black" /><line x1="50" y1="0" x2="50" y2="20" stroke="black" /><line x1="60" y1="0" x2="60" y2="15" stroke="black" /><line x1="70" y1="0" x2="70" y2="20" stroke="black" /><line x1="80" y1="0" x2="80" y2="15" stroke="black" /><line x1="90" y1="0" x2="90" y2="20" stroke="black" /></svg>' }
+                ],
+                mascotSVGs: {
+                    neutral: '<svg viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 13.5h-3v-3h3v3zm6 0h-3v-3h3v3z"/></svg>',
+                    happy: '<svg viewBox="0 0 24 24" fill="#34d399"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14c-1.5 1.5-3.58 2.5-5.99 2.5s-4.5-1-6-2.5c-.25-.25-.25-.66 0-.91.25-.25.66-.25.91 0 1.22.99 2.7 1.66 4.34 1.66s3.12-.67 4.34-1.66c.25-.25.66-.25.91 0 .25.25.25.66 0 .91zM8.5 12c.83 0 1.5-.67 1.5-1.5S9.33 9 8.5 9 7 9.67 7 10.5 7.67 12 8.5 12zm7 0c.83 0 1.5-.67 1.5-1.5S16.33 9 15.5 9 14 9.67 14 10.5s.67 1.5 1.5 1.5z"/></svg>',
+                    sad: '<svg viewBox="0 0 24 24" fill="#f87171"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4.5-9C6.67 11 6 10.33 6 9.5S6.67 8 7.5 8s1.5.67 1.5 1.5S8.33 11 7.5 11zm9 0c-.83 0-1.5-.67-1.5-1.5S15.67 8 16.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-2.01 4c-1.24 1.23-2.99 2-4.99 2s-3.75-.77-5-2c-.25-.25-.25-.66 0-.91s.66-.25.91 0c.98.98 2.24 1.66 3.84 1.66s2.86-.68 3.84-1.66c.25-.25.66-.25.91 0s.25.66 0 .91z" transform="rotate(180 12 12)"/></svg>'
+                },
+            },
+            state: {
+                currentWordIndex: 0,
+                score: 0,
+                difficulty: 'easy',
+                incorrectWords: [],
+                shuffledVocab: [],
+                gameStartTime: null,
+                audioContext: null,
+                confettiParticles: [],
+            },
+            dom: {},
+
+            init() {
+                this.cacheDom();
+                this.bindEvents();
+                this.showScreen('start');
+            },
+            
+            cacheDom() {
+                this.dom.startContainer = document.getElementById('start-container');
+                this.dom.gameContainer = document.getElementById('game-container');
+                this.dom.resultContainer = document.getElementById('result-container');
+                this.dom.easyBtn = document.getElementById('easy-btn');
+                this.dom.hardBtn = document.getElementById('hard-btn');
+                this.dom.backButton = document.getElementById('back-button');
+                this.dom.imageContainer = document.getElementById('image-container');
+                this.dom.speakButton = document.getElementById('speak-button');
+                this.dom.answerInput = document.getElementById('answer-input');
+                this.dom.submitButton = document.getElementById('submit-button');
+                this.dom.feedbackText = document.getElementById('feedback-text');
+                this.dom.scoreDisplay = document.getElementById('score');
+                this.dom.progressText = document.getElementById('progress-text');
+                this.dom.finalScoreDisplay = document.getElementById('final-score');
+                this.dom.totalTimeDisplay = document.getElementById('total-time');
+                this.dom.reviewSection = document.getElementById('review-section');
+                this.dom.reviewList = document.getElementById('review-list');
+                this.dom.restartButton = document.getElementById('restart-button');
+                this.dom.resultTitle = document.getElementById('result-title');
+                this.dom.confettiCanvas = document.getElementById('confetti-canvas');
+                this.dom.mascotContainer = document.getElementById('mascot-container');
+            },
+
+            bindEvents() {
+                this.dom.easyBtn.addEventListener('click', () => this.selectDifficulty('easy'));
+                this.dom.hardBtn.addEventListener('click', () => this.selectDifficulty('hard'));
+                this.dom.backButton.addEventListener('click', () => this.showScreen('start'));
+                this.dom.speakButton.addEventListener('click', () => this.speak(this.state.shuffledVocab[this.state.currentWordIndex].word));
+                this.dom.submitButton.addEventListener('click', () => this.checkAnswer());
+                this.dom.answerInput.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') this.checkAnswer();
+                });
+                this.dom.restartButton.addEventListener('click', () => this.showScreen('start'));
+                this.dom.reviewList.addEventListener('click', (event) => {
+                    const button = event.target.closest('.review-speak-btn');
+                    if (button) this.speak(button.dataset.word);
+                });
+            },
+
+            showScreen(screenName) {
+                this.vfx.stopConfetti();
+                this.dom.startContainer.classList.add('hidden');
+                this.dom.gameContainer.classList.add('hidden');
+                this.dom.resultContainer.classList.add('hidden');
+                this.dom[`${screenName}Container`].classList.remove('hidden');
+            },
+
+            selectDifficulty(level) {
+                this.audio.init();
+                this.state.difficulty = level;
+                this.showScreen('game');
+                this.startGame();
+            },
+
+            startGame() {
+                this.state.shuffledVocab = [...this.data.vocabulary].sort(() => Math.random() - 0.5);
+                this.state.currentWordIndex = 0;
+                this.state.score = 0;
+                this.state.incorrectWords = [];
+                this.state.gameStartTime = new Date(); // เริ่มจับเวลา
+                this.dom.scoreDisplay.textContent = this.state.score;
+                this.dom.reviewSection.classList.add('hidden');
+                this.dom.reviewList.innerHTML = '';
+                this.loadNextWord();
+            },
+
+            loadNextWord() {
+                if (this.state.currentWordIndex < this.state.shuffledVocab.length) {
+                    this.ui.setMascot('neutral');
+                    const currentWord = this.state.shuffledVocab[this.state.currentWordIndex];
+                    this.dom.imageContainer.style.visibility = this.state.difficulty === 'hard' ? 'hidden' : 'visible';
+                    this.dom.imageContainer.innerHTML = currentWord.svg;
+                    this.dom.answerInput.value = '';
+                    this.dom.answerInput.disabled = false;
+                    this.dom.submitButton.disabled = false;
+                    this.dom.feedbackText.textContent = '';
+                    this.dom.feedbackText.className = 'text-xl font-semibold';
+                    this.dom.progressText.textContent = `คำที่ ${this.state.currentWordIndex + 1} จาก ${this.state.shuffledVocab.length}`;
+                    this.dom.answerInput.focus();
+                } else {
+                    this.endGame();
+                }
+            },
+
+            checkAnswer() {
+                const userAnswer = this.dom.answerInput.value.trim().toLowerCase();
+                const correctAnswer = this.state.shuffledVocab[this.state.currentWordIndex].word.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    this.audio.playSound('correct');
+                    this.ui.setMascot('happy');
+                    this.state.score++;
+                    this.dom.scoreDisplay.textContent = this.state.score;
+                    this.dom.feedbackText.textContent = 'ถูกต้อง เก่งมากจ้า!';
+                    this.dom.feedbackText.classList.add('text-green-500', 'correct-animation');
+                } else {
+                    this.audio.playSound('incorrect');
+                    this.ui.setMascot('sad');
+                    this.state.incorrectWords.push(this.state.shuffledVocab[this.state.currentWordIndex]);
+                    this.dom.feedbackText.textContent = `ผิดน้า! คือ "${correctAnswer}"`;
+                    this.dom.feedbackText.classList.add('text-red-500');
+                    this.dom.gameContainer.classList.add('incorrect-animation');
+                    setTimeout(() => this.dom.gameContainer.classList.remove('incorrect-animation'), 500);
+                }
+                this.proceedToNext();
+            },
+            
+            proceedToNext() {
+                this.state.currentWordIndex++;
+                this.dom.answerInput.disabled = true;
+                this.dom.submitButton.disabled = true;
+                setTimeout(() => this.loadNextWord(), 1500); // ลดเวลารอเหลือ 1.5 วินาที
+            },
+
+            endGame() {
+                this.showScreen('result');
+                const gameEndTime = new Date();
+                const durationSeconds = Math.round((gameEndTime - this.state.gameStartTime) / 1000);
+                const minutes = Math.floor(durationSeconds / 60);
+                const seconds = durationSeconds % 60;
+
+                this.dom.finalScoreDisplay.textContent = `${this.state.score} / ${this.state.shuffledVocab.length}`;
+                this.dom.totalTimeDisplay.textContent = `${minutes} นาที ${seconds} วินาที`;
+
+                if (this.state.score === this.state.shuffledVocab.length && this.state.score > 0) {
+                    this.dom.resultTitle.textContent = "สุดยอดไปเลย!";
+                    this.vfx.startConfetti();
+                } else {
+                    this.dom.resultTitle.textContent = "จบเกมแล้วจ้า!";
+                }
+
+                if (this.state.incorrectWords.length > 0) {
+                    this.dom.reviewSection.classList.remove('hidden');
+                    this.dom.reviewList.innerHTML = '';
+                    this.state.incorrectWords.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center justify-between p-2 bg-white rounded-lg shadow-sm';
+                        div.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10">${item.svg}</div><span class="font-semibold text-lg">${item.word}</span></div><button class="review-speak-btn btn btn-purple !p-2 !rounded-full" data-word="${item.word}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg></button>`;
+                        this.dom.reviewList.appendChild(div);
+                    });
+                }
+            },
+
+            speak(word) {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                }
+            },
+            
+            audio: {
+                init() { if (!vocabGame.state.audioContext) vocabGame.state.audioContext = new (window.AudioContext || window.webkitAudioContext)(); },
+                playSound(type) { if (!vocabGame.state.audioContext) return; const audioCtx = vocabGame.state.audioContext; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01); if (type === 'correct') { o.type = 'sine'; o.frequency.setValueAtTime(600, audioCtx.currentTime); } else { o.type = 'sawtooth'; o.frequency.setValueAtTime(200, audioCtx.currentTime); } o.start(audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2); o.stop(audioCtx.currentTime + 0.2); }
+            },
+            
+            ui: { setMascot(state) { vocabGame.dom.mascotContainer.innerHTML = vocabGame.data.mascotSVGs[state]; } },
+
+            vfx: {
+                startConfetti() { const canvas = vocabGame.dom.confettiCanvas; const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; const colors = ['#f472b6', '#c084fc', '#60a5fa', '#34d399', '#facc15']; vocabGame.state.confettiParticles = []; for (let i = 0; i < 200; i++) { vocabGame.state.confettiParticles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, color: colors[Math.floor(Math.random() * colors.length)], size: Math.random() * 5 + 5, speed: Math.random() * 5 + 2, angle: Math.random() * 360, }); } vocabGame.vfx.animateConfetti(); },
+                animateConfetti() { const canvas = vocabGame.dom.confettiCanvas; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); vocabGame.state.confettiParticles.forEach(p => { p.y += p.speed; p.x += Math.sin(p.angle); if (p.y > canvas.height) { p.y = -p.size; p.x = Math.random() * canvas.width; } ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); }); if (vocabGame.state.confettiParticles.length > 0) requestAnimationFrame(vocabGame.vfx.animateConfetti); },
+                stopConfetti() { vocabGame.state.confettiParticles = []; const canvas = vocabGame.dom.confettiCanvas; if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); } }
+            }
+        };
+        window.onload = () => { vocabGame.init(); };
+    </script>
 </body>
 </html>
