@@ -88,10 +88,18 @@
 
     <div id="start-container" class="card w-full max-w-md p-8 rounded-2xl text-center">
         <h1 class="text-5xl font-bold text-pink-500 mb-4">เกมทายศัพท์แสนสนุก</h1>
-        <h2 class="text-2xl mb-8">เลือกระดับความยากได้เลยจ้า</h2>
+        <h2 class="text-2xl mb-6">เลือกระดับความยากได้เลยจ้า</h2>
         <div class="flex flex-col gap-4">
             <button id="easy-btn" class="btn btn-green">ง่าย (มีรูปภาพ)</button>
             <button id="hard-btn" class="btn btn-blue">ยาก (ไม่มีรูปภาพ)</button>
+        </div>
+        
+        <!-- Leaderboard Section -->
+        <div class="mt-8">
+            <h2 class="text-3xl font-bold text-purple-500 mb-4">🏆 5 อันดับแรก 🏆</h2>
+            <div id="start-leaderboard-loading" class="text-lg">กำลังโหลดข้อมูล...</div>
+            <ol id="start-leaderboard-list" class="text-left space-y-3"></ol>
+            <div id="start-leaderboard-error" class="hidden text-red-500 mt-4">ไม่สามารถโหลดข้อมูลได้</div>
         </div>
     </div>
 
@@ -132,12 +140,25 @@
     </div>
 
     <canvas id="confetti-canvas"></canvas>
+    
+    <div id="name-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="card p-8 text-center rounded-2xl">
+            <h3 class="text-3xl mb-4 text-pink-500">เก่งมาก!</h3>
+            <p class="mb-4 text-lg">ใส่ชื่อของหนูเพื่อบันทึกคะแนนได้เลย</p>
+            <input type="text" id="player-name" placeholder="ชื่อผู้เล่น" maxlength="15" class="w-full p-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:outline-none transition text-xl text-center">
+            <button id="submit-score-btn" class="btn btn-pink mt-4 w-full">ส่งคะแนน</button>
+        </div>
+    </div>
+
     <footer class="mt-8 text-pink-800 text-lg font-semibold opacity-70">
         เกมทายศัพท์อังกฤษแสนสนุก เพื่อพี่แจน โดย พ่อแกน
     </footer>
 
     <script>
         const vocabGame = {
+            config: {
+                WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbyE7z5ELBLTeJdnZJhwqyOMWGzHN31jcYatPJYLWpN_KopcDOLS-P3W_IsiE0QJYGG_QA/exec'
+            },
             data: {
                 vocabulary: [
                     { word: 'shapes', svg: '<svg class="svg-icon" viewBox="0 0 100 100"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="#f87171"/><circle cx="25" cy="25" r="20" fill="#60a5fa"/><rect x="60" y="60" width="30" height="30" fill="#facc15"/></svg>' },
@@ -164,6 +185,7 @@
                 incorrectWords: [],
                 shuffledVocab: [],
                 gameStartTime: null,
+                gameEndTime: null,
                 audioContext: null,
                 confettiParticles: [],
             },
@@ -197,6 +219,12 @@
                 this.dom.resultTitle = document.getElementById('result-title');
                 this.dom.confettiCanvas = document.getElementById('confetti-canvas');
                 this.dom.mascotContainer = document.getElementById('mascot-container');
+                this.dom.startLeaderboardLoading = document.getElementById('start-leaderboard-loading');
+                this.dom.startLeaderboardList = document.getElementById('start-leaderboard-list');
+                this.dom.startLeaderboardError = document.getElementById('start-leaderboard-error');
+                this.dom.nameModal = document.getElementById('name-modal');
+                this.dom.playerNameInput = document.getElementById('player-name');
+                this.dom.submitScoreBtn = document.getElementById('submit-score-btn');
             },
 
             bindEvents() {
@@ -205,22 +233,22 @@
                 this.dom.backButton.addEventListener('click', () => this.showScreen('start'));
                 this.dom.speakButton.addEventListener('click', () => this.speak(this.state.shuffledVocab[this.state.currentWordIndex].word));
                 this.dom.submitButton.addEventListener('click', () => this.checkAnswer());
-                this.dom.answerInput.addEventListener('keyup', (event) => {
-                    if (event.key === 'Enter') this.checkAnswer();
-                });
+                this.dom.answerInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') this.checkAnswer(); });
                 this.dom.restartButton.addEventListener('click', () => this.showScreen('start'));
-                this.dom.reviewList.addEventListener('click', (event) => {
-                    const button = event.target.closest('.review-speak-btn');
-                    if (button) this.speak(button.dataset.word);
-                });
+                this.dom.reviewList.addEventListener('click', (event) => { const button = event.target.closest('.review-speak-btn'); if (button) this.speak(button.dataset.word); });
+                this.dom.submitScoreBtn.addEventListener('click', () => this.submitScore());
             },
 
             showScreen(screenName) {
                 this.vfx.stopConfetti();
-                this.dom.startContainer.classList.add('hidden');
-                this.dom.gameContainer.classList.add('hidden');
-                this.dom.resultContainer.classList.add('hidden');
+                ['start', 'game', 'result'].forEach(id => {
+                    this.dom[`${id}Container`].classList.add('hidden');
+                });
                 this.dom[`${screenName}Container`].classList.remove('hidden');
+
+                if (screenName === 'start') {
+                    this.showLeaderboard();
+                }
             },
 
             selectDifficulty(level) {
@@ -235,7 +263,7 @@
                 this.state.currentWordIndex = 0;
                 this.state.score = 0;
                 this.state.incorrectWords = [];
-                this.state.gameStartTime = new Date(); // เริ่มจับเวลา
+                this.state.gameStartTime = new Date();
                 this.dom.scoreDisplay.textContent = this.state.score;
                 this.dom.reviewSection.classList.add('hidden');
                 this.dom.reviewList.innerHTML = '';
@@ -263,7 +291,6 @@
             checkAnswer() {
                 const userAnswer = this.dom.answerInput.value.trim().toLowerCase();
                 const correctAnswer = this.state.shuffledVocab[this.state.currentWordIndex].word.toLowerCase();
-
                 if (userAnswer === correctAnswer) {
                     this.audio.playSound('correct');
                     this.ui.setMascot('happy');
@@ -287,16 +314,44 @@
                 this.state.currentWordIndex++;
                 this.dom.answerInput.disabled = true;
                 this.dom.submitButton.disabled = true;
-                setTimeout(() => this.loadNextWord(), 1500); // ลดเวลารอเหลือ 1.5 วินาที
+                setTimeout(() => this.loadNextWord(), 1500);
             },
 
             endGame() {
+                this.state.gameEndTime = new Date();
+                this.dom.nameModal.classList.remove('hidden');
+                this.dom.playerNameInput.focus();
+            },
+            
+            async submitScore() {
+                const name = this.dom.playerNameInput.value.trim();
+                if (!name) {
+                    this.dom.playerNameInput.classList.add('border-red-500');
+                    return;
+                }
+                this.dom.playerNameInput.classList.remove('border-red-500');
+                this.dom.submitScoreBtn.disabled = true;
+                this.dom.submitScoreBtn.textContent = 'กำลังส่ง...';
+
+                const durationSeconds = Math.round((this.state.gameEndTime - this.state.gameStartTime) / 1000);
+                
+                try {
+                    await this.api.postScore(name, this.state.score, durationSeconds);
+                } catch (error) {
+                    console.error('Failed to post score:', error);
+                } finally {
+                    this.dom.nameModal.classList.add('hidden');
+                    this.dom.submitScoreBtn.disabled = false;
+                    this.dom.submitScoreBtn.textContent = 'ส่งคะแนน';
+                    this.dom.playerNameInput.value = '';
+                    this.displayResults(durationSeconds);
+                }
+            },
+
+            displayResults(durationSeconds) {
                 this.showScreen('result');
-                const gameEndTime = new Date();
-                const durationSeconds = Math.round((gameEndTime - this.state.gameStartTime) / 1000);
                 const minutes = Math.floor(durationSeconds / 60);
                 const seconds = durationSeconds % 60;
-
                 this.dom.finalScoreDisplay.textContent = `${this.state.score} / ${this.state.shuffledVocab.length}`;
                 this.dom.totalTimeDisplay.textContent = `${minutes} นาที ${seconds} วินาที`;
 
@@ -319,6 +374,34 @@
                 }
             },
 
+            async showLeaderboard() {
+                this.dom.startLeaderboardList.innerHTML = '';
+                this.dom.startLeaderboardLoading.classList.remove('hidden');
+                this.dom.startLeaderboardError.classList.add('hidden');
+
+                try {
+                    const scores = await this.api.getScores();
+                    this.dom.startLeaderboardLoading.classList.add('hidden');
+                    scores.slice(0, 5).forEach((entry, index) => {
+                        const li = document.createElement('li');
+                        const minutes = Math.floor(entry.time / 60);
+                        const seconds = entry.time % 60;
+                        li.className = 'text-xl p-3 bg-purple-50 rounded-lg flex items-center gap-4';
+                        li.innerHTML = `
+                            <span class="font-bold text-purple-500 w-8 text-center">${index + 1}.</span>
+                            <span class="flex-grow">${entry.name}</span>
+                            <span class="font-bold text-pink-500">${entry.score} คะแนน</span>
+                            <span class="text-sm text-gray-500">${minutes}m ${seconds}s</span>
+                        `;
+                        this.dom.startLeaderboardList.appendChild(li);
+                    });
+                } catch (error) {
+                    console.error('Failed to get scores:', error);
+                    this.dom.startLeaderboardLoading.classList.add('hidden');
+                    this.dom.startLeaderboardError.classList.remove('hidden');
+                }
+            },
+
             speak(word) {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
@@ -329,6 +412,25 @@
                 }
             },
             
+            api: {
+                async postScore(name, score, time) {
+                    const response = await fetch(vocabGame.config.WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'addScore', name, score, time })
+                    });
+                    return response;
+                },
+                async getScores() {
+                    const response = await fetch(`${vocabGame.config.WEB_APP_URL}?action=getScores`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                }
+            },
+
             audio: {
                 init() { if (!vocabGame.state.audioContext) vocabGame.state.audioContext = new (window.AudioContext || window.webkitAudioContext)(); },
                 playSound(type) { if (!vocabGame.state.audioContext) return; const audioCtx = vocabGame.state.audioContext; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01); if (type === 'correct') { o.type = 'sine'; o.frequency.setValueAtTime(600, audioCtx.currentTime); } else { o.type = 'sawtooth'; o.frequency.setValueAtTime(200, audioCtx.currentTime); } o.start(audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2); o.stop(audioCtx.currentTime + 0.2); }
