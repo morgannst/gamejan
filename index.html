@@ -88,10 +88,21 @@
 
     <div id="start-container" class="card w-full max-w-md p-8 rounded-2xl text-center">
         <h1 class="text-5xl font-bold text-pink-500 mb-4">เกมทายศัพท์แสนสนุก</h1>
-        <h2 class="text-2xl mb-6">เลือกระดับความยากได้เลยจ้า</h2>
-        <div class="flex flex-col gap-4">
-            <button id="easy-btn" class="btn btn-green">ง่าย (มีรูปภาพ)</button>
-            <button id="hard-btn" class="btn btn-blue">ยาก (ไม่มีรูปภาพ)</button>
+        
+        <!-- Name Input Section -->
+        <div id="name-input-section">
+            <h2 class="text-2xl mb-4">ใส่ชื่อของหนูได้เลยจ้า</h2>
+            <input type="text" id="player-name-input" placeholder="ชื่อผู้เล่น" maxlength="15" class="w-full p-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:outline-none transition text-xl text-center mb-4">
+            <button id="confirm-name-btn" class="btn btn-pink w-full">เริ่มเล่นเกม</button>
+        </div>
+
+        <!-- Difficulty Section -->
+        <div id="difficulty-section" class="hidden">
+            <h2 class="text-2xl mb-6">สวัสดี <span id="player-name-display" class="font-bold text-pink-500"></span>! เลือกระดับได้เลย</h2>
+            <div class="flex flex-col gap-4">
+                <button id="easy-btn" class="btn btn-green">ง่าย (มีรูปภาพ)</button>
+                <button id="hard-btn" class="btn btn-blue">ยาก (ไม่มีรูปภาพ)</button>
+            </div>
         </div>
         
         <!-- Leaderboard Section -->
@@ -140,15 +151,6 @@
     </div>
 
     <canvas id="confetti-canvas"></canvas>
-    
-    <div id="name-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="card p-8 text-center rounded-2xl">
-            <h3 class="text-3xl mb-4 text-pink-500">เก่งมาก!</h3>
-            <p class="mb-4 text-lg">ใส่ชื่อของหนูเพื่อบันทึกคะแนนได้เลย</p>
-            <input type="text" id="player-name" placeholder="ชื่อผู้เล่น" maxlength="15" class="w-full p-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:outline-none transition text-xl text-center">
-            <button id="submit-score-btn" class="btn btn-pink mt-4 w-full">ส่งคะแนน</button>
-        </div>
-    </div>
 
     <footer class="mt-8 text-pink-800 text-lg font-semibold opacity-70">
         เกมทายศัพท์อังกฤษแสนสนุก เพื่อพี่แจน โดย พ่อแกน
@@ -179,6 +181,7 @@
                 },
             },
             state: {
+                playerName: '',
                 currentWordIndex: 0,
                 score: 0,
                 difficulty: 'easy',
@@ -222,12 +225,16 @@
                 this.dom.startLeaderboardLoading = document.getElementById('start-leaderboard-loading');
                 this.dom.startLeaderboardList = document.getElementById('start-leaderboard-list');
                 this.dom.startLeaderboardError = document.getElementById('start-leaderboard-error');
-                this.dom.nameModal = document.getElementById('name-modal');
-                this.dom.playerNameInput = document.getElementById('player-name');
-                this.dom.submitScoreBtn = document.getElementById('submit-score-btn');
+                this.dom.nameInputSection = document.getElementById('name-input-section');
+                this.dom.playerNameInput = document.getElementById('player-name-input');
+                this.dom.confirmNameBtn = document.getElementById('confirm-name-btn');
+                this.dom.difficultySection = document.getElementById('difficulty-section');
+                this.dom.playerNameDisplay = document.getElementById('player-name-display');
             },
 
             bindEvents() {
+                this.dom.confirmNameBtn.addEventListener('click', () => this.confirmName());
+                this.dom.playerNameInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') this.confirmName(); });
                 this.dom.easyBtn.addEventListener('click', () => this.selectDifficulty('easy'));
                 this.dom.hardBtn.addEventListener('click', () => this.selectDifficulty('hard'));
                 this.dom.backButton.addEventListener('click', () => this.showScreen('start'));
@@ -236,7 +243,6 @@
                 this.dom.answerInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') this.checkAnswer(); });
                 this.dom.restartButton.addEventListener('click', () => this.showScreen('start'));
                 this.dom.reviewList.addEventListener('click', (event) => { const button = event.target.closest('.review-speak-btn'); if (button) this.speak(button.dataset.word); });
-                this.dom.submitScoreBtn.addEventListener('click', () => this.submitScore());
             },
 
             showScreen(screenName) {
@@ -247,8 +253,24 @@
                 this.dom[`${screenName}Container`].classList.remove('hidden');
 
                 if (screenName === 'start') {
+                    this.dom.nameInputSection.classList.remove('hidden');
+                    this.dom.difficultySection.classList.add('hidden');
+                    this.dom.playerNameInput.value = '';
                     this.showLeaderboard();
                 }
+            },
+            
+            confirmName() {
+                const name = this.dom.playerNameInput.value.trim();
+                if (!name) {
+                    this.dom.playerNameInput.classList.add('border-red-500');
+                    return;
+                }
+                this.dom.playerNameInput.classList.remove('border-red-500');
+                this.state.playerName = name;
+                this.dom.playerNameDisplay.textContent = name;
+                this.dom.nameInputSection.classList.add('hidden');
+                this.dom.difficultySection.classList.remove('hidden');
             },
 
             selectDifficulty(level) {
@@ -319,31 +341,16 @@
 
             endGame() {
                 this.state.gameEndTime = new Date();
-                this.dom.nameModal.classList.remove('hidden');
-                this.dom.playerNameInput.focus();
+                this.submitScore();
             },
             
             async submitScore() {
-                const name = this.dom.playerNameInput.value.trim();
-                if (!name) {
-                    this.dom.playerNameInput.classList.add('border-red-500');
-                    return;
-                }
-                this.dom.playerNameInput.classList.remove('border-red-500');
-                this.dom.submitScoreBtn.disabled = true;
-                this.dom.submitScoreBtn.textContent = 'กำลังส่ง...';
-
                 const durationSeconds = Math.round((this.state.gameEndTime - this.state.gameStartTime) / 1000);
-                
                 try {
-                    await this.api.postScore(name, this.state.score, durationSeconds);
+                    await this.api.postScore(this.state.playerName, this.state.score, durationSeconds);
                 } catch (error) {
                     console.error('Failed to post score:', error);
                 } finally {
-                    this.dom.nameModal.classList.add('hidden');
-                    this.dom.submitScoreBtn.disabled = false;
-                    this.dom.submitScoreBtn.textContent = 'ส่งคะแนน';
-                    this.dom.playerNameInput.value = '';
                     this.displayResults(durationSeconds);
                 }
             },
