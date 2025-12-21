@@ -206,6 +206,10 @@
     </div>
 
     <script>
+        // --- CONFIGURATION ---
+        // ⚠️⚠️⚠️ วาง URL ของ Google Apps Script ที่ Deploy ล่าสุดตรงนี้ ⚠️⚠️⚠️
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfQYOxqFcn8tZbzYTQCbRXzP6qbpju6TMl6WjpGPcW4oCOeXm8hR_MWxVJbvUKwaOl7Q/exec';
+
         // --- DATA ---
         const vocabulary = [
             { word: "homes", thaiHint: "บ้านเรือน ที่อยู่อาศัยแบบต่างๆ", icon: "fa-house-chimney", sentence: "People live in different homes.", thai: "ผู้คนอาศัยอยู่ในบ้านที่แตกต่างกัน" },
@@ -240,7 +244,7 @@
             return array;
         }
 
-        // --- AUDIO ENGINE (Centralized & Hardcore Mobile Fix) ---
+        // --- AUDIO ENGINE ---
         const AudioEngine = {
             synths: {},
             bgMusic: null,
@@ -250,8 +254,6 @@
 
             init() {
                 if (this.initialized) return;
-                
-                // --- SYNTHS ---
                 this.synths.correct = new Tone.PolySynth(Tone.Synth).toDestination();
                 this.synths.correct.volume.value = -5;
                 this.synths.wrong = new Tone.MembraneSynth().toDestination();
@@ -263,14 +265,12 @@
 
                 this.initMusic();
                 
-                // --- SPEECH SETUP ---
-                window.utterances = []; // Prevent Garbage Collection bug
+                window.utterances = [];
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
                     this.loadVoices();
                 }
 
-                // --- GLOBAL UNLOCK ON TOUCH ---
                 const unlockHandler = () => {
                     this.unlock();
                     document.body.removeEventListener('touchstart', unlockHandler);
@@ -302,12 +302,7 @@
             },
 
             async unlock() {
-                // 1. Resume Tone.js Context
-                if (Tone.context.state !== 'running') {
-                    await Tone.start();
-                }
-                
-                // 2. Wake up Speech Synthesis
+                if (Tone.context.state !== 'running') await Tone.start();
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const empty = new SpeechSynthesisUtterance('');
@@ -319,7 +314,6 @@
             async toggleMusic() {
                 if (!this.initialized) this.init();
                 await this.unlock();
-
                 const icon = document.getElementById('music-icon');
                 if (this.isMusicPlaying) {
                     Tone.Transport.stop();
@@ -348,7 +342,6 @@
             loadVoices() {
                 if (!('speechSynthesis' in window)) return;
                 const voices = window.speechSynthesis.getVoices();
-                // Prioritize voices
                 this.cachedVoice = voices.find(v => v.lang === 'en-US') || 
                                    voices.find(v => v.lang.startsWith('en')) || 
                                    voices[0];
@@ -356,18 +349,14 @@
 
             speak(text) {
                 if (!('speechSynthesis' in window)) return;
-                
                 window.speechSynthesis.cancel();
-                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
                 utterance.pitch = 1.1;
                 utterance.volume = 1.0;
-
-                // Fix: Don't force voice if it causes issues, let browser decide if cached is bad
                 if (this.cachedVoice) {
                     utterance.voice = this.cachedVoice;
-                    utterance.lang = this.cachedVoice.lang; // Important for Android
+                    utterance.lang = this.cachedVoice.lang;
                 } else {
                     this.loadVoices();
                     if (this.cachedVoice) {
@@ -375,13 +364,10 @@
                         utterance.lang = this.cachedVoice.lang;
                     }
                 }
-
-                // Keep reference to prevent GC
                 window.utterances.push(utterance);
                 utterance.onend = () => {
                     window.utterances = window.utterances.filter(u => u !== utterance);
                 };
-
                 window.speechSynthesis.speak(utterance);
             },
 
@@ -402,13 +388,11 @@
         async function startGame() {
             const nameInput = document.getElementById('player-name');
             const inputName = nameInput.value.trim();
-            
             if (!inputName) {
                 nameInput.classList.add('shake');
                 setTimeout(() => nameInput.classList.remove('shake'), 500);
                 return;
             }
-
             await AudioEngine.unlock();
             AudioEngine.playSound('click');
             if (!AudioEngine.isMusicPlaying) AudioEngine.toggleMusic();
@@ -418,20 +402,16 @@
             GameState.currentQIndex = 0;
             GameState.totalCorrectChars = 0;
             GameState.startTime = new Date();
-            
-            // Randomize Vocabulary every game
             GameState.vocabList = shuffleArray([...vocabulary]);
 
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-
-            // Reduced timeout for mobile responsiveness
             setTimeout(loadQuestion, 50); 
         }
 
         function loadQuestion() {
-            const data = GameState.vocabList[GameState.currentQIndex]; // Use shuffled list
+            const data = GameState.vocabList[GameState.currentQIndex];
             GameState.usedHint = false;
 
             document.getElementById('q-current').innerText = GameState.currentQIndex + 1;
@@ -442,7 +422,6 @@
             const iconEl = document.getElementById('vocab-icon');
             iconEl.className = `fas ${data.icon} text-6xl text-purple-400`;
             iconEl.style.transform = "none";
-            
             document.getElementById('thai-hint').innerText = data.thaiHint;
             
             const input = document.getElementById('answer-input');
@@ -458,8 +437,6 @@
             document.getElementById('submit-btn').style.display = 'block';
             document.getElementById('result-overlay').classList.add('hidden');
             document.getElementById('feedback-msg').innerText = "";
-            
-            // Speak immediately
             AudioEngine.speak(data.word);
         }
 
@@ -475,16 +452,13 @@
             if (GameState.usedHint) return;
             GameState.usedHint = true;
             AudioEngine.playSound('click');
-            
             const word = GameState.vocabList[GameState.currentQIndex].word;
-            const input = document.getElementById('answer-input');
-            input.value = word.charAt(0);
-            input.focus();
+            document.getElementById('answer-input').value = word.charAt(0);
+            document.getElementById('answer-input').focus();
             
-            const btn = document.getElementById('hint-btn');
-            btn.classList.remove('text-yellow-400');
-            btn.classList.add('text-gray-300');
-            btn.disabled = true;
+            document.getElementById('hint-btn').disabled = true;
+            document.getElementById('hint-btn').classList.remove('text-yellow-400');
+            document.getElementById('hint-btn').classList.add('text-gray-300');
             
             const feedback = document.getElementById('feedback-msg');
             feedback.innerText = "ใช้คำใบ้แล้ว (ข้อนี้ไม่ได้คะแนนนะจ๊ะ)";
@@ -503,26 +477,17 @@
 
             if (isCorrect) {
                 AudioEngine.playSound('correct');
-                resultInfo = {
-                    title: "ถูกต้อง เก่งมาก!",
-                    icon: '<i class="fas fa-check-circle text-green-400"></i>',
-                    cls: "text-green-500"
-                };
+                resultInfo = { title: "ถูกต้อง เก่งมาก!", icon: '<i class="fas fa-check-circle text-green-400"></i>', cls: "text-green-500" };
                 GameState.totalCorrectChars += target.length;
                 if (!GameState.usedHint) GameState.score++;
             } else {
                 AudioEngine.playSound('wrong');
-                resultInfo = {
-                    title: `ผิดจ้า! คำตอบคือ: ${target}`,
-                    icon: '<i class="fas fa-times-circle text-red-400"></i>',
-                    cls: "text-red-500"
-                };
+                resultInfo = { title: `ผิดจ้า! คำตอบคือ: ${target}`, icon: '<i class="fas fa-times-circle text-red-400"></i>', cls: "text-red-500" };
                 if (GameState.score > 0) GameState.score--;
             }
 
             document.getElementById('score-display').innerText = GameState.score;
             document.getElementById('submit-btn').style.display = 'none';
-            
             const overlay = document.getElementById('result-overlay');
             overlay.classList.remove('hidden');
             
@@ -535,8 +500,6 @@
             const nextBtn = document.getElementById('next-q-btn');
             const isLast = GameState.currentQIndex === GameState.vocabList.length - 1;
             nextBtn.innerHTML = isLast ? 'ดูผลคะแนน <i class="fas fa-flag-checkered"></i>' : 'ข้อถัดไป <i class="fas fa-arrow-right"></i>';
-
-            // Speak sentence
             AudioEngine.speak(data.sentence);
         }
 
@@ -571,9 +534,7 @@
                 document.getElementById(`star-${i}`).className = stars >= i ? "fas fa-star text-yellow-400 pop-in" : "fas fa-star text-gray-200";
             }
 
-            if (stars === 3) {
-                setTimeout(() => AudioEngine.playSound('fanfare'), 200);
-            }
+            if (stars === 3) setTimeout(() => AudioEngine.playSound('fanfare'), 200);
 
             saveHighScore(GameState.playerName, GameState.score);
             loadHighScores('highscore-list-end');
@@ -586,24 +547,21 @@
             
             const data = { name, score, wpm, accuracy };
 
-            if (typeof google !== 'undefined' && google.script) {
-                google.script.run
-                    .withSuccessHandler((response) => {
-                         if(response && response.status === 'success') {
-                             statusDiv.innerHTML = '<span class="text-green-500"><i class="fas fa-check-circle"></i> บันทึกข้อมูลสำเร็จ!</span>';
-                         } else {
-                             statusDiv.innerHTML = '<span class="text-red-400"><i class="fas fa-times-circle"></i> ' + (response ? response.message : 'Error') + '</span>';
-                         }
-                    })
-                    .withFailureHandler((err) => {
-                        statusDiv.innerHTML = '<span class="text-red-400"><i class="fas fa-times-circle"></i> บันทึกไม่สำเร็จ</span>';
-                        console.error(err);
-                    })
-                    .saveScore(data);
-            } else {
-                statusDiv.innerHTML = '<span class="text-orange-400">โหมดทดสอบ (ไม่ได้รันบน GAS)</span>';
-                console.log("Mock save:", data);
-            }
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                statusDiv.innerHTML = '<span class="text-green-500"><i class="fas fa-check-circle"></i> บันทึกข้อมูลสำเร็จ!</span>';
+            })
+            .catch(err => {
+                console.error(err);
+                statusDiv.innerHTML = '<span class="text-red-400"><i class="fas fa-times-circle"></i> บันทึกไม่สำเร็จ</span>';
+            });
         }
 
         function resetGame() {
@@ -618,7 +576,6 @@
 
         function saveHighScore(name, score) {
             let highScores = JSON.parse(localStorage.getItem('vocabGameScores')) || [];
-            // Added Time to date string
             const date = new Date().toLocaleString('th-TH', { 
                 day: 'numeric', month: 'short', year: '2-digit',
                 hour: '2-digit', minute: '2-digit'
@@ -642,7 +599,6 @@
                 li.className = "flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg";
                 let badge = index === 0 ? '<i class="fas fa-crown text-yellow-500 ml-2"></i>' : '';
                 
-                // Updated Display with Date/Time
                 li.innerHTML = `
                     <div class="flex flex-col">
                         <span class="font-medium text-pink-600">${index + 1}. ${entry.name}${badge}</span>
@@ -658,9 +614,7 @@
             if (event.key === "Enter") { event.preventDefault(); checkAnswer(); }
         });
 
-        // Start initialization
         window.onload = init;
-
     </script>
 </body>
 </html>
