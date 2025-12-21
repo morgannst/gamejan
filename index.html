@@ -192,6 +192,16 @@
                 </div>
             </div>
 
+            <!-- Review Wrong Words Section -->
+            <div id="review-section" class="hidden bg-red-50 rounded-xl p-4 mb-6 text-left border border-red-100">
+                <h3 class="text-red-500 font-bold mb-3 text-sm flex items-center">
+                    <i class="fas fa-book-open mr-2"></i> ทบทวนคำศัพท์ที่ผิด
+                </h3>
+                <ul id="review-list" class="space-y-2 text-sm text-gray-700 max-h-40 overflow-y-auto">
+                    <!-- Wrong words will be injected here -->
+                </ul>
+            </div>
+
             <div id="sync-status" class="mb-4 text-sm text-gray-400 flex items-center justify-center h-6"></div>
 
             <div class="bg-gray-50 rounded-xl p-4 mb-6">
@@ -232,7 +242,8 @@
             usedHint: false,
             startTime: null,
             totalCorrectChars: 0,
-            vocabList: [] // Stores shuffled vocabulary
+            vocabList: [], // Stores shuffled vocabulary
+            wrongWords: [] // Stores objects of wrong answers for review
         };
 
         // --- UTILS ---
@@ -403,6 +414,7 @@
             GameState.totalCorrectChars = 0;
             GameState.startTime = new Date();
             GameState.vocabList = shuffleArray([...vocabulary]);
+            GameState.wrongWords = []; // Reset wrong words
 
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
@@ -484,6 +496,9 @@
                 AudioEngine.playSound('wrong');
                 resultInfo = { title: `ผิดจ้า! คำตอบคือ: ${target}`, icon: '<i class="fas fa-times-circle text-red-400"></i>', cls: "text-red-500" };
                 if (GameState.score > 0) GameState.score--;
+                
+                // Track wrong word
+                GameState.wrongWords.push(data);
             }
 
             document.getElementById('score-display').innerText = GameState.score;
@@ -535,6 +550,34 @@
             }
 
             if (stars === 3) setTimeout(() => AudioEngine.playSound('fanfare'), 200);
+
+            // Render Review Section
+            const reviewSection = document.getElementById('review-section');
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = "";
+
+            if (GameState.wrongWords.length > 0) {
+                reviewSection.classList.remove('hidden');
+                GameState.wrongWords.forEach(word => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-center justify-between bg-white p-2 rounded-lg border border-red-100";
+                    li.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas ${word.icon} text-red-300 w-6 text-center mr-3 text-lg"></i>
+                            <div>
+                                <div class="font-bold text-red-600 text-base">${word.word}</div>
+                                <div class="text-xs text-gray-400">${word.thaiHint}</div>
+                            </div>
+                        </div>
+                        <button onclick="AudioEngine.speak('${word.word}')" class="text-gray-400 hover:text-pink-500 p-2 active:scale-95 transition">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    `;
+                    reviewList.appendChild(li);
+                });
+            } else {
+                reviewSection.classList.add('hidden');
+            }
 
             saveHighScore(GameState.playerName, GameState.score);
             loadHighScores('highscore-list-end');
