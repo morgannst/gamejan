@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Game for Kids</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Itim', 'cursive'],
+                        head: ['Mali', 'cursive'],
+                    },
+                    colors: {
+                        pastelPink: '#FFD1DC',
+                        pastelPurple: '#E0BBE4',
+                        pastelBlue: '#AEC6CF',
+                        pastelYellow: '#FDFD96',
+                        pastelGreen: '#B5EAD7',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce-slow 3s infinite ease-in-out',
+                        'pop-in': 'pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both'
+                    },
+                    keyframes: {
+                        'bounce-slow': {
+                            '0%, 100%': { transform: 'translateY(-5px)' },
+                            '50%': { transform: 'translateY(5px)' },
+                        },
+                        'pop-in': {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        'shake': {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            /* Cute Gradient Background */
+            background: linear-gradient(135deg, #FFD1DC, #E0BBE4, #AEC6CF);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            font-family: 'Itim', cursive;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Polka Dot Overlay */
+        .bg-polka {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.4) 3px, transparent 3px);
+            background-size: 30px 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border-radius: 24px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.5);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-slate-700 relative selection:bg-pink-200">
+
+    <div class="bg-polka"></div>
+
+    <!-- Main Game Container -->
+    <div id="app" class="w-full max-w-lg p-4 mx-auto relative z-10">
+        
+        <!-- Navigation (Home Button) -->
+        <button onclick="Game.confirmHome()" class="absolute top-0 left-0 m-2 p-3 bg-white/60 rounded-full hover:bg-white text-indigo-500 hover:text-indigo-600 transition shadow-sm z-40 hidden group" id="home-btn" title="กลับหน้าหลัก">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        </button>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-400 text-white px-6 py-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 font-bold">
+            กรุณากรอกชื่อก่อนเล่นจ้า!
+        </div>
+
+        <!-- SCREEN: HOME -->
+        <div id="home-screen" class="glass-card p-8 text-center animate-pop">
+            <!-- Logo SVG -->
+            <div class="w-32 h-32 mx-auto mb-6 animate-bounce-slow">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#FDFD96" stroke="#fff" stroke-width="4"/>
+                    <path d="M30 40 Q50 20 70 40" stroke="#FFD1DC" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="35" cy="55" r="5" fill="#333"/>
+                    <circle cx="65" cy="55" r="5" fill="#333"/>
+                    <path d="M45 65 Q50 75 55 65" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                    <text x="50" y="30" font-family="'Mali', cursive" font-size="14" text-anchor="middle" fill="#FF80AB" font-weight="bold">ABC</text>
+                    <!-- Decorative Elements -->
+                    <circle cx="20" cy="30" r="3" fill="#AEC6CF"/>
+                    <circle cx="80" cy="30" r="3" fill="#E0BBE4"/>
+                </svg>
+            </div>
+
+            <h1 class="text-4xl font-head font-bold text-indigo-600 mb-2 drop-shadow-sm tracking-wide">Spelling Fun!</h1>
+            <p class="text-lg text-slate-500 mb-8 font-medium">เกมทายคำศัพท์แสนสนุก</p>
+
+            <div class="space-y-4 max-w-xs mx-auto">
+                <div class="relative">
+                    <input type="text" id="player-name" placeholder="ชื่อเล่นของหนู..." class="w-full px-6 py-4 rounded-full border-2 border-white/60 bg-white/50 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-300 text-center text-xl placeholder-slate-400 transition-all text-indigo-600 font-bold">
+                </div>
+                
+                <button onclick="Game.start()" class="w-full py-4 bg-gradient-to-r from-pink-400 to-indigo-400 hover:from-pink-500 hover:to-indigo-500 text-white text-2xl font-bold rounded-full shadow-lg hover:scale-105 transform transition hover:shadow-xl active:scale-95">
+                    เริ่มเล่นเลย! 🎮
+                </button>
+            </div>
+
+            <!-- High Score Section -->
+            <div class="mt-8 bg-white/40 rounded-2xl p-5 border border-white/60">
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <span class="text-2xl">🏆</span>
+                    <h3 class="text-xl font-bold text-indigo-500">คนเก่งประจำวัน</h3>
+                </div>
+                <div class="bg-white/40 rounded-xl p-2 h-32 overflow-y-auto custom-scroll">
+                    <ul id="highscore-list" class="space-y-2 text-left">
+                        <!-- High scores injected here -->
+                        <li class="text-center text-slate-400 text-sm py-4">ยังไม่มีคนเล่นเลย มาเป็นคนแรกกันเถอะ!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: GAME -->
+        <div id="game-screen" class="glass-card p-6 text-center hidden relative animate-pop min-h-[500px] flex flex-col">
+            <!-- Progress Bar -->
+            <div class="w-full bg-white/50 rounded-full h-5 mb-6 relative overflow-hidden shadow-inner p-1">
+                <div id="progress-bar" class="bg-gradient-to-r from-pastelGreen to-green-400 h-3 rounded-full transition-all duration-700 ease-out shadow-sm" style="width: 0%"></div>
+            </div>
+
+            <div class="flex justify-between items-center mb-2 px-2">
+                <div class="bg-white/50 px-3 py-1 rounded-full text-slate-500 text-sm font-bold border border-white">
+                    ข้อที่ <span id="question-counter">1/10</span>
+                </div>
+                <div class="bg-indigo-100/80 px-3 py-1 rounded-full text-indigo-600 font-bold text-sm border border-indigo-200">
+                    ⭐ <span id="current-score">0</span>
+                </div>
+            </div>
+
+            <!-- Image Area (Inline SVG) -->
+            <div class="relative group">
+                <div id="word-image" class="w-48 h-48 mx-auto mb-4 bg-white/50 rounded-[2rem] p-4 shadow-sm border-4 border-white flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+                    <!-- SVG injected via JS -->
+                </div>
+                <!-- Speaker Button Overlay -->
+                <button onclick="Game.speakWord()" class="absolute -bottom-2 right-1/4 bg-yellow-300 hover:bg-yellow-400 text-yellow-800 p-3 rounded-full shadow-lg transition transform hover:rotate-12 hover:scale-110 border-4 border-white" title="ฟังเสียง">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Hint Area -->
+            <div class="mb-6 h-8 flex justify-center items-center">
+                <button id="hint-btn" onclick="Game.showHint()" class="flex items-center gap-1 text-sm bg-indigo-100 text-indigo-500 px-4 py-1.5 rounded-full hover:bg-indigo-200 transition font-bold shadow-sm">
+                    💡 ขอคำใบ้ (ไม่ได้ดาวนะ)
+                </button>
+                <div id="hint-display" class="hidden text-slate-600 font-bold text-lg bg-yellow-100/80 px-4 py-1 rounded-lg border border-yellow-200 animate-pop"></div>
+            </div>
+
+            <!-- Input Area -->
+            <form onsubmit="event.preventDefault(); Game.checkAnswer();" class="mt-auto">
+                <input type="text" id="answer-input" autocomplete="off" class="w-full text-center text-3xl font-head tracking-widest bg-white/70 border-2 border-indigo-100 rounded-2xl py-4 px-4 focus:outline-none focus:border-indigo-400 focus:bg-white text-indigo-600 placeholder-indigo-200 transition shadow-sm" placeholder="พิมพ์คำตอบ...">
+                
+                <button type="submit" class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-indigo-500/30 transition transform active:scale-95 text-xl flex items-center justify-center gap-2">
+                    <span>ส่งคำตอบ</span> 🚀
+                </button>
+            </form>
+        </div>
+
+        <!-- SCREEN: FEEDBACK MODAL -->
+        <div id="feedback-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden p-4 opacity-0 transition-opacity duration-300">
+            <div class="glass-card w-full max-w-sm p-6 text-center bg-white relative transform scale-95 transition-transform duration-300" id="feedback-content">
+                <div id="feedback-icon" class="text-7xl mb-2 animate-bounce-slow inline-block">🎉</div>
+                <h2 id="feedback-title" class="text-3xl font-head font-bold mb-2 text-indigo-600"></h2>
+                
+                <div class="bg-indigo-50/80 rounded-2xl p-5 my-4 border border-indigo-100">
+                    <p class="text-3xl font-bold text-slate-700 mb-1 tracking-wide" id="feedback-word"></p>
+                    <p class="text-lg text-slate-500 mb-4" id="feedback-meaning"></p>
+                    <div class="h-px bg-indigo-200 mb-4 w-3/4 mx-auto"></div>
+                    <div class="flex flex-col items-center justify-center gap-2">
+                         <div class="flex items-center gap-2">
+                             <button onclick="Game.speakSentence()" class="bg-white p-2 rounded-full text-indigo-500 hover:text-indigo-700 shadow-sm border border-indigo-100 hover:bg-indigo-50 transition">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                </svg>
+                            </button>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Example</p>
+                         </div>
+                        <div class="text-center">
+                            <p id="feedback-sentence" class="text-slate-800 font-medium italic text-lg"></p>
+                            <p id="feedback-sentence-trans" class="text-sm text-slate-500 mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="next-btn" onclick="Game.nextQuestion()" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-400/30 text-xl transition transform hover:-translate-y-1">
+                    ข้อต่อไป ➡️
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: CONFIRM HOME MODAL -->
+        <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden p-4">
+             <div class="glass-card w-full max-w-sm p-6 text-center bg-white animate-pop">
+                <div class="text-5xl mb-4">🏠</div>
+                <h3 class="text-2xl font-bold text-slate-700 mb-2">กลับหน้าแรก?</h3>
+                <p class="text-slate-500 mb-6">ถ้ากลับตอนนี้ เกมจะเริ่มใหม่นะจ๊ะ</p>
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('confirm-modal').classList.add('hidden')" class="flex-1 bg-white border-2 border-slate-200 text-slate-500 font-bold py-2 rounded-xl hover:bg-slate-50">
+                        เล่นต่อ
+                    </button>
+                    <button onclick="Game.goHome(true)" class="flex-1 bg-pink-400 text-white font-bold py-2 rounded-xl hover:bg-pink-500 shadow-md">
+                        กลับหน้าแรก
+                    </button>
+                </div>
+             </div>
+        </div>
+
+        <!-- SCREEN: END -->
+        <div id="end-screen" class="glass-card p-8 text-center hidden animate-pop">
+            <h2 class="text-4xl font-head font-bold text-indigo-600 mb-6">จบเกมแล้ว!</h2>
+            
+            <div id="stars" class="flex justify-center gap-3 mb-6 text-6xl drop-shadow-md filter">
+                <!-- Stars JS -->
+            </div>
+
+            <div class="bg-white/50 rounded-2xl p-6 mb-8 border border-white">
+                <p id="final-praise" class="text-2xl font-bold text-pink-500 mb-2"></p>
+                <div class="flex justify-center items-end gap-2 text-slate-600">
+                    <span>คะแนนรวม</span>
+                    <span id="final-score" class="font-bold text-indigo-600 text-5xl leading-none">0</span>
+                    <span>คะแนน</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="Game.start()" class="w-full bg-indigo-500 text-white font-bold py-3.5 rounded-full hover:bg-indigo-600 transition shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    เล่นอีกครั้ง
+                </button>
+                <button onclick="Game.goHome(true)" class="w-full bg-white/80 border-2 border-indigo-200 text-indigo-500 font-bold py-3.5 rounded-full hover:bg-indigo-50 transition">
+                    กลับหน้าหลัก
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SVG ASSETS (Generated for Kids/Chibi Style) ---
+        const SVGs = {
+            ferris_wheel: `<svg viewBox="0 0 200 200"><circle cx="100" cy="90" r="70" stroke="#FF80AB" stroke-width="8" fill="none"/><path d="M100 90 L100 20 M100 90 L160 55 M100 90 L160 125 M100 90 L100 160 M100 90 L40 125 M100 90 L40 55" stroke="#FFD1DC" stroke-width="4"/><circle cx="100" cy="90" r="10" fill="#FDFD96"/><path d="M70 160 L100 90 L130 160" stroke="#AEC6CF" stroke-width="8" fill="none" stroke-linecap="round"/><rect x="90" y="10" width="20" height="20" rx="5" fill="#B5EAD7"/><rect x="150" y="45" width="20" height="20" rx="5" fill="#E0BBE4"/><rect x="150" y="115" width="20" height="20" rx="5" fill="#FF80AB"/><rect x="90" y="150" width="20" height="20" rx="5" fill="#B5EAD7"/><rect x="30" y="115" width="20" height="20" rx="5" fill="#E0BBE4"/><rect x="30" y="45" width="20" height="20" rx="5" fill="#FF80AB"/></svg>`,
+            city: `<svg viewBox="0 0 200 200"><rect x="40" y="80" width="40" height="100" fill="#AEC6CF" rx="5"/><rect x="90" y="40" width="50" height="140" fill="#E0BBE4" rx="5"/><rect x="150" y="100" width="30" height="80" fill="#FFD1DC" rx="5"/><rect x="50" y="90" width="10" height="10" fill="white"/><rect x="50" y="110" width="10" height="10" fill="white"/><rect x="100" y="60" width="10" height="10" fill="white"/><rect x="120" y="60" width="10" height="10" fill="white"/><rect x="100" y="80" width="10" height="10" fill="white"/><rect x="120" y="80" width="10" height="10" fill="white"/><circle cx="170" cy="30" r="15" fill="#FDFD96" opacity="0.8"/></svg>`,
+            countryside: `<svg viewBox="0 0 200 200"><circle cx="160" cy="40" r="20" fill="#FDFD96"/><path d="M0 150 Q50 100 100 150 T200 150 V200 H0 Z" fill="#B5EAD7"/><path d="M-20 180 Q60 140 140 180 T300 180 V200 H-20 Z" fill="#90EE90"/><rect x="40" y="110" width="40" height="40" fill="#FFD1DC" stroke="#A88884" stroke-width="2"/><path d="M35 110 L60 85 L85 110 Z" fill="#FF80AB"/><rect x="55" y="130" width="10" height="20" fill="#A88884" rx="2"/><circle cx="150" cy="130" r="15" fill="#81C784"/><rect x="148" y="145" width="4" height="20" fill="#8D6E63"/></svg>`,
+            tomorrow: `<svg viewBox="0 0 200 200"><rect x="40" y="50" width="120" height="120" rx="15" fill="white" stroke="#AEC6CF" stroke-width="4"/><rect x="40" y="50" width="120" height="40" rx="15" fill="#FF80AB"/><text x="100" y="80" font-family="Mali" font-size="20" fill="white" text-anchor="middle">NEXT DAY</text><text x="100" y="140" font-family="Itim" font-size="60" fill="#333" text-anchor="middle">☀️</text><path d="M140 120 L170 120 L155 135" stroke="#333" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
+            yesterday: `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="70" fill="#E0BBE4" stroke="white" stroke-width="5"/><circle cx="100" cy="100" r="5" fill="#333"/><path d="M100 100 L100 50" stroke="#333" stroke-width="5" stroke-linecap="round"/><path d="M100 100 L60 100" stroke="#333" stroke-width="5" stroke-linecap="round"/><path d="M100 40 Q60 40 40 70 L30 60 M40 70 L55 70" stroke="#FF80AB" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+            penguin: `<svg viewBox="0 0 200 200"><ellipse cx="100" cy="110" rx="50" ry="70" fill="#37474F"/><ellipse cx="100" cy="115" rx="35" ry="55" fill="white"/><circle cx="85" cy="90" r="5" fill="#333"/><circle cx="115" cy="90" r="5" fill="#333"/><path d="M95 100 L105 100 L100 110 Z" fill="#FFB74D"/><path d="M60 130 Q50 150 70 170" stroke="#FFB74D" stroke-width="8" stroke-linecap="round"/><path d="M140 130 Q150 150 130 170" stroke="#FFB74D" stroke-width="8" stroke-linecap="round"/></svg>`,
+            octopus: `<svg viewBox="0 0 200 200"><circle cx="100" cy="90" r="50" fill="#FFD1DC"/><circle cx="85" cy="85" r="8" fill="white"/><circle cx="115" cy="85" r="8" fill="white"/><circle cx="85" cy="85" r="3" fill="#333"/><circle cx="115" cy="85" r="3" fill="#333"/><path d="M95 100 Q100 105 105 100" stroke="#333" stroke-width="2" fill="none"/><path d="M60 120 Q50 160 70 150 T90 150" fill="none" stroke="#FFD1DC" stroke-width="15" stroke-linecap="round"/><path d="M140 120 Q150 160 130 150 T110 150" fill="none" stroke="#FFD1DC" stroke-width="15" stroke-linecap="round"/><path d="M55 100 Q30 120 50 130" fill="none" stroke="#FFD1DC" stroke-width="15" stroke-linecap="round"/><path d="M145 100 Q170 120 150 130" fill="none" stroke="#FFD1DC" stroke-width="15" stroke-linecap="round"/></svg>`,
+            turtle: `<svg viewBox="0 0 200 200"><ellipse cx="100" cy="110" rx="60" ry="45" fill="#B5EAD7"/><path d="M70 110 Q100 60 130 110" fill="#81C784" stroke="#66BB6A" stroke-width="2"/><circle cx="160" cy="110" r="25" fill="#B5EAD7"/><circle cx="165" cy="105" r="3" fill="#333"/><path d="M60 145 L50 165" stroke="#B5EAD7" stroke-width="12" stroke-linecap="round"/><path d="M140 145 L150 165" stroke="#B5EAD7" stroke-width="12" stroke-linecap="round"/><path d="M40 110 L30 120" stroke="#B5EAD7" stroke-width="8" stroke-linecap="round"/></svg>`,
+            dolphin: `<svg viewBox="0 0 200 200"><path d="M160 100 Q140 60 80 80 Q40 90 40 120 Q60 130 100 110" fill="#AEC6CF"/><circle cx="70" cy="95" r="3" fill="#333"/><path d="M100 80 L90 60 L110 75" fill="#AEC6CF"/><path d="M100 110 L110 130 L120 115" fill="#AEC6CF"/><path d="M160 100 Q180 100 170 80 M160 100 Q180 110 170 130" stroke="#AEC6CF" stroke-width="5" fill="none"/></svg>`,
+            alligator: `<svg viewBox="0 0 200 200"><rect x="40" y="100" width="120" height="40" rx="10" fill="#B5EAD7"/><path d="M40 100 L30 120 L50 120 Z" fill="#81C784"/><path d="M160 100 Q190 110 190 130 L160 140" fill="#B5EAD7"/><circle cx="170" cy="115" r="5" fill="white"/><circle cx="172" cy="115" r="2" fill="#333"/><path d="M60 140 L60 155" stroke="#B5EAD7" stroke-width="10" stroke-linecap="round"/><path d="M140 140 L140 155" stroke="#B5EAD7" stroke-width="10" stroke-linecap="round"/><path d="M40 100 L50 90 L60 100 L70 90 L80 100 L90 90 L100 100" fill="none" stroke="#81C784" stroke-width="3"/></svg>`
+        };
+
+        // --- VOCABULARY DATA ---
+        const vocabData = [
+            { word: 'ferris wheel', meaning: 'ชิงช้าสวรรค์', hint: 'เครื่องเล่นในสวนสนุก หมุนเป็นวงกลมสูงๆ', sentence: 'We see the big ferris wheel.', sentenceTrans: 'พวกเราเห็นชิงช้าสวรรค์อันใหญ่', svg: SVGs.ferris_wheel },
+            { word: 'city', meaning: 'เมือง', hint: 'ที่ที่มีตึกเยอะๆ และรถมากมาย', sentence: 'The city is very busy.', sentenceTrans: 'ในเมืองมีความวุ่นวายมาก', svg: SVGs.city },
+            { word: 'countryside', meaning: 'ชนบท', hint: 'นอกเมือง มีทุ่งนาและภูเขา', sentence: 'Grandma lives in the countryside.', sentenceTrans: 'คุณยายอาศัยอยู่ในชนบท', svg: SVGs.countryside },
+            { word: 'tomorrow', meaning: 'พรุ่งนี้', hint: 'วันที่ต่อจากวันนี้', sentence: 'I will go to school tomorrow.', sentenceTrans: 'ฉันจะไปโรงเรียนพรุ่งนี้', svg: SVGs.tomorrow },
+            { word: 'yesterday', meaning: 'เมื่อวาน', hint: 'วันที่ผ่านมาแล้ว', sentence: 'Yesterday was Sunday.', sentenceTrans: 'เมื่อวานคือวันอาทิตย์', svg: SVGs.yesterday },
+            { word: 'penguin', meaning: 'นกเพนกวิน', hint: 'นกตัวสีดำขาว อยู่ที่หนาวๆ เดินต้วมเตี้ยม', sentence: 'The penguin loves the ice.', sentenceTrans: 'นกเพนกวินชอบน้ำแข็ง', svg: SVGs.penguin },
+            { word: 'octopus', meaning: 'ปลาหมึกยักษ์', hint: 'สัตว์ทะเลที่มี 8 หนวด', sentence: 'An octopus has eight legs.', sentenceTrans: 'ปลาหมึกยักษ์มี 8 ขา', svg: SVGs.octopus },
+            { word: 'turtle', meaning: 'เต่า', hint: 'สัตว์ที่มีกระดองแข็ง เดินช้า', sentence: 'The turtle walks slowly.', sentenceTrans: 'เต่าเดินอย่างช้าๆ', svg: SVGs.turtle },
+            { word: 'dolphin', meaning: 'โลมา', hint: 'สัตว์เลี้ยงลูกด้วยนมในทะเล ฉลาดและขี้เล่น', sentence: 'Dolphins can jump high.', sentenceTrans: 'โลมากระโดดได้สูง', svg: SVGs.dolphin },
+            { word: 'alligator', meaning: 'จระเข้', hint: 'สัตว์เลื้อยคลานตัวเขียว ฟันแหลม อยู่ในน้ำ', sentence: 'Be careful of the alligator!', sentenceTrans: 'ระวังจระเข้นะ!', svg: SVGs.alligator }
+        ];
+
+        // --- GAME LOGIC ---
+        const Game = {
+            state: {
+                playerName: '',
+                questions: [],
+                currentIndex: 0,
+                score: 0,
+                isHintUsed: false
+            },
+
+            init: function() {
+                this.loadHighScores();
+                // Prevent form submit refresh
+                document.getElementById('answer-input').addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        this.checkAnswer();
+                    }
+                });
+            },
+
+            loadHighScores: function() {
+                try {
+                    const scores = JSON.parse(localStorage.getItem('spellingGameScores')) || [];
+                    const list = document.getElementById('highscore-list');
+                    if (scores.length === 0) {
+                        list.innerHTML = `<li class="text-center text-slate-400 text-sm py-4">ยังไม่มีคนเล่นเลย มาเป็นคนแรกกันเถอะ!</li>`;
+                        return;
+                    }
+                    list.innerHTML = scores.map((s, i) => {
+                        let medal = '';
+                        if (i === 0) medal = '🥇';
+                        else if (i === 1) medal = '🥈';
+                        else if (i === 2) medal = '🥉';
+                        
+                        return `<li class="flex justify-between items-center bg-white/60 p-3 rounded-lg text-sm shadow-sm mb-1">
+                            <span class="font-bold text-slate-600 truncate max-w-[120px]">${medal} ${i+1}. ${s.name}</span>
+                            <span class="font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md">${s.score} pts</span>
+                        </li>`;
+                    }).join('');
+                } catch (e) {
+                    console.error("Local storage access failed", e);
+                }
+            },
+
+            saveHighScore: function() {
+                try {
+                    let scores = JSON.parse(localStorage.getItem('spellingGameScores')) || [];
+                    scores.push({ name: this.state.playerName, score: this.state.score });
+                    scores.sort((a, b) => b.score - a.score); // Descending
+                    scores = scores.slice(0, 5); // Top 5
+                    localStorage.setItem('spellingGameScores', JSON.stringify(scores));
+                } catch(e) {
+                    console.error("Could not save high score", e);
+                }
+            },
+
+            shuffleQuestions: function() {
+                let array = [...vocabData];
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            },
+
+            start: function() {
+                const nameInput = document.getElementById('player-name').value.trim();
+                if (!nameInput) {
+                    this.showToast();
+                    document.getElementById('player-name').focus();
+                    return;
+                }
+                
+                this.state.playerName = nameInput;
+                this.state.questions = this.shuffleQuestions();
+                this.state.currentIndex = 0;
+                this.state.score = 0;
+
+                this.showScreen('game-screen');
+                document.getElementById('home-btn').classList.remove('hidden');
+                this.renderQuestion();
+            },
+
+            showToast: function() {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                toast.classList.add('opacity-100', 'animate-bounce');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'animate-bounce');
+                    toast.classList.add('opacity-0');
+                }, 2000);
+            },
+
+            renderQuestion: function() {
+                const q = this.state.questions[this.state.currentIndex];
+                this.state.isHintUsed = false;
+
+                // Reset UI
+                const input = document.getElementById('answer-input');
+                input.value = '';
+                input.classList.remove('border-red-400', 'bg-red-50', 'text-red-500');
+                input.classList.add('border-indigo-100', 'bg-white/70', 'text-indigo-600');
+                
+                document.getElementById('hint-display').classList.add('hidden');
+                document.getElementById('hint-btn').classList.remove('hidden');
+                
+                // Update Info
+                document.getElementById('question-counter').innerText = `${this.state.currentIndex + 1}/${this.state.questions.length}`;
+                document.getElementById('current-score').innerText = `${this.state.score}`;
+                
+                // Progress Bar
+                const progress = ((this.state.currentIndex) / this.state.questions.length) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+
+                // SVG
+                document.getElementById('word-image').innerHTML = q.svg;
+
+                // Focus (Delay slightly for transition)
+                setTimeout(() => {
+                    document.getElementById('answer-input').focus();
+                }, 300);
+
+                // Auto Speak
+                setTimeout(() => this.speak(q.word), 600);
+            },
+
+            checkAnswer: function() {
+                const inputEl = document.getElementById('answer-input');
+                const input = inputEl.value.trim().toLowerCase();
+                const currentQ = this.state.questions[this.state.currentIndex];
+                
+                if (!input) return;
+
+                const isCorrect = input === currentQ.word.toLowerCase();
+                
+                // Calculate Score
+                if (isCorrect) {
+                    const points = this.state.isHintUsed ? 0 : 10;
+                    this.state.score += points;
+                    this.showFeedback(true, points);
+                } else {
+                    // Shake animation for error
+                    inputEl.classList.add('animate-shake', 'border-red-400', 'bg-red-50', 'text-red-500');
+                    setTimeout(() => inputEl.classList.remove('animate-shake'), 500);
+                    // Just show feedback immediately for kids game
+                    this.showFeedback(false, 0);
+                }
+            },
+
+            showHint: function() {
+                const currentQ = this.state.questions[this.state.currentIndex];
+                this.state.isHintUsed = true;
+                
+                const display = document.getElementById('hint-display');
+                const btn = document.getElementById('hint-btn');
+                
+                // Show first letter + hint text
+                display.innerHTML = `<span class="text-pink-500 font-bold text-2xl">${currentQ.word.charAt(0).toUpperCase()}...</span> <span class="text-sm font-normal">(${currentQ.hint})</span>`;
+                display.classList.remove('hidden');
+                btn.classList.add('hidden');
+            },
+
+            showFeedback: function(isCorrect, points) {
+                const modal = document.getElementById('feedback-modal');
+                const content = document.getElementById('feedback-content');
+                const title = document.getElementById('feedback-title');
+                const icon = document.getElementById('feedback-icon');
+                const word = document.getElementById('feedback-word');
+                const meaning = document.getElementById('feedback-meaning');
+                const sentence = document.getElementById('feedback-sentence');
+                const trans = document.getElementById('feedback-sentence-trans');
+                const currentQ = this.state.questions[this.state.currentIndex];
+                const nextBtn = document.getElementById('next-btn');
+
+                modal.classList.remove('hidden');
+                // Force reflow for transition
+                void modal.offsetWidth; 
+                modal.classList.remove('opacity-0');
+                
+                if (isCorrect) {
+                    icon.innerText = points > 0 ? '🌟' : '😅';
+                    title.innerText = points > 0 ? 'เก่งมาก!' : 'ถูกแล้วจ้า (แต่ใช้คำใบ้)';
+                    title.className = "text-3xl font-head font-bold mb-2 " + (points > 0 ? "text-green-500" : "text-yellow-500");
+                    if(points > 0) setTimeout(() => this.speak("Excellent!"), 200);
+                    nextBtn.className = "w-full bg-green-400 hover:bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-400/30 text-xl transition transform hover:-translate-y-1";
+                } else {
+                    icon.innerText = '❌';
+                    title.innerText = 'เฉลยจ้า';
+                    title.className = "text-3xl font-head font-bold mb-2 text-pink-500";
+                    setTimeout(() => this.speak("Nice try!"), 200);
+                    nextBtn.className = "w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-400/30 text-xl transition transform hover:-translate-y-1";
+                }
+
+                word.innerText = currentQ.word;
+                meaning.innerText = currentQ.meaning;
+                sentence.innerText = `"${currentQ.sentence}"`;
+                trans.innerText = currentQ.sentenceTrans;
+                
+                // Auto focus next button logic
+                setTimeout(() => nextBtn.focus(), 100);
+            },
+
+            nextQuestion: function() {
+                const modal = document.getElementById('feedback-modal');
+                modal.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    this.state.currentIndex++;
+
+                    if (this.state.currentIndex >= this.state.questions.length) {
+                        this.endGame();
+                    } else {
+                        this.renderQuestion();
+                    }
+                }, 300);
+            },
+
+            speakWord: function() {
+                const q = this.state.questions[this.state.currentIndex];
+                this.speak(q.word);
+            },
+
+            speakSentence: function() {
+                const q = this.state.questions[this.state.currentIndex];
+                this.speak(q.sentence);
+            },
+
+            speak: function(text) {
+                if ('speechSynthesis' in window) {
+                    // Cancel any previous speaking
+                    window.speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8; // Slower for kids
+                    utterance.pitch = 1.1; // Slightly higher pitch
+                    window.speechSynthesis.speak(utterance);
+                }
+            },
+
+            endGame: function() {
+                this.showScreen('end-screen');
+                document.getElementById('home-btn').classList.add('hidden');
+                
+                const finalScore = this.state.score;
+                const maxScore = this.state.questions.length * 10;
+                
+                // Animate score count
+                const scoreEl = document.getElementById('final-score');
+                let currentDisplayScore = 0;
+                const timer = setInterval(() => {
+                    if (currentDisplayScore >= finalScore) {
+                        clearInterval(timer);
+                    } else {
+                        currentDisplayScore++;
+                        scoreEl.innerText = currentDisplayScore;
+                    }
+                }, 50);
+
+                // Calculate Stars
+                const percentage = (finalScore / maxScore) * 100;
+                let starsHTML = '';
+                let praise = '';
+
+                if (percentage === 100) {
+                    starsHTML = '<span class="text-yellow-400">⭐⭐⭐</span>';
+                    praise = 'สุดยอด! เทพมาก!';
+                } else if (percentage >= 70) {
+                    starsHTML = '<span class="text-yellow-400">⭐⭐</span><span class="text-gray-300 opacity-50">⭐</span>';
+                    praise = 'เก่งมาก! พยายามอีกนิดนะ';
+                } else {
+                    starsHTML = '<span class="text-yellow-400">⭐</span><span class="text-gray-300 opacity-50">⭐⭐</span>';
+                    praise = 'สู้ๆ นะ ฝึกฝนบ่อยๆ เก่งแน่นอน';
+                }
+
+                document.getElementById('stars').innerHTML = starsHTML;
+                document.getElementById('final-praise').innerText = praise;
+
+                this.saveHighScore();
+            },
+
+            showScreen: function(screenId) {
+                ['home-screen', 'game-screen', 'end-screen'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(screenId).classList.remove('hidden');
+                
+                // Specific Logic for Screens
+                if(screenId === 'home-screen') {
+                    this.init(); // Reload scores
+                    document.getElementById('player-name').value = '';
+                }
+            },
+
+            confirmHome: function() {
+                document.getElementById('confirm-modal').classList.remove('hidden');
+            },
+
+            goHome: function(confirmed) {
+                if(confirmed) {
+                    document.getElementById('confirm-modal').classList.add('hidden');
+                    this.showScreen('home-screen');
+                    document.getElementById('home-btn').classList.add('hidden');
+                }
+            }
+        };
+
+        // Initialize Game
+        Game.init();
+
+    </script>
+</body>
+</html>
