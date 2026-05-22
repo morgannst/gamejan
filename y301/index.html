@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Game - สนุกกับคำศัพท์! ทดสอบ 27 พ.ค. 2569</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body { font-family: 'Mali', cursive; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center;}
+        h1, h2, h3, h4, h5, h6, .heading-font { font-family: 'Itim', cursive; }
+        
+        /* Glassmorphism Classes */
+        .glass-panel { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 2px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); border-radius: 24px; }
+        .glass-btn { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(4px); transition: all 0.2s ease; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .glass-btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .glass-btn:active { transform: translateY(1px); }
+        .glass-input { background: rgba(255, 255, 255, 0.6); border: 2px solid rgba(255,255,255,0.8); transition: all 0.3s ease; }
+        .glass-input:focus { outline: none; background: rgba(255, 255, 255, 0.9); border-color: #a18cd1; box-shadow: 0 0 15px rgba(161, 140, 209, 0.4); }
+        
+        /* Animations */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.8); border-radius: 10px; }
+    </style>
+</head>
+<body class="text-gray-800 p-4">
+
+    <div id="app" class="w-full max-w-2xl mx-auto relative overflow-hidden h-[90vh] md:h-[80vh] flex flex-col justify-center items-center">
+        
+        <!-- Connection Status Badge -->
+        <div id="connection-status" class="absolute top-4 right-4 glass-panel px-3 py-1.5 flex items-center gap-2 text-xs md:text-sm font-bold text-gray-600 z-50 fade-in shadow-sm">
+            <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></div>
+            <span id="status-text">กำลังตรวจสอบ...</span>
+        </div>
+
+        <!-- ================= START SCREEN ================= -->
+        <div id="screen-start" class="glass-panel p-8 w-full max-w-md text-center fade-in flex flex-col items-center justify-center">
+            <div class="animate-float mb-4">
+                <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#FFB7B2"/>
+                    <circle cx="35" cy="40" r="5" fill="#333"/>
+                    <circle cx="65" cy="40" r="5" fill="#333"/>
+                    <path d="M 40 60 Q 50 70 60 60" stroke="#333" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    <circle cx="25" cy="50" r="6" fill="#FF8A8A" opacity="0.6"/>
+                    <circle cx="75" cy="50" r="6" fill="#FF8A8A" opacity="0.6"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl text-purple-600 mb-2 drop-shadow-md">Spelling Game!</h1>
+            <p class="text-gray-600 mb-6">มาทายคำศัพท์ภาษาอังกฤษกันเถอะ</p>
+            
+            <input type="text" id="player-name" placeholder="พิมพ์ชื่อเล่นของหนูที่นี่..." class="glass-input w-full p-4 rounded-xl text-center text-xl mb-4 font-bold text-purple-700" autocomplete="off">
+            
+            <button id="btn-start" class="glass-btn w-full py-4 rounded-xl text-xl font-bold text-purple-600 mb-6 bg-gradient-to-r from-yellow-200 to-yellow-400 border-yellow-100 heading-font">
+                🚀 เริ่มเล่นเกมเลย!
+            </button>
+
+            <!-- Leaderboard -->
+            <div class="bg-white/30 rounded-xl p-4 w-full border border-white/40">
+                <h3 class="heading-font text-lg text-purple-700 mb-2 flex items-center justify-center gap-2">
+                    🏆 <span>คนเก่ง Top 5</span>
+                </h3>
+                <div id="leaderboard-content" class="text-sm">
+                    <div class="flex justify-center my-4">
+                        <svg class="animate-spin h-6 w-6 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= GAME SCREEN ================= -->
+        <div id="screen-game" class="glass-panel p-6 w-full h-full max-h-[800px] hidden flex-col fade-in">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <button id="btn-home" class="glass-btn p-2 rounded-full text-purple-600 w-12 h-12 flex items-center justify-center text-xl" title="กลับหน้าแรก">🏠</button>
+                <div class="glass-panel px-6 py-2 rounded-full text-lg font-bold text-pink-600 heading-font">
+                    คะแนน: <span id="ui-score" class="text-2xl">0</span>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="w-full bg-white/50 rounded-full h-4 mb-6 border border-white">
+                <div id="ui-progress" class="bg-gradient-to-r from-pink-400 to-purple-500 h-4 rounded-full transition-all duration-500" style="width: 10%"></div>
+            </div>
+
+            <!-- Game Content -->
+            <div class="flex-1 flex flex-col items-center justify-center w-full">
+                <h2 id="ui-question-num" class="heading-font text-xl text-gray-500 mb-2">ข้อที่ 1 / 10</h2>
+                
+                <!-- SVG Area -->
+                <div id="ui-svg-container" class="mb-4 h-32 w-32 animate-float"></div>
+                
+                <h3 id="ui-hint-th" class="text-2xl md:text-3xl font-bold text-purple-700 mb-2 text-center bg-white/40 px-6 py-2 rounded-xl">คำแปล</h3>
+                
+                <div class="flex gap-2 mb-6">
+                    <button id="btn-listen" class="glass-btn px-4 py-2 rounded-lg text-blue-600 font-bold flex items-center gap-2">
+                        🔊 ฟังเสียง
+                    </button>
+                    <button id="btn-hint" class="glass-btn px-4 py-2 rounded-lg text-orange-500 font-bold flex items-center gap-2">
+                        💡 ขอคำใบ้
+                    </button>
+                </div>
+
+                <div id="hint-display" class="hidden text-xl text-red-500 mb-4 heading-font font-bold">
+                    อักษรตัวแรกคือ: <span id="ui-first-letter" class="text-3xl bg-white/50 px-3 py-1 rounded">A</span>
+                </div>
+
+                <input type="text" id="answer-input" placeholder="พิมพ์คำศัพท์ภาษาอังกฤษ..." class="glass-input w-full md:w-3/4 p-4 rounded-xl text-center text-2xl mb-4 font-bold text-blue-700" autocomplete="off">
+                
+                <button id="btn-submit" class="glass-btn w-full md:w-3/4 py-4 rounded-xl text-2xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 border-pink-300 heading-font mt-auto shadow-lg hover:from-purple-600 hover:to-pink-600">
+                    ✨ ส่งคำตอบ ✨
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= END SCREEN ================= -->
+        <div id="screen-end" class="glass-panel p-8 w-full max-w-md text-center hidden flex-col items-center justify-center fade-in">
+            <h1 class="text-4xl text-pink-600 mb-4 heading-font drop-shadow-sm">เย้! จบเกมแล้ว 🎉</h1>
+            
+            <div id="ui-stars" class="text-6xl mb-4 flex justify-center gap-2 animate-bounce">
+                <!-- Stars will be injected here -->
+            </div>
+
+            <div class="bg-white/50 rounded-2xl p-6 w-full mb-6 border border-white">
+                <p class="text-xl mb-2 text-gray-600">หนูทำคะแนนได้</p>
+                <p class="text-6xl font-bold text-purple-600 heading-font"><span id="final-score">10</span>/10</p>
+                <p id="ui-feedback-msg" class="text-xl mt-4 font-bold text-pink-500"></p>
+            </div>
+
+            <div id="save-status" class="mb-4 text-sm font-bold px-4 py-2 rounded-full text-blue-600 bg-blue-100/50 hidden items-center gap-2">
+                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                กำลังบันทึกคะแนน...
+            </div>
+
+            <button id="btn-restart" class="glass-btn w-full py-4 rounded-xl text-xl font-bold text-purple-600 bg-gradient-to-r from-yellow-200 to-yellow-400 border-yellow-100 heading-font">
+                🔄 เล่นอีกครั้ง
+            </button>
+        </div>
+
+        <!-- ================= MODALS ================= -->
+        <!-- Feedback Modal -->
+        <div id="modal-feedback" class="absolute inset-0 z-50 bg-black/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm p-6 text-center transform transition-transform scale-95 border-4" id="modal-feedback-content">
+                <div id="feedback-icon" class="text-6xl mb-4">✅</div>
+                <h2 id="feedback-title" class="text-3xl heading-font font-bold mb-2">เก่งมาก!</h2>
+                <p class="text-gray-600 mb-2">คำที่ถูกต้องคือ</p>
+                <p id="feedback-correct-word" class="text-4xl text-purple-600 font-bold heading-font mb-4">Apple</p>
+                
+                <div class="bg-white/50 rounded-xl p-4 mb-6 text-left">
+                    <p class="text-sm text-gray-500 mb-1">ตัวอย่างประโยค:</p>
+                    <p id="feedback-sentence" class="text-lg font-bold text-gray-800">The apple is red.</p>
+                    <p id="feedback-sentence-th" class="text-sm text-gray-600 mb-3">แอปเปิ้ลสีแดง</p>
+                    <button id="btn-listen-sentence" class="glass-btn w-full py-2 rounded-lg text-blue-600 font-bold text-sm flex items-center justify-center gap-2">
+                        🔊 ฟังประโยค
+                    </button>
+                </div>
+                
+                <button id="btn-next-word" class="glass-btn w-full py-3 rounded-xl text-xl font-bold text-white bg-gradient-to-r from-green-400 to-green-500 border-green-300 heading-font">
+                    ข้อต่อไป 👉
+                </button>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div id="modal-confirm" class="absolute inset-0 z-50 bg-black/20 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-xs p-6 text-center">
+                <h2 class="text-2xl heading-font font-bold mb-4 text-purple-600">แน่ใจไหม?</h2>
+                <p class="mb-6 text-gray-600">ถ้ากลับหน้าแรก คะแนนของเกมนี้จะหายไปนะ</p>
+                <div class="flex gap-4">
+                    <button id="btn-cancel-home" class="glass-btn flex-1 py-2 rounded-xl text-gray-600 font-bold">เล่นต่อ</button>
+                    <button id="btn-confirm-home" class="glass-btn flex-1 py-2 rounded-xl text-red-500 font-bold bg-red-50 border-red-200">กลับหน้าแรก</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 อัปเดต URL เรียบร้อยแล้ว
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfQYOxqFcn8tZbzYTQCbRXzP6qbpju6TMl6WjpGPcW4oCOeXm8hR_MWxVJbvUKwaOl7Q/exec';
+
+        // Vocabulary Data with SVG Illustrations
+        const VOCAB_DATA = [
+            {
+                word: "quickly",
+                hintTh: "อย่างรวดเร็ว (เหมือนจรวด!)",
+                sentence: "The rabbit runs quickly.",
+                sentenceTh: "กระต่ายวิ่งอย่างรวดเร็ว",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M20 80 L80 20 L60 10 L10 60 Z" fill="#FF9A9E"/><path d="M80 20 Q90 10 95 5 Q90 20 80 20" fill="#FECFEF"/><circle cx="45" cy="45" r="10" fill="#FFF"/><circle cx="20" cy="80" r="15" fill="#FFA07A" opacity="0.6"/></svg>`
+            },
+            {
+                word: "slowly",
+                hintTh: "อย่างช้าๆ (เหมือนเต่า)",
+                sentence: "The turtle walks slowly.",
+                sentenceTh: "เต่าเดินอย่างช้าๆ",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M20 70 Q50 30 80 70 Z" fill="#A8E6CF"/><circle cx="80" cy="75" r="10" fill="#DCEDC1"/><circle cx="25" cy="75" r="5" fill="#DCEDC1"/><circle cx="40" cy="75" r="5" fill="#DCEDC1"/><circle cx="55" cy="75" r="5" fill="#DCEDC1"/></svg>`
+            },
+            {
+                word: "forward",
+                hintTh: "ไปข้างหน้า",
+                sentence: "Walk forward to the door.",
+                sentenceTh: "เดินไปข้างหน้าไปที่ประตู",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M50 10 L90 50 L70 50 L70 90 L30 90 L30 50 L10 50 Z" fill="#88D8B0"/></svg>`
+            },
+            {
+                word: "backwards",
+                hintTh: "ถอยหลัง",
+                sentence: "Take one step backwards.",
+                sentenceTh: "ก้าวถอยหลังหนึ่งก้าว",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M50 90 L10 50 L30 50 L30 10 L70 10 L70 50 L90 50 Z" fill="#FF847C"/></svg>`
+            },
+            {
+                word: "celebration",
+                hintTh: "งานฉลอง (มีลูกโป่ง!)",
+                sentence: "We have a big celebration.",
+                sentenceTh: "เรามีงานเฉลิมฉลองใหญ่",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="30" cy="40" r="20" fill="#FFD3B6"/><circle cx="70" cy="50" r="15" fill="#FFAAA5"/><path d="M30 60 Q35 80 40 100" stroke="#FFF" stroke-width="2"/><path d="M70 65 Q65 85 60 100" stroke="#FFF" stroke-width="2"/></svg>`
+            },
+            {
+                word: "together",
+                hintTh: "ด้วยกัน",
+                sentence: "We play together.",
+                sentenceTh: "เราเล่นด้วยกัน",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="35" cy="35" r="15" fill="#FFDAC1"/><circle cx="65" cy="35" r="15" fill="#B5EAD7"/><path d="M20 80 Q35 55 50 80" stroke="#FFDAC1" stroke-width="10" stroke-linecap="round"/><path d="M80 80 Q65 55 50 80" stroke="#B5EAD7" stroke-width="10" stroke-linecap="round"/></svg>`
+            },
+            {
+                word: "New Year",
+                hintTh: "วันปีใหม่ (พลุสวยๆ)",
+                sentence: "Happy New Year!",
+                sentenceTh: "สวัสดีปีใหม่!",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M50 10 L50 30 M50 70 L50 90 M10 50 L30 50 M70 50 L90 50 M25 25 L40 40 M60 60 L75 75 M75 25 L60 40 M40 60 L25 75" stroke="#FFDF00" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="50" r="10" fill="#FF6B6B"/></svg>`
+            },
+            {
+                word: "dragon",
+                hintTh: "มังกร (พ่นไฟได้)",
+                sentence: "The dragon is flying.",
+                sentenceTh: "มังกรกำลังบิน",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><path d="M20 50 Q50 10 80 50 Q50 90 20 50" fill="#A8E6CF"/><circle cx="60" cy="40" r="5" fill="#333"/><path d="M75 55 Q90 60 95 50" stroke="#FF8A8A" stroke-width="4" stroke-linecap="round"/></svg>`
+            },
+            {
+                word: "difficult",
+                hintTh: "ยากจังเลย (เหงื่อตก)",
+                sentence: "This puzzle is difficult.",
+                sentenceTh: "ปริศนานี้ยากจัง",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#FFD3B6"/><path d="M30 40 Q40 30 50 40" stroke="#333" stroke-width="3" fill="none"/><path d="M70 40 Q60 30 50 40" stroke="#333" stroke-width="3" fill="none"/><path d="M40 70 Q50 60 60 70" stroke="#333" stroke-width="3" fill="none"/><circle cx="80" cy="30" r="5" fill="#88D8B0"/></svg>`
+            },
+            {
+                word: "easy",
+                hintTh: "ง่ายนิดเดียว (ยิ้มแฉ่ง)",
+                sentence: "The test is very easy.",
+                sentenceTh: "ข้อสอบนี้ง่ายมาก",
+                svg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#FFDAC1"/><circle cx="35" cy="40" r="5" fill="#333"/><circle cx="65" cy="40" r="5" fill="#333"/><path d="M30 60 Q50 80 70 60" stroke="#333" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M80 20 L70 30 L85 40" stroke="#FF6B6B" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`
+            }
+        ];
+
+        // Game Object Architecture
+        const Game = {
+            state: {
+                words: [],
+                currentIndex: 0,
+                score: 0,
+                playerName: '',
+                isHintUsed: false
+            },
+            
+            // DOM Elements
+            els: {
+                startScreen: document.getElementById('screen-start'),
+                gameScreen: document.getElementById('screen-game'),
+                endScreen: document.getElementById('screen-end'),
+                nameInput: document.getElementById('player-name'),
+                ansInput: document.getElementById('answer-input'),
+                leaderboard: document.getElementById('leaderboard-content'),
+                modals: {
+                    feedback: document.getElementById('modal-feedback'),
+                    confirm: document.getElementById('modal-confirm')
+                }
+            },
+
+            init() {
+                this.bindEvents();
+                this.api.getLeaderboard();
+            },
+
+            bindEvents() {
+                // Start
+                document.getElementById('btn-start').addEventListener('click', () => this.logic.startGame());
+                this.els.nameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.logic.startGame(); });
+                
+                // Game
+                document.getElementById('btn-submit').addEventListener('click', () => this.logic.checkAnswer());
+                this.els.ansInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.logic.checkAnswer(); });
+                
+                document.getElementById('btn-listen').addEventListener('click', () => {
+                    this.audio.speak(this.state.words[this.state.currentIndex].word);
+                });
+                
+                document.getElementById('btn-hint').addEventListener('click', () => {
+                    this.state.isHintUsed = true;
+                    document.getElementById('hint-display').classList.remove('hidden');
+                    // auto focus back to input
+                    this.els.ansInput.focus();
+                });
+
+                // Home Nav
+                document.getElementById('btn-home').addEventListener('click', () => {
+                    this.els.modals.confirm.classList.remove('hidden');
+                });
+                document.getElementById('btn-cancel-home').addEventListener('click', () => {
+                    this.els.modals.confirm.classList.add('hidden');
+                    this.els.ansInput.focus();
+                });
+                document.getElementById('btn-confirm-home').addEventListener('click', () => {
+                    this.els.modals.confirm.classList.add('hidden');
+                    this.ui.showScreen('start');
+                });
+
+                // Feedback
+                document.getElementById('btn-next-word').addEventListener('click', () => this.logic.nextWord());
+                document.getElementById('btn-listen-sentence').addEventListener('click', () => {
+                    this.audio.speak(this.state.words[this.state.currentIndex].sentence);
+                });
+
+                // End
+                document.getElementById('btn-restart').addEventListener('click', () => {
+                    this.ui.showScreen('start');
+                    this.els.nameInput.value = this.state.playerName; // keep name
+                    this.api.getLeaderboard();
+                });
+            },
+
+            logic: {
+                startGame() {
+                    const name = Game.els.nameInput.value.trim();
+                    if (!name) {
+                        Game.els.nameInput.focus();
+                        Game.els.nameInput.classList.add('animate-pulse', 'border-red-400');
+                        setTimeout(() => Game.els.nameInput.classList.remove('animate-pulse', 'border-red-400'), 1000);
+                        return;
+                    }
+                    
+                    Game.state.playerName = name;
+                    Game.state.score = 0;
+                    Game.state.currentIndex = 0;
+                    // Deep copy and shuffle
+                    Game.state.words = Game.utils.shuffle([...VOCAB_DATA]);
+                    
+                    Game.ui.showScreen('game');
+                    this.renderWord();
+                },
+
+                renderWord() {
+                    const idx = Game.state.currentIndex;
+                    const wordObj = Game.state.words[idx];
+                    Game.state.isHintUsed = false;
+
+                    // Update UI
+                    document.getElementById('ui-question-num').textContent = `ข้อที่ ${idx + 1} / ${Game.state.words.length}`;
+                    document.getElementById('ui-hint-th').textContent = wordObj.hintTh;
+                    document.getElementById('ui-svg-container').innerHTML = wordObj.svg;
+                    document.getElementById('ui-score').textContent = Game.state.score;
+                    document.getElementById('ui-first-letter').textContent = wordObj.word.charAt(0).toUpperCase();
+                    
+                    document.getElementById('hint-display').classList.add('hidden');
+                    Game.els.ansInput.value = '';
+                    Game.els.ansInput.classList.remove('border-red-400', 'border-green-400');
+                    
+                    // Progress bar
+                    const percent = ((idx) / Game.state.words.length) * 100;
+                    document.getElementById('ui-progress').style.width = `${percent}%`;
+
+                    // Auto speak
+                    setTimeout(() => Game.audio.speak(wordObj.word), 500);
+                    Game.els.ansInput.focus();
+                },
+
+                checkAnswer() {
+                    const ans = Game.els.ansInput.value.trim().toLowerCase();
+                    if (!ans) return;
+
+                    const wordObj = Game.state.words[Game.state.currentIndex];
+                    const isCorrect = (ans === wordObj.word.toLowerCase());
+
+                    if (isCorrect && !Game.state.isHintUsed) {
+                        Game.state.score++;
+                    }
+
+                    Game.ui.showFeedback(isCorrect, wordObj);
+                },
+
+                nextWord() {
+                    Game.els.modals.feedback.classList.add('hidden');
+                    Game.state.currentIndex++;
+                    
+                    if (Game.state.currentIndex >= Game.state.words.length) {
+                        this.endGame();
+                    } else {
+                        this.renderWord();
+                    }
+                },
+
+                endGame() {
+                    document.getElementById('ui-progress').style.width = `100%`;
+                    Game.ui.showScreen('end');
+                    
+                    const score = Game.state.score;
+                    const max = Game.state.words.length;
+                    document.getElementById('final-score').textContent = score;
+                    
+                    // Feedback message and stars
+                    let msg = "";
+                    let stars = "";
+                    if (score === max) { msg = "เพอร์เฟกต์! หนูเก่งที่สุดเลย!"; stars = "⭐⭐⭐⭐⭐"; }
+                    else if (score >= 7) { msg = "ยอดเยี่ยมมาก พยายามได้ดี!"; stars = "⭐⭐⭐⭐"; }
+                    else if (score >= 5) { msg = "เก่งมากจ้า ฝึกอีกนิดนึงนะ!"; stars = "⭐⭐⭐"; }
+                    else { msg = "ไม่เป็นไรนะ ลองใหม่อีกครั้ง หนูทำได้!"; stars = "⭐⭐"; }
+                    
+                    document.getElementById('ui-feedback-msg').textContent = msg;
+                    document.getElementById('ui-stars').innerHTML = stars;
+
+                    // Save score automatically
+                    Game.api.saveScore(Game.state.playerName, score);
+                }
+            },
+
+            ui: {
+                showScreen(screenName) {
+                    Game.els.startScreen.classList.add('hidden', 'flex');
+                    Game.els.gameScreen.classList.add('hidden', 'flex');
+                    Game.els.endScreen.classList.add('hidden', 'flex');
+                    
+                    Game.els.startScreen.classList.remove('flex');
+                    Game.els.gameScreen.classList.remove('flex');
+                    Game.els.endScreen.classList.remove('flex');
+
+                    const activeScreen = document.getElementById(`screen-${screenName}`);
+                    activeScreen.classList.remove('hidden');
+                    activeScreen.classList.add('flex');
+                    
+                    if(screenName === 'start') {
+                        Game.els.nameInput.focus();
+                    }
+                },
+
+                showFeedback(isCorrect, wordObj) {
+                    const modal = Game.els.modals.feedback;
+                    const content = document.getElementById('modal-feedback-content');
+                    
+                    document.getElementById('feedback-correct-word').textContent = wordObj.word;
+                    document.getElementById('feedback-sentence').textContent = wordObj.sentence;
+                    document.getElementById('feedback-sentence-th').textContent = wordObj.sentenceTh;
+
+                    if (isCorrect) {
+                        document.getElementById('feedback-icon').textContent = "✅";
+                        document.getElementById('feedback-title').textContent = "ถูกต้อง! เก่งมาก";
+                        document.getElementById('feedback-title').className = "text-3xl heading-font font-bold mb-2 text-green-500";
+                        content.className = "glass-panel w-full max-w-sm p-6 text-center transform transition-transform scale-100 border-4 border-green-400";
+                    } else {
+                        document.getElementById('feedback-icon').textContent = "❌";
+                        document.getElementById('feedback-title').textContent = "เกือบถูกแล้ว!";
+                        document.getElementById('feedback-title').className = "text-3xl heading-font font-bold mb-2 text-red-500";
+                        content.className = "glass-panel w-full max-w-sm p-6 text-center transform transition-transform scale-100 border-4 border-red-400";
+                    }
+
+                    modal.classList.remove('hidden');
+                    document.getElementById('btn-next-word').focus();
+                }
+            },
+
+            api: {
+                async getLeaderboard() {
+                    if (SCRIPT_URL === 'YOUR_WEB_APP_URL') {
+                        Game.els.leaderboard.innerHTML = '<p class="text-gray-500 text-center">รอใส่ SCRIPT_URL</p>';
+                        return;
+                    }
+                    
+                    const statusDot = document.getElementById('status-dot');
+                    const statusText = document.getElementById('status-text');
+
+                    try {
+                        const res = await fetch(SCRIPT_URL + "?action=getLeaderboard");
+                        const data = await res.json();
+                        
+                        // อัปเดตสถานะว่าเชื่อมต่อสำเร็จ
+                        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]';
+                        statusText.textContent = 'เชื่อมต่อออนไลน์';
+                        statusText.classList.replace('text-gray-600', 'text-green-600');
+
+                        if(data && data.length > 0) {
+                            let html = '<ul class="space-y-2">';
+                            data.forEach((row, i) => {
+                                const medals = ['🥇', '🥈', '🥉', '✨', '✨'];
+                                html += `<li class="flex justify-between items-center bg-white/40 p-2 rounded-lg">
+                                    <span class="font-bold text-gray-700">${medals[i]} ${row.name}</span>
+                                    <span class="font-bold text-purple-600">${row.score} คะแนน</span>
+                                </li>`;
+                            });
+                            html += '</ul>';
+                            Game.els.leaderboard.innerHTML = html;
+                        } else {
+                            Game.els.leaderboard.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีคะแนน มาเป็นคนแรกเลย!</p>';
+                        }
+                    } catch (error) {
+                        // อัปเดตสถานะว่าเชื่อมต่อไม่สำเร็จ
+                        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse';
+                        statusText.textContent = 'ออฟไลน์ (ไม่สามารถบันทึกได้)';
+                        statusText.classList.replace('text-gray-600', 'text-red-500');
+                        
+                        Game.els.leaderboard.innerHTML = '<p class="text-center text-red-400 text-xs">ไม่สามารถเชื่อมต่อฐานข้อมูลได้</p>';
+                    }
+                },
+
+                async saveScore(name, score) {
+                    if (SCRIPT_URL === 'YOUR_WEB_APP_URL') return;
+
+                    const statusEl = document.getElementById('save-status');
+                    statusEl.classList.remove('hidden');
+                    statusEl.classList.add('flex');
+                    
+                    try {
+                        await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            redirect: 'follow', // Required for GAS
+                            body: JSON.stringify({ name: name, score: score }),
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' } // text/plain to avoid CORS preflight in GAS
+                        });
+                        statusEl.innerHTML = '✅ บันทึกคะแนนสำเร็จ!';
+                        statusEl.classList.replace('text-blue-600', 'text-green-600');
+                        statusEl.classList.replace('bg-blue-100/50', 'bg-green-100/50');
+                    } catch (error) {
+                        statusEl.innerHTML = '❌ บันทึกไม่สำเร็จ (ออฟไลน์)';
+                        statusEl.classList.replace('text-blue-600', 'text-red-600');
+                        statusEl.classList.replace('bg-blue-100/50', 'bg-red-100/50');
+                    }
+                }
+            },
+
+            audio: {
+                speak(text) {
+                    if ('speechSynthesis' in window) {
+                        // Cancel current speaking
+                        window.speechSynthesis.cancel();
+                        const msg = new SpeechSynthesisUtterance(text);
+                        msg.lang = 'en-US';
+                        msg.rate = 0.8; // Slow down slightly for kids
+                        msg.pitch = 1.2; // Slightly higher pitch
+                        window.speechSynthesis.speak(msg);
+                    }
+                }
+            },
+
+            utils: {
+                shuffle(array) {
+                    let currentIndex = array.length, randomIndex;
+                    while (currentIndex > 0) {
+                        randomIndex = Math.floor(Math.random() * currentIndex);
+                        currentIndex--;
+                        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+                    }
+                    return array;
+                }
+            }
+        };
+
+        // Initialize App on load
+        window.addEventListener('DOMContentLoaded', () => {
+            Game.init();
+        });
+    </script>
+</body>
+</html>
