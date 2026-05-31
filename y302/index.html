@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมคำศัพท์แสนสนุก ป.3 - เตรียมสอบ 10 มิ.ย. 69</title>
+    <!-- Tailwind CSS for modern & responsive UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka for English, Kanit for Thai -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #FFE5EC 0%, #F0E6FF 50%, #E8F0FE 100%);
+            min-height: 100vh;
+        }
+        .bouncy {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col justify-between" onclick="unlockAudioOnFirstTouch()">
+
+    <!-- Header Section -->
+    <header class="max-w-4xl w-full mx-auto text-center mb-6">
+        <div class="inline-block bg-yellow-300 text-yellow-800 font-bold px-4 py-2 rounded-full shadow-md text-sm md:text-base border-2 border-yellow-400 mb-2 bouncy">
+            📅 ตารางสอบ: 10 มิ.ย. 69 🎉
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black text-purple-700 tracking-wide drop-shadow-md">
+            English Vocabulary P.3
+        </h1>
+        <p class="text-gray-600 mt-1 text-sm md:text-base font-semibold">ตะลุยเกาะมหาสมบัติคำศัพท์แสนสนุก ทั้งหมด 10 คำ!</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl w-full mx-auto flex-grow flex flex-col justify-center items-center">
+
+        <!-- SCREEN 1: LOBBY -->
+        <div id="lobbyScreen" class="w-full bg-white rounded-3xl p-6 md:p-10 shadow-xl border-4 border-purple-200 text-center flex flex-col items-center">
+            
+            <!-- Android Sound Unlocked Indicator -->
+            <div id="soundAlert" class="mb-4 px-4 py-2 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300 flex items-center gap-2">
+                <span class="animate-ping w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>🔊 แตะตรงไหนก็ได้บนจอ 1 ครั้ง เพื่อเปิดใช้งานระบบเสียงสำหรับแท็บเล็ต</span>
+            </div>
+
+            <div class="text-6xl md:text-8xl mb-4 bouncy">🌴🎒🗺️</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-purple-600 mb-6">ยินดีต้อนรับเข้าสู่เกาะคำศัพท์!</h2>
+            
+            <p class="text-gray-600 max-w-md mb-8 text-base md:text-lg">มาฝึกฝนและทดสอบคำศัพท์ภาษาอังกฤษที่ออกสอบ เพื่อเตรียมตัวเป็นผู้ชนะในการสอบกันเถอะครับเด็กๆ!</p>
+            
+            <!-- Avatar Selection -->
+            <div class="mb-8 w-full max-w-md">
+                <p class="text-purple-600 font-bold mb-3">เลือกฮีโร่ตัวจิ๋วของคุณ:</p>
+                <div class="grid grid-cols-5 gap-3" id="avatarList">
+                    <!-- Dynamic avatars filled via JS -->
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
+                <!-- Mode 1 Button -->
+                <button onclick="changeScreen('study')" class="flex flex-col items-center bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-orange-700">
+                    <span class="text-4xl mb-2">🃏</span>
+                    <span class="text-lg">1. การ์ดฝึกฝนคำศัพท์</span>
+                    <span class="text-xs font-normal opacity-90 mt-1">ฝึกฟัง พลิกดูคำแปล</span>
+                </button>
+
+                <!-- Mode 2 Button -->
+                <button onclick="changeScreen('quiz')" class="flex flex-col items-center bg-gradient-to-br from-emerald-400 to-teal-600 hover:from-emerald-300 hover:to-teal-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-teal-800">
+                    <span class="text-4xl mb-2">🎯</span>
+                    <span class="text-lg">2. เกมตอบคำถาม (4 ตัวเลือก)</span>
+                    <span class="text-xs font-normal opacity-90 mt-1">ทดสอบความจำชิงดาว</span>
+                </button>
+
+                <!-- Mode 3 Button -->
+                <button onclick="changeScreen('spelling')" class="flex flex-col items-center bg-gradient-to-br from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-blue-800">
+                    <span class="text-4xl mb-2">✍️</span>
+                    <span class="text-lg">3. เกมฝึกสะกดคำศัพท์</span>
+                    <span class="text-xs font-normal opacity-90 mt-1">ฝึกพิมพ์สะกดคำให้แม่น</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: STUDY MODE (FLASHCARDS) -->
+        <div id="studyScreen" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-amber-200 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="changeScreen('lobby')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors text-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> กลับหน้าแรก
+                </button>
+                <div class="text-sm font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full" id="studyProgressText">
+                    คำที่ 1/10
+                </div>
+            </div>
+
+            <!-- Flashcard Arena -->
+            <div class="relative w-full h-80 cursor-pointer" onclick="flipCard()">
+                <div id="flashcard" class="card-inner w-full h-full relative duration-500">
+                    
+                    <!-- Card Front (English) -->
+                    <div class="card-front absolute inset-0 w-full h-full bg-gradient-to-tr from-amber-50 to-yellow-100 rounded-3xl border-4 border-amber-400 p-6 flex flex-col justify-between shadow-md">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-amber-700 bg-amber-200 px-3 py-1 rounded-full">💡 กดคลิกที่นี่เพื่อคว่ำการ์ดดูคำแปล</span>
+                            <span class="text-3xl" id="cardEmoji">🤝</span>
+                        </div>
+                        <div class="text-center my-auto">
+                            <h2 class="text-4xl md:text-6xl font-black text-amber-800 tracking-wide" id="cardWord">partner</h2>
+                            <p class="text-gray-500 text-sm mt-2 font-mono">กดปุ่ม 🔊 เพื่อฟังเสียงอ่าน</p>
+                        </div>
+                        <div class="flex justify-center">
+                            <button onclick="speakCurrentWord(event)" class="w-14 h-14 bg-amber-500 hover:bg-amber-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg transform transition-transform active:scale-95">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card Back (Thai Translation) -->
+                    <div class="card-back absolute inset-0 w-full h-full bg-gradient-to-tr from-purple-50 to-indigo-100 rounded-3xl border-4 border-purple-400 p-6 flex flex-col justify-between shadow-md">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-purple-700 bg-purple-200 px-3 py-1 rounded-full">✨ คำแปลภาษาไทย</span>
+                            <span class="text-3xl" id="cardEmojiBack">🤝</span>
+                        </div>
+                        <div class="text-center my-auto px-4">
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-purple-800" id="cardTranslation">คู่หู / เพื่อนร่วมทีม</h2>
+                            <div class="mt-4 p-3 bg-white bg-opacity-70 rounded-xl inline-block border border-purple-200 max-w-md">
+                                <p class="text-xs text-gray-500 text-left font-bold">📝 ตัวอย่างประโยค:</p>
+                                <p class="text-sm text-indigo-700 font-bold mt-1 text-left" id="cardSentence">"You are my learning partner!"</p>
+                                <p class="text-xs text-gray-600 mt-1 text-left" id="cardSentenceTh">"เธอคือคู่หูในการเรียนของฉันนะ!"</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-center">
+                            <button onclick="speakCurrentSentence(event)" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center text-sm font-bold shadow-lg transform transition-transform active:scale-95 gap-2">
+                                <i class="fa-solid fa-volume-high"></i> ฟังประโยคภาษาอังกฤษ
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Prev / Next Controls -->
+            <div class="flex justify-between items-center mt-6 gap-4">
+                <button onclick="prevCard()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold rounded-2xl transition-all shadow border-b-4 border-gray-300 text-center">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> คำก่อนหน้า
+                </button>
+                <button onclick="nextCard()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold rounded-2xl transition-all shadow border-b-4 border-amber-700 text-center">
+                    คำถัดไป <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: QUIZ MODE (MULTIPLE CHOICE) -->
+        <div id="quizScreen" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-emerald-200 hidden">
+            <!-- Quiz Header Info -->
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="quitQuiz()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors text-sm">
+                    <i class="fa-solid fa-xmark mr-1"></i> ออกจากเกม
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full" id="quizProgress">
+                        ข้อที่ 1/10
+                    </div>
+                    <div class="text-sm font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                        ⭐ คะแนน: <span id="quizScoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Timer Bar -->
+            <div class="w-full bg-gray-100 h-3 rounded-full mb-6 overflow-hidden">
+                <div id="quizTimerBar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full w-full transition-all duration-100 ease-linear"></div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="text-center mb-8">
+                <p class="text-sm text-emerald-500 font-bold tracking-wider uppercase mb-1">แปลภาษาอังกฤษคำนี้เป็นภาษาไทยให้ถูกต้อง:</p>
+                <div class="flex justify-center items-center gap-3">
+                    <h2 class="text-4xl md:text-5xl font-black text-emerald-800 tracking-wide" id="quizQuestionWord">partner</h2>
+                    <button onclick="speakQuizWord()" class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center hover:bg-emerald-200 transition-colors">
+                        <i class="fa-solid fa-volume-high text-sm"></i>
+                    </button>
+                </div>
+                <div class="text-6xl mt-4 bouncy" id="quizQuestionEmoji">🤝</div>
+            </div>
+
+            <!-- Multiple Choices Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="quizOptionsContainer">
+                <!-- Dynamically generated buttons -->
+            </div>
+        </div>
+
+        <!-- SCREEN 4: SPELLING MODE -->
+        <div id="spellingScreen" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-sky-200 hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="changeScreen('lobby')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors text-sm">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> กลับหน้าแรก
+                </button>
+                <div class="text-sm font-bold text-sky-600 bg-sky-50 px-3 py-1 rounded-full" id="spellingProgress">
+                    คำที่ 1/10
+                </div>
+            </div>
+
+            <!-- Spelling Challenge Box -->
+            <div class="text-center mb-6 flex flex-col items-center">
+                <div class="text-6xl mb-2" id="spellingEmoji">🤝</div>
+                <h2 class="text-2xl font-extrabold text-gray-800 mb-1" id="spellingThaiTranslation">คู่หู / เพื่อนร่วมทีม</h2>
+                <p class="text-xs text-gray-500">ฟังเสียงสะกดคำ แล้วพิมพ์สะกดลงในช่องว่าง</p>
+
+                <!-- Audio Play Button -->
+                <button onclick="speakSpellingWord()" class="mt-4 px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-full flex items-center gap-2 shadow-md transform transition-transform active:scale-95">
+                    <i class="fa-solid fa-volume-high text-xl"></i> กดเพื่อฟังเสียงสะกดคำ
+                </button>
+            </div>
+
+            <!-- Input Box -->
+            <div class="mb-4">
+                <input type="text" id="spellingInput" placeholder="พิมพ์สะกดคำศัพท์ภาษาอังกฤษที่นี่..." 
+                       class="w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase"
+                       autocomplete="off" autofocus>
+            </div>
+
+            <!-- Letter Assistance Blocks (Hint) -->
+            <div class="flex justify-center flex-wrap gap-2 mb-6" id="spellingLetterHints">
+                <!-- Generated underscores based on length -->
+            </div>
+
+            <!-- Hint button and Submit button -->
+            <div class="flex gap-4">
+                <button onclick="revealSpellingHint()" class="px-5 py-3 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-2xl transition-colors border border-amber-300 text-sm">
+                    💡 ขอคำใบ้ตัวอักษร
+                </button>
+                <button onclick="checkSpellingAnswer()" class="flex-1 py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg border-b-4 border-blue-800 text-center text-lg">
+                    ตรวจสอบคำตอบ! 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: RESULTS SCREEN -->
+        <div id="resultScreen" class="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border-4 border-purple-300 text-center hidden">
+            <!-- Reward Icon -->
+            <div class="relative inline-block mb-6">
+                <span class="text-8xl" id="resultIcon">🏆</span>
+                <span class="absolute -bottom-2 -right-2 text-4xl" id="resultMiniBadge">👑</span>
+            </div>
+
+            <h2 class="text-3xl font-black text-purple-700 mb-2">สุดยอดฝีมือ!</h2>
+            <p class="text-gray-600 text-sm font-semibold mb-6" id="resultModeTitle">ผลคะแนนจากการตอบคำถามสุดยาก</p>
+
+            <!-- Score board -->
+            <div class="bg-purple-50 rounded-2xl p-6 border border-purple-100 mb-8">
+                <p class="text-sm text-purple-500 font-bold uppercase tracking-wider">คะแนนทั้งหมดที่คุณทำได้</p>
+                <div class="text-5xl font-black text-purple-800 mt-2 mb-1" id="resultScore">
+                    10 / 10
+                </div>
+                <div class="flex justify-center gap-1 text-2xl text-yellow-400" id="resultStars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+            </div>
+
+            <p class="text-sm font-medium text-purple-600 bg-purple-100 py-2 px-4 rounded-full inline-block mb-8" id="resultFeedback">
+                เก่งมากเลยครับ! หนูพร้อมสอบวันที่ 10 มิ.ย. 69 แน่นอน!
+            </p>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="changeScreen('lobby')" class="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-extrabold rounded-2xl shadow-lg border-b-4 border-indigo-800 text-lg">
+                    🎮 กลับไปเล่นโหมดอื่น
+                </button>
+                <button onclick="restartCurrentMode()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-colors">
+                    🔄 เล่นโหมดนี้อีกรอบ
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Credit -->
+    <footer class="max-w-4xl w-full mx-auto text-center mt-6 text-gray-400 text-xs font-semibold">
+        <p>© 2026 เกมทดสอบภาษาอังกฤษ ป.3 • ออกแบบขึ้นเพื่อความสนุกและความรู้ของเด็กๆ 🌟</p>
+    </footer>
+
+    <!-- Custom Modals (Using Toast alerts to avoid native alert popups) -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none z-50">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage" class="font-bold">ข้อความทดสอบ</span>
+    </div>
+
+    <!-- Main Game Logic JavaScript -->
+    <script>
+        // VOCABULARY LIST FROM IMAGE (Grade 3 Adaptations)
+        const vocabList = [
+            { id: 1, word: "partner", translation: "คู่หู / เพื่อนร่วมทีม", emoji: "🤝", sentence: "You are my learning partner!", sentenceTh: "เธอคือคู่หูในการเรียนของฉันนะ!" },
+            { id: 2, word: "team", translation: "ทีม / กลุ่ม", emoji: "🙌", sentence: "We work as a team.", sentenceTh: "พวกเราทำงานร่วมกันเป็นทีมนะ" },
+            { id: 3, word: "directions", translation: "ทิศทาง / เส้นทาง", emoji: "🧭", sentence: "Follow the directions on the map.", sentenceTh: "เดินตามทิศทางบนแผนที่นะ" },
+            { id: 4, word: "mammals", translation: "สัตว์เลี้ยงลูกด้วยนม", emoji: "🐋", sentence: "Whales and dolphins are mammals.", sentenceTh: "วาฬและโลมาเป็นสัตว์เลี้ยงลูกด้วยนมนะ" },
+            { id: 5, word: "birds", translation: "นก (หลายตัว)", emoji: "🐦", sentence: "The birds are singing in the tree.", sentenceTh: "เหล่านกกำลังร้องเพลงอยู่บนต้นไม้" },
+            { id: 6, word: "narrator", translation: "ผู้บรรยาย / คนเล่าเรื่อง", emoji: "🎙️", sentence: "The narrator tells a beautiful story.", sentenceTh: "ผู้บรรยายกำลังเล่าเรื่องราวที่แสนวิเศษ" },
+            { id: 7, word: "favourite", translation: "ที่โปรดปราน / ชอบมากที่สุด", emoji: "💖", sentence: "Pink is my favourite colour.", sentenceTh: "สีชมพูคือสีที่ฉันชอบมากที่สุดเลย" },
+            { id: 8, word: "jumping", translation: "กำลังกระโดด", emoji: "🦘", sentence: "The rabbit is jumping in the garden.", sentenceTh: "กระต่ายกำลังกระโดดอยู่ในสวน" },
+            { id: 9, word: "running", translation: "กำลังวิ่ง", emoji: "🏃", sentence: "The puppy is running on the grass.", sentenceTh: "ลูกสุนัขกำลังวิ่งอยู่บนสนามหญ้า" },
+            { id: 10, word: "playing", translation: "กำลังเล่น", emoji: "🧸", sentence: "We love playing games together.", sentenceTh: "พวกเราชอบเล่นเกมด้วยกันนะ" }
+        ];
+
+        // Cute avatars list for players
+        const avatars = ["🐱", "🐶", "🐰", "🦁", "🦊", "🐼", "🐸", "🐵", "🦄", "🐧"];
+        let selectedAvatar = "🐱";
+
+        // APP STATES
+        let currentScreen = "lobby";
+        let currentStudyIndex = 0;
+        let isCardFlipped = false;
+
+        // Quiz State
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let quizTimer = null;
+        const quizDuration = 10; // seconds per question
+        let quizTimeLeft = quizDuration;
+        let activeQuizList = [];
+
+        // Spelling State
+        let currentSpellingIndex = 0;
+        let spellingScore = 0;
+        let spellingHintsUsed = 0;
+        let activeSpellingList = [];
+
+        // AUDIO SYNTHESIZER (Dynamic loading on user gesture to avoid Android WebAudio bans)
+        let audioCtx = null;
+        let isAudioUnlocked = false;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Android Special: Unlocking audio engine and warming SpeechSynthesis
+        function unlockAudioOnFirstTouch() {
+            if (isAudioUnlocked) return;
+            
+            try {
+                // 1. Unlocking WebAudio API
+                initAudioContext();
+                
+                // 2. Warming up Google Text-to-Speech Engine with a silent trigger
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const silentUtterance = new SpeechSynthesisUtterance('');
+                    silentUtterance.volume = 0; // silent
+                    window.speechSynthesis.speak(silentUtterance);
+                }
+                
+                // 3. Update Indicator UI
+                isAudioUnlocked = true;
+                const soundAlert = document.getElementById('soundAlert');
+                if (soundAlert) {
+                    soundAlert.className = "mb-4 px-4 py-2 bg-emerald-500 text-white text-xs font-bold rounded-full border border-emerald-600 flex items-center gap-2 animate-bounce";
+                    soundAlert.innerHTML = `<i class="fa-solid fa-volume-high"></i> <span>เปิดใช้งานระบบเสียงเรียบร้อยแล้วจ้า! 🎉</span>`;
+                    setTimeout(() => {
+                        soundAlert.classList.add('hidden');
+                    }, 3000);
+                }
+                
+                // Play a confirmation soft pop tone
+                playSound('click');
+            } catch (error) {
+                console.log("Audio unlock failed: ", error);
+            }
+        }
+
+        function playTone(freq, type, duration) {
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.type = type || "sine";
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function playSound(soundType) {
+            if (soundType === 'correct') {
+                playTone(523.25, "sine", 0.1); // C5
+                setTimeout(() => playTone(659.25, "sine", 0.15), 100); // E5
+            } else if (soundType === 'wrong') {
+                playTone(220, "sawtooth", 0.3); // A3 buzz
+            } else if (soundType === 'click') {
+                playTone(392, "triangle", 0.08); // G4 soft pop
+            } else if (soundType === 'win') {
+                playTone(523.25, "sine", 0.1); // C5
+                setTimeout(() => playTone(659.25, "sine", 0.1), 100); // E5
+                setTimeout(() => playTone(783.99, "sine", 0.1), 200); // G5
+                setTimeout(() => playTone(1046.5, "sine", 0.3), 300); // C6
+            }
+        }
+
+        // SPEECH SYNTHESIS (Google TTS Engine friendly format)
+        function speakEnglish(text, rate = 0.75) {
+            if ('speechSynthesis' in window) {
+                try {
+                    window.speechSynthesis.cancel(); // Cancel any lingering speeches
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = rate; // slower speed for Thai elementary kids
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+                    
+                    // Force SpeechSynthesis on Android to re-awake if it enters idle mode
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {
+                    showToast("🔊 ระบบการอ่านออกเสียงขัดข้องชั่วคราว ลองกดแตะหน้าจออีกครั้งครับ", "❌");
+                }
+            } else {
+                showToast("🔊 อุปกรณ์นี้ไม่รองรับระบบสังเคราะห์เสียงพูด", "❌");
+            }
+        }
+
+        // INIT LOBBY
+        window.onload = function() {
+            renderAvatars();
+            
+            // Allow spelling inputs to check with Enter key
+            document.getElementById('spellingInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkSpellingAnswer();
+                }
+            });
+        };
+
+        function renderAvatars() {
+            const container = document.getElementById('avatarList');
+            container.innerHTML = "";
+            avatars.forEach(avatar => {
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = `text-3xl p-2 rounded-xl transition-all border-2 ${selectedAvatar === avatar ? 'border-purple-600 bg-purple-100 scale-110' : 'border-gray-200 hover:border-purple-300'}`;
+                btn.innerText = avatar;
+                btn.onclick = () => {
+                    unlockAudioOnFirstTouch(); // Unlock on interaction
+                    playSound('click');
+                    selectedAvatar = avatar;
+                    renderAvatars();
+                    showToast(`เลือกฮีโร่ ${avatar} สำเร็จแล้ว!`, "🎉");
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // TOAST NOTIFICATIONS
+        function showToast(message, icon = "⭐") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').innerText = icon;
+            document.getElementById('toastMessage').innerText = message;
+            
+            toast.className = toast.className.replace('translate-y-[-100px] opacity-0 pointer-events-none', 'translate-y-0 opacity-100 pointer-events-auto');
+            
+            setTimeout(() => {
+                toast.className = toast.className.replace('translate-y-0 opacity-100 pointer-events-auto', 'translate-y-[-100px] opacity-0 pointer-events-none');
+            }, 3000);
+        }
+
+        // SCREEN NAVIGATOR
+        function changeScreen(screenName) {
+            unlockAudioOnFirstTouch(); // Unlock safely
+            playSound('click');
+            
+            // Hide all
+            document.getElementById('lobbyScreen').classList.add('hidden');
+            document.getElementById('studyScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('spellingScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+
+            // Clear any active interval timers
+            if (quizTimer) clearInterval(quizTimer);
+
+            currentScreen = screenName;
+
+            // Show active
+            if (screenName === 'lobby') {
+                document.getElementById('lobbyScreen').classList.remove('hidden');
+            } else if (screenName === 'study') {
+                document.getElementById('studyScreen').classList.remove('hidden');
+                currentStudyIndex = 0;
+                resetCardState();
+                updateCardData();
+            } else if (screenName === 'quiz') {
+                document.getElementById('quizScreen').classList.remove('hidden');
+                startQuizMode();
+            } else if (screenName === 'spelling') {
+                document.getElementById('spellingScreen').classList.remove('hidden');
+                startSpellingMode();
+            } else if (screenName === 'result') {
+                document.getElementById('resultScreen').classList.remove('hidden');
+            }
+        }
+
+        function restartCurrentMode() {
+            if (currentScreen === 'result') {
+                const modeTitle = document.getElementById('resultModeTitle').innerText;
+                if (modeTitle.includes('ตอบคำถาม')) {
+                    changeScreen('quiz');
+                } else {
+                    changeScreen('spelling');
+                }
+            }
+        }
+
+        // ==========================================
+        // 1. STUDY MODE LOGIC (FLASHCARDS)
+        // ==========================================
+        function flipCard() {
+            unlockAudioOnFirstTouch();
+            playSound('click');
+            const card = document.getElementById('flashcard');
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                card.classList.add('card-flipped');
+            } else {
+                card.classList.remove('card-flipped');
+            }
+        }
+
+        function resetCardState() {
+            isCardFlipped = false;
+            document.getElementById('flashcard').classList.remove('card-flipped');
+        }
+
+        function updateCardData() {
+            const data = vocabList[currentStudyIndex];
+            
+            // Front-end card text
+            document.getElementById('cardWord').innerText = data.word;
+            document.getElementById('cardEmoji').innerText = data.emoji;
+            document.getElementById('studyProgressText').innerText = `คำที่ ${currentStudyIndex + 1}/10`;
+
+            // Back-end card text
+            document.getElementById('cardTranslation').innerText = data.translation;
+            document.getElementById('cardEmojiBack').innerText = data.emoji;
+            document.getElementById('cardSentence').innerText = `"${data.sentence}"`;
+            document.getElementById('cardSentenceTh').innerText = `"${data.sentenceTh}"`;
+
+            // Speak English immediately when displaying front card
+            setTimeout(() => {
+                speakEnglish(data.word);
+            }, 300);
+        }
+
+        function speakCurrentWord(event) {
+            if(event) event.stopPropagation(); // Prevent card from flipping
+            unlockAudioOnFirstTouch();
+            speakEnglish(vocabList[currentStudyIndex].word);
+        }
+
+        function speakCurrentSentence(event) {
+            if(event) event.stopPropagation(); // Prevent card from flipping
+            unlockAudioOnFirstTouch();
+            speakEnglish(vocabList[currentStudyIndex].sentence, 0.7); // Slower speech for sentence
+        }
+
+        // Navigation
+        function prevCard() {
+            if (currentStudyIndex > 0) {
+                currentStudyIndex--;
+                resetCardState();
+                setTimeout(() => { updateCardData(); }, 150);
+            } else {
+                showToast("นี่คือคำศัพท์แรกแล้วครับ!", "✨");
+            }
+        }
+
+        function nextCard() {
+            if (currentStudyIndex < vocabList.length - 1) {
+                currentStudyIndex++;
+                resetCardState();
+                setTimeout(() => { updateCardData(); }, 150);
+            } else {
+                showToast("หนูเรียนรู้ครบทุกคำศัพท์แล้ว! ลองไปเล่นเกมกันเลย 🚀", "👑");
+                setTimeout(() => { changeScreen('lobby'); }, 1500);
+            }
+        }
+
+        // ==========================================
+        // 2. QUIZ MODE LOGIC (MULTIPLE CHOICE)
+        // ==========================================
+        function startQuizMode() {
+            quizScore = 0;
+            currentQuizIndex = 0;
+            activeQuizList = [...vocabList].sort(() => Math.random() - 0.5);
+            document.getElementById('quizScoreDisplay').innerText = quizScore;
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= activeQuizList.length) {
+                endGameMode('quiz');
+                return;
+            }
+
+            const currentItem = activeQuizList[currentQuizIndex];
+            document.getElementById('quizProgress').innerText = `ข้อที่ ${currentQuizIndex + 1}/10`;
+            document.getElementById('quizQuestionWord').innerText = currentItem.word;
+            document.getElementById('quizQuestionEmoji').innerText = currentItem.emoji;
+
+            // Generate choices
+            const incorrectOptions = vocabList
+                .filter(item => item.id !== currentItem.id)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3)
+                .map(item => item.translation);
+            
+            const allOptions = [...incorrectOptions, currentItem.translation]
+                .sort(() => Math.random() - 0.5);
+
+            // Redraw options UI
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = "";
+
+            allOptions.forEach((option) => {
+                const btn = document.createElement('button');
+                btn.className = "py-4 px-6 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 text-gray-800 text-lg font-bold rounded-2xl border-2 border-purple-200 transition-all text-left flex items-center justify-between group shadow-sm";
+                btn.innerHTML = `
+                    <span>${option}</span>
+                    <span class="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-sm text-purple-700 font-bold group-hover:scale-110 duration-200"><i class="fa-solid fa-question"></i></span>
+                `;
+                btn.onclick = () => selectQuizAnswer(btn, option, currentItem.translation);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Play word audio
+            setTimeout(() => { speakEnglish(currentItem.word); }, 300);
+
+            // Timer management
+            quizTimeLeft = quizDuration;
+            updateQuizTimerBar();
+            if (quizTimer) clearInterval(quizTimer);
+            quizTimer = setInterval(() => {
+                quizTimeLeft -= 0.1;
+                updateQuizTimerBar();
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimer);
+                    handleTimeOut(currentItem.translation);
+                }
+            }, 100);
+        }
+
+        function updateQuizTimerBar() {
+            const percentage = (quizTimeLeft / quizDuration) * 100;
+            const bar = document.getElementById('quizTimerBar');
+            bar.style.width = `${percentage}%`;
+            if (percentage < 30) {
+                bar.className = "bg-gradient-to-r from-rose-500 to-red-500 h-full w-full transition-all duration-100 ease-linear";
+            } else {
+                bar.className = "bg-gradient-to-r from-emerald-400 to-teal-500 h-full w-full transition-all duration-100 ease-linear";
+            }
+        }
+
+        function speakQuizWord() {
+            const currentItem = activeQuizList[currentQuizIndex];
+            speakEnglish(currentItem.word);
+        }
+
+        function selectQuizAnswer(selectedBtn, chosenTranslation, correctTranslation) {
+            clearInterval(quizTimer);
+            disableQuizButtons();
+
+            if (chosenTranslation === correctTranslation) {
+                playSound('correct');
+                quizScore++;
+                document.getElementById('quizScoreDisplay').innerText = quizScore;
+                selectedBtn.className = "py-4 px-6 bg-emerald-500 text-white text-lg font-bold rounded-2xl border-2 border-emerald-600 shadow-md flex items-center justify-between duration-300";
+                selectedBtn.innerHTML = `
+                    <span>${chosenTranslation}</span>
+                    <span class="w-8 h-8 rounded-full bg-white text-emerald-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                `;
+                
+                confetti({
+                    particleCount: 20,
+                    spread: 30,
+                    origin: { y: 0.8 }
+                });
+            } else {
+                playSound('wrong');
+                selectedBtn.className = "py-4 px-6 bg-rose-500 text-white text-lg font-bold rounded-2xl border-2 border-rose-600 shadow-md flex items-center justify-between duration-300";
+                selectedBtn.innerHTML = `
+                    <span>${chosenTranslation}</span>
+                    <span class="w-8 h-8 rounded-full bg-white text-rose-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-xmark"></i></span>
+                `;
+
+                highlightCorrectAnswer(correctTranslation);
+            }
+
+            setTimeout(() => {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            }, 1800);
+        }
+
+        function handleTimeOut(correctTranslation) {
+            disableQuizButtons();
+            playSound('wrong');
+            showToast("หมดเวลาซะแล้ว! ⏰", "😢");
+            highlightCorrectAnswer(correctTranslation);
+
+            setTimeout(() => {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            }, 2000);
+        }
+
+        function highlightCorrectAnswer(correctTranslation) {
+            const container = document.getElementById('quizOptionsContainer');
+            const buttons = container.getElementsByTagName('button');
+            for (let btn of buttons) {
+                if (btn.innerText.includes(correctTranslation)) {
+                    btn.className = "py-4 px-6 bg-emerald-100 text-emerald-800 text-lg font-bold rounded-2xl border-2 border-emerald-400 flex items-center justify-between shadow-sm animate-pulse";
+                    btn.innerHTML = `
+                        <span>${correctTranslation}</span>
+                        <span class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-check"></i></span>
+                    `;
+                }
+            }
+        }
+
+        function disableQuizButtons() {
+            const container = document.getElementById('quizOptionsContainer');
+            const buttons = container.getElementsByTagName('button');
+            for (let btn of buttons) {
+                btn.disabled = true;
+                btn.style.pointerEvents = "none";
+            }
+        }
+
+        function quitQuiz() {
+            if (confirm("ต้องการที่จะออกจากการตอบคำถามนี้ใช่หรือไม่? คะแนนที่ทำได้จะไม่ถูกบันทึกนะเด็กๆ")) {
+                changeScreen('lobby');
+            }
+        }
+
+        // ==========================================
+        // 3. SPELLING GAME MODE LOGIC
+        // ==========================================
+        function startSpellingMode() {
+            spellingScore = 0;
+            currentSpellingIndex = 0;
+            spellingHintsUsed = 0;
+            activeSpellingList = [...vocabList].sort(() => Math.random() - 0.5);
+            loadSpellingWord();
+        }
+
+        function loadSpellingWord() {
+            if (currentSpellingIndex >= activeSpellingList.length) {
+                endGameMode('spelling');
+                return;
+            }
+
+            const currentItem = activeSpellingList[currentSpellingIndex];
+            document.getElementById('spellingProgress').innerText = `ข้อที่ ${currentSpellingIndex + 1}/10`;
+            document.getElementById('spellingEmoji').innerText = currentItem.emoji;
+            document.getElementById('spellingThaiTranslation').innerText = currentItem.translation;
+            
+            // Clear input box
+            const inputField = document.getElementById('spellingInput');
+            inputField.value = "";
+            inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase";
+            inputField.disabled = false;
+            
+            renderSpellingUnderscores(currentItem.word);
+            
+            setTimeout(() => { speakEnglish(currentItem.word); }, 300);
+            inputField.focus();
+        }
+
+        function speakSpellingWord() {
+            const currentItem = activeSpellingList[currentSpellingIndex];
+            speakEnglish(currentItem.word);
+        }
+
+        function renderSpellingUnderscores(word) {
+            const hintContainer = document.getElementById('spellingLetterHints');
+            hintContainer.innerHTML = "";
+            
+            for (let i = 0; i < word.length; i++) {
+                const box = document.createElement('span');
+                box.className = "w-10 h-10 border-2 border-gray-300 rounded-lg flex items-center justify-center font-black text-xl bg-gray-50 uppercase text-sky-700";
+                box.innerText = ""; 
+                box.id = `spellingBox-${i}`;
+                hintContainer.appendChild(box);
+            }
+        }
+
+        function revealSpellingHint() {
+            playSound('click');
+            const currentItem = activeSpellingList[currentSpellingIndex];
+            const word = currentItem.word;
+            
+            let filledIndex = -1;
+            for (let i = 0; i < word.length; i++) {
+                const box = document.getElementById(`spellingBox-${i}`);
+                if (box.innerText === "") {
+                    filledIndex = i;
+                    break;
+                }
+            }
+
+            if (filledIndex !== -1) {
+                const correctChar = word[filledIndex];
+                const box = document.getElementById(`spellingBox-${filledIndex}`);
+                box.innerText = correctChar;
+                box.className = "w-10 h-10 border-2 border-amber-400 bg-amber-50 rounded-lg flex items-center justify-center font-black text-xl text-amber-700 uppercase animate-bounce";
+                spellingHintsUsed++;
+                
+                showToast(`บอกตัวอักษรตำแหน่งที่ ${filledIndex+1} เรียบร้อย!`, "💡");
+            } else {
+                showToast("สะกดครบหมดทุกตัวแล้วจ้า!", "✨");
+            }
+        }
+
+        function checkSpellingAnswer() {
+            const currentItem = activeSpellingList[currentSpellingIndex];
+            const userInput = document.getElementById('spellingInput').value.trim().toLowerCase();
+            const correctWord = currentItem.word.toLowerCase();
+            const inputField = document.getElementById('spellingInput');
+
+            if (userInput === "") {
+                showToast("พิมพ์ตอบภาษาอังกฤษก่อนนะจ๊ะหนูๆ!", "✏️");
+                return;
+            }
+
+            inputField.disabled = true;
+
+            if (userInput === correctWord) {
+                playSound('correct');
+                spellingScore++;
+                inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-2xl uppercase";
+                
+                for (let i = 0; i < correctWord.length; i++) {
+                    const box = document.getElementById(`spellingBox-${i}`);
+                    box.innerText = correctWord[i];
+                    box.className = "w-10 h-10 border-2 border-emerald-500 bg-emerald-100 rounded-lg flex items-center justify-center font-black text-xl text-emerald-800 uppercase";
+                }
+
+                confetti({
+                    particleCount: 20,
+                    spread: 30,
+                    origin: { y: 0.8 }
+                });
+
+                showToast("ถูกต้องจ้า! เก่งที่สุดเลย! 🌟", "🎉");
+
+            } else {
+                playSound('wrong');
+                inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-rose-500 bg-rose-50 text-rose-700 rounded-2xl uppercase";
+                
+                for (let i = 0; i < correctWord.length; i++) {
+                    const box = document.getElementById(`spellingBox-${i}`);
+                    box.innerText = correctWord[i];
+                    box.className = "w-10 h-10 border-2 border-emerald-500 bg-emerald-50 rounded-lg flex items-center justify-center font-black text-xl text-emerald-700 uppercase";
+                }
+
+                showToast(`ยังสะกดไม่ถูกน้า.. คำที่ถูกคือ: ${currentItem.word.toUpperCase()}`, "❌");
+            }
+
+            setTimeout(() => {
+                currentSpellingIndex++;
+                loadSpellingWord();
+            }, 2500);
+        }
+
+        // ==========================================
+        // END GAME SCREEN LOGIC
+        // ==========================================
+        function endGameMode(mode) {
+            playSound('win');
+            changeScreen('result');
+
+            let score = 0;
+            let feedback = "";
+            let emoji = "🏆";
+            let starsHtml = "";
+
+            if (mode === 'quiz') {
+                score = quizScore;
+                document.getElementById('resultModeTitle').innerText = "ผลคะแนนสอบประลองตอบคำถามรวดเร็ว";
+            } else {
+                score = spellingScore;
+                document.getElementById('resultModeTitle').innerText = "ผลคะแนนสอบเกมเขียนสะกดคำยอดอัจฉริยะ";
+            }
+
+            document.getElementById('resultScore').innerText = `${score} / 10`;
+
+            if (score === 10) {
+                feedback = "ว้าว สุดยอดแชมเปี้ยน! หนูได้คะแนนเต็มพร้อมทำข้อสอบวันที่ 10 มิ.ย. 69 แน่นอน!";
+                emoji = "🏆";
+                starsHtml = `
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                `;
+                triggerTriumphantConfetti();
+            } else if (score >= 7) {
+                feedback = "เก่งมากเลยครับคนเก่ง! อีกแค่นิดเดียวเท่านั้นก็จะเต็มสิบแล้ว!";
+                emoji = "🥇";
+                starsHtml = `
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                `;
+                triggerNormalConfetti();
+            } else if (score >= 5) {
+                feedback = "ผ่านเกณฑ์แล้วจ้า! ลองกลับไปฝึกฝนกับการ์ดคำศัพท์เยอะๆ นะ จะได้จำแม่นขึ้นครับ!";
+                emoji = "🥈";
+                starsHtml = `
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                `;
+            } else {
+                feedback = "พยายามต่อไปนะลูก! ลองกลับไปทบทวนในโหมดการ์ดดูอีกรอบ แล้วหนูจะเก่งขึ้นแน่นอน!";
+                emoji = "📚";
+                starsHtml = `
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                `;
+            }
+
+            document.getElementById('resultIcon').innerText = emoji;
+            document.getElementById('resultMiniBadge').innerText = selectedAvatar;
+            document.getElementById('resultFeedback').innerText = feedback;
+            document.getElementById('resultStars').innerHTML = starsHtml;
+        }
+
+        // CONFETTI EFFECTS
+        function triggerTriumphantConfetti() {
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function triggerNormalConfetti() {
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+</body>
+</html>
