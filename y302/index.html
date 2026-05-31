@@ -582,11 +582,20 @@
             // Load saved student metadata from localStorage if exists
             const savedName = localStorage.getItem('p3_vocab_studentName');
             const savedClass = localStorage.getItem('p3_vocab_studentClass');
-            const savedUrl = localStorage.getItem('p3_vocab_googleScriptUrl');
+            let savedUrl = localStorage.getItem('p3_vocab_googleScriptUrl');
+            
+            // Define the default Apps Script URL provided by the user
+            const defaultGasUrl = "https://script.google.com/macros/s/AKfycbzfQYOxqFcn8tZbzYTQCbRXzP6qbpju6TMl6WjpGPcW4oCOeXm8hR_MWxVJbvUKwaOl7Q/exec";
             
             if (savedName) document.getElementById('studentNameInput').value = savedName;
             if (savedClass) document.getElementById('studentClassInput').value = savedClass;
-            if (savedUrl) document.getElementById('googleScriptUrlInput').value = savedUrl;
+            
+            // Force write default URL to localStorage if it is empty
+            if (!savedUrl || savedUrl.trim() === "") {
+                savedUrl = defaultGasUrl;
+                localStorage.setItem('p3_vocab_googleScriptUrl', defaultGasUrl);
+            }
+            document.getElementById('googleScriptUrlInput').value = savedUrl;
             
             // Allow spelling inputs to check with Enter key
             document.getElementById('spellingInput').addEventListener('keypress', function(e) {
@@ -1183,7 +1192,8 @@
 
         // GOOGLE SHEET EXPORTER WITH FAILSAFE & CORS REDIRECT HANDLING
         function uploadScoreToGoogleSheet() {
-            const scriptUrl = localStorage.getItem('p3_vocab_googleScriptUrl');
+            const defaultGasUrl = "https://script.google.com/macros/s/AKfycbzfQYOxqFcn8tZbzYTQCbRXzP6qbpju6TMl6WjpGPcW4oCOeXm8hR_MWxVJbvUKwaOl7Q/exec";
+            const scriptUrl = localStorage.getItem('p3_vocab_googleScriptUrl') || defaultGasUrl;
             
             if (!scriptUrl || scriptUrl.trim() === "") {
                 playSound('wrong');
