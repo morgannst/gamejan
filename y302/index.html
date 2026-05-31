@@ -130,6 +130,16 @@
                     <span class="text-xs font-normal opacity-90 mt-1">ฝึกพิมพ์สะกดคำให้แม่น</span>
                 </button>
             </div>
+
+            <!-- Top 5 Leaderboard Display -->
+            <div class="w-full max-w-2xl bg-indigo-50 border-2 border-indigo-200 rounded-3xl p-5 mt-6 shadow-inner text-left">
+                <p class="text-indigo-800 font-extrabold text-center text-lg mb-4 flex items-center justify-center gap-2">
+                    🏆 ทำเนียบสุดยอดฝีมือ 5 อันดับแรก (Top 5 Leaderboard)
+                </p>
+                <div id="leaderboardList" class="space-y-2.5">
+                    <!-- Dynamic rows will be inserted here via JS -->
+                </div>
+            </div>
         </div>
 
         <!-- SCREEN 2: STUDY MODE (FLASHCARDS) -->
@@ -567,6 +577,7 @@
         // INIT LOBBY & DATA LOADING
         window.onload = function() {
             renderAvatars();
+            renderLeaderboard(); // Render the leaderboard on initial load
             
             // Load saved student metadata from localStorage if exists
             const savedName = localStorage.getItem('p3_vocab_studentName');
@@ -699,6 +710,7 @@
             // Show active
             if (screenName === 'lobby') {
                 document.getElementById('lobbyScreen').classList.remove('hidden');
+                renderLeaderboard(); // Update leaderboard view when returning to lobby
             } else if (screenName === 'study') {
                 document.getElementById('studyScreen').classList.remove('hidden');
                 currentStudyIndex = 0;
@@ -1110,6 +1122,9 @@
                 document.getElementById('resultModeTitle').innerText = "ผลคะแนนสอบเกมเขียนสะกดคำยอดอัจฉริยะ";
             }
 
+            // Save the result to local leaderboard
+            saveScoreToLocalLeaderboard(studentName, studentClass, selectedAvatar, modeText, score);
+
             document.getElementById('resultScore').innerText = `${score} / 10`;
             document.getElementById('resultStudentName').innerText = studentName;
             document.getElementById('resultStudentClass').innerText = studentClass;
@@ -1274,6 +1289,80 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
+        }
+
+        // LEADERBOARD CONTROL FUNCTIONS (Saved in LocalStorage)
+        function saveScoreToLocalLeaderboard(name, className, avatar, mode, score) {
+            try {
+                let leaderboard = JSON.parse(localStorage.getItem('p3_vocab_leaderboard')) || [];
+                
+                const newRecord = {
+                    name: name || "ผู้เล่นนิรนาม",
+                    class: className || "ป.3",
+                    avatar: avatar || "🐱",
+                    mode: mode,
+                    score: score,
+                    date: new Date().toLocaleDateString('th-TH', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    })
+                };
+                
+                leaderboard.push(newRecord);
+                // Sort by highest score first, then by date (most recent)
+                leaderboard.sort((a, b) => b.score - a.score);
+                // Slice to top 5
+                leaderboard = leaderboard.slice(0, 5);
+                
+                localStorage.setItem('p3_vocab_leaderboard', JSON.stringify(leaderboard));
+            } catch (e) {
+                console.error("Failed to save highscore to leaderboard:", e);
+            }
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+            if (!container) return;
+            
+            try {
+                const leaderboard = JSON.parse(localStorage.getItem('p3_vocab_leaderboard')) || [];
+                
+                if (leaderboard.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-5 text-indigo-400 text-sm font-bold bg-white bg-opacity-65 rounded-2xl border border-dashed border-indigo-200">
+                            ✨ ยังไม่มีทำเนียบสถิติในเครื่องนี้ มาร่วมสร้างคะแนนคนแรกกันเถอะ! ✨
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = "";
+                leaderboard.forEach((record, index) => {
+                    const medals = ["🥇", "🥈", "🥉", "✨", "⭐"];
+                    const medal = medals[index] || "⭐";
+                    
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-indigo-100 shadow-sm transition-all hover:scale-[1.01]";
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl font-bold w-6 text-center">${medal}</span>
+                            <span class="text-3xl">${record.avatar}</span>
+                            <div>
+                                <p class="font-extrabold text-gray-800 text-sm md:text-base leading-tight">${record.name} <span class="text-xs text-indigo-500 font-semibold">(${record.class})</span></p>
+                                <p class="text-[10px] md:text-xs text-gray-400 font-semibold mt-0.5">${record.mode} • ${record.date}</p>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-extrabold px-3 py-1.5 rounded-xl text-xs md:text-sm shadow-sm">
+                            ⭐ ${record.score} / 10
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch (e) {
+                console.error("Failed to render leaderboard:", e);
+            }
         }
     </script>
 </body>
