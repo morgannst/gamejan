@@ -46,7 +46,18 @@
 <body class="p-4 md:p-8 flex flex-col justify-between" onclick="unlockAudioOnFirstTouch()">
 
     <!-- Header Section -->
-    <header class="max-w-4xl w-full mx-auto text-center mb-6">
+    <header class="max-w-4xl w-full mx-auto text-center mb-4 relative">
+        <!-- Settings button for teachers to configure Sheets Web App URL -->
+        <div class="absolute right-2 top-2 flex gap-2 z-40">
+            <!-- View Original worksheet button (259.jpg) -->
+            <button onclick="toggleWorksheetModal(true)" class="bg-white hover:bg-yellow-50 text-yellow-600 w-10 h-10 rounded-full shadow border border-yellow-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95" title="ดูใบงานเตรียมสอบ">
+                <i class="fa-solid fa-file-image text-lg"></i>
+            </button>
+            <button onclick="toggleSettingsModal(true)" class="bg-white hover:bg-gray-100 text-gray-700 w-10 h-10 rounded-full shadow border border-gray-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95" title="ตั้งค่าคุณครู">
+                <i class="fa-solid fa-gear text-lg"></i>
+            </button>
+        </div>
+        
         <div class="inline-block bg-yellow-300 text-yellow-800 font-bold px-4 py-2 rounded-full shadow-md text-sm md:text-base border-2 border-yellow-400 mb-2 bouncy">
             📅 ตารางสอบ: 10 มิ.ย. 69 🎉
         </div>
@@ -68,36 +79,52 @@
                 <span>🔊 แตะตรงไหนก็ได้บนจอ 1 ครั้ง เพื่อเปิดใช้งานระบบเสียงสำหรับแท็บเล็ต</span>
             </div>
 
-            <div class="text-6xl md:text-8xl mb-4 bouncy">🌴🎒🗺️</div>
-            <h2 class="text-2xl md:text-3xl font-bold text-purple-600 mb-6">ยินดีต้อนรับเข้าสู่เกาะคำศัพท์!</h2>
+            <div class="text-5xl md:text-7xl mb-2 bouncy">🌴🎒🗺️</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-purple-600 mb-4">ยินดีต้อนรับเข้าสู่เกาะคำศัพท์!</h2>
             
-            <p class="text-gray-600 max-w-md mb-8 text-base md:text-lg">มาฝึกฝนและทดสอบคำศัพท์ภาษาอังกฤษที่ออกสอบ เพื่อเตรียมตัวเป็นผู้ชนะในการสอบกันเถอะครับเด็กๆ!</p>
+            <!-- Student Information Input Card -->
+            <div class="w-full max-w-md bg-purple-50 border border-purple-200 p-4 rounded-2xl mb-6 shadow-inner text-left">
+                <p class="text-purple-700 font-bold mb-3 text-center"><i class="fa-solid fa-user-pen mr-2"></i>ข้อมูลผู้เข้าทดสอบคำศัพท์</p>
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">ชื่อ-นามสกุล (เด็กชาย / เด็กหญิง):</label>
+                        <input type="text" id="studentNameInput" placeholder="กรอกชื่อและนามสกุลของคุณที่นี่..." 
+                               class="w-full px-4 py-2 rounded-xl border-2 border-purple-200 focus:outline-none focus:border-purple-500 font-semibold text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">ชั้นเรียน และเลขที่ (เช่น ป.3/1 เลขที่ 15):</label>
+                        <input type="text" id="studentClassInput" placeholder="เช่น ป.3/2 เลขที่ 8" 
+                               class="w-full px-4 py-2 rounded-xl border-2 border-purple-200 focus:outline-none focus:border-purple-500 font-semibold text-gray-700">
+                    </div>
+                </div>
+            </div>
             
             <!-- Avatar Selection -->
-            <div class="mb-8 w-full max-w-md">
+            <div class="mb-6 w-full max-w-md">
                 <p class="text-purple-600 font-bold mb-3">เลือกฮีโร่ตัวจิ๋วของคุณ:</p>
                 <div class="grid grid-cols-5 gap-3" id="avatarList">
                     <!-- Dynamic avatars filled via JS -->
                 </div>
             </div>
 
+            <!-- Game Mode Buttons -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
                 <!-- Mode 1 Button -->
-                <button onclick="changeScreen('study')" class="flex flex-col items-center bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-orange-700">
+                <button onclick="checkInfoAndChangeScreen('study')" class="flex flex-col items-center bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-orange-700">
                     <span class="text-4xl mb-2">🃏</span>
                     <span class="text-lg">1. การ์ดฝึกฝนคำศัพท์</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ฝึกฟัง พลิกดูคำแปล</span>
                 </button>
 
                 <!-- Mode 2 Button -->
-                <button onclick="changeScreen('quiz')" class="flex flex-col items-center bg-gradient-to-br from-emerald-400 to-teal-600 hover:from-emerald-300 hover:to-teal-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-teal-800">
+                <button onclick="checkInfoAndChangeScreen('quiz')" class="flex flex-col items-center bg-gradient-to-br from-emerald-400 to-teal-600 hover:from-emerald-300 hover:to-teal-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-teal-800">
                     <span class="text-4xl mb-2">🎯</span>
                     <span class="text-lg">2. เกมตอบคำถาม (4 ตัวเลือก)</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ทดสอบความจำชิงดาว</span>
                 </button>
 
                 <!-- Mode 3 Button -->
-                <button onclick="changeScreen('spelling')" class="flex flex-col items-center bg-gradient-to-br from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-blue-800">
+                <button onclick="checkInfoAndChangeScreen('spelling')" class="flex flex-col items-center bg-gradient-to-br from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-blue-800">
                     <span class="text-4xl mb-2">✍️</span>
                     <span class="text-lg">3. เกมฝึกสะกดคำศัพท์</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ฝึกพิมพ์สะกดคำให้แม่น</span>
@@ -215,7 +242,7 @@
         <!-- SCREEN 4: SPELLING MODE -->
         <div id="spellingScreen" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-sky-200 hidden">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
                 <button onclick="changeScreen('lobby')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors text-sm">
                     <i class="fa-solid fa-arrow-left mr-1"></i> กลับหน้าแรก
                 </button>
@@ -225,26 +252,26 @@
             </div>
 
             <!-- Spelling Challenge Box -->
-            <div class="text-center mb-6 flex flex-col items-center">
-                <div class="text-6xl mb-2" id="spellingEmoji">🤝</div>
+            <div class="text-center mb-4 flex flex-col items-center">
+                <div class="text-5xl mb-1" id="spellingEmoji">🤝</div>
                 <h2 class="text-2xl font-extrabold text-gray-800 mb-1" id="spellingThaiTranslation">คู่หู / เพื่อนร่วมทีม</h2>
                 <p class="text-xs text-gray-500">ฟังเสียงสะกดคำ แล้วพิมพ์สะกดลงในช่องว่าง</p>
 
                 <!-- Audio Play Button -->
-                <button onclick="speakSpellingWord()" class="mt-4 px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-full flex items-center gap-2 shadow-md transform transition-transform active:scale-95">
-                    <i class="fa-solid fa-volume-high text-xl"></i> กดเพื่อฟังเสียงสะกดคำ
+                <button onclick="speakSpellingWord()" class="mt-3 px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-full flex items-center gap-2 shadow-md transform transition-transform active:scale-95 text-sm">
+                    <i class="fa-solid fa-volume-high text-lg"></i> กดเพื่อฟังเสียงสะกดคำ
                 </button>
             </div>
 
             <!-- Input Box -->
             <div class="mb-4">
-                <input type="text" id="spellingInput" placeholder="พิมพ์สะกดคำศัพท์ภาษาอังกฤษที่นี่..." 
-                       class="w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase"
+                <input type="text" id="spellingInput" placeholder="พิมพ์สะกดคำศัพท์ที่นี่..." 
+                       class="w-full px-4 py-3 text-xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase"
                        autocomplete="off" autofocus>
             </div>
 
             <!-- Letter Assistance Blocks (Hint) -->
-            <div class="flex justify-center flex-wrap gap-2 mb-6" id="spellingLetterHints">
+            <div class="flex justify-center flex-wrap gap-1.5 mb-5" id="spellingLetterHints">
                 <!-- Generated underscores based on length -->
             </div>
 
@@ -253,45 +280,56 @@
                 <button onclick="revealSpellingHint()" class="px-5 py-3 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-2xl transition-colors border border-amber-300 text-sm">
                     💡 ขอคำใบ้ตัวอักษร
                 </button>
-                <button onclick="checkSpellingAnswer()" class="flex-1 py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg border-b-4 border-blue-800 text-center text-lg">
+                <button onclick="checkSpellingAnswer()" class="flex-1 py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg border-b-4 border-blue-800 text-center text-base">
                     ตรวจสอบคำตอบ! 🚀
                 </button>
             </div>
         </div>
 
         <!-- SCREEN 5: RESULTS SCREEN -->
-        <div id="resultScreen" class="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border-4 border-purple-300 text-center hidden">
+        <div id="resultScreen" class="w-full max-w-md bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-purple-300 text-center hidden">
             <!-- Reward Icon -->
-            <div class="relative inline-block mb-6">
-                <span class="text-8xl" id="resultIcon">🏆</span>
+            <div class="relative inline-block mb-4">
+                <span class="text-7xl md:text-8xl" id="resultIcon">🏆</span>
                 <span class="absolute -bottom-2 -right-2 text-4xl" id="resultMiniBadge">👑</span>
             </div>
 
-            <h2 class="text-3xl font-black text-purple-700 mb-2">สุดยอดฝีมือ!</h2>
-            <p class="text-gray-600 text-sm font-semibold mb-6" id="resultModeTitle">ผลคะแนนจากการตอบคำถามสุดยาก</p>
+            <h2 class="text-2xl md:text-3xl font-black text-purple-700 mb-1">สุดยอดฝีมือ!</h2>
+            <p class="text-gray-600 text-xs font-semibold mb-4" id="resultModeTitle">ผลคะแนนจากการตอบคำถามสุดยาก</p>
 
             <!-- Score board -->
-            <div class="bg-purple-50 rounded-2xl p-6 border border-purple-100 mb-8">
-                <p class="text-sm text-purple-500 font-bold uppercase tracking-wider">คะแนนทั้งหมดที่คุณทำได้</p>
-                <div class="text-5xl font-black text-purple-800 mt-2 mb-1" id="resultScore">
+            <div class="bg-purple-50 rounded-2xl p-4 border border-purple-100 mb-4">
+                <p class="text-xs text-purple-500 font-bold uppercase tracking-wider">คะแนนทั้งหมดที่ได้</p>
+                <div class="text-4xl font-black text-purple-800 mt-1 mb-1" id="resultScore">
                     10 / 10
                 </div>
-                <div class="flex justify-center gap-1 text-2xl text-yellow-400" id="resultStars">
+                <div class="flex justify-center gap-1 text-xl text-yellow-400" id="resultStars">
                     <i class="fa-solid fa-star"></i>
                     <i class="fa-solid fa-star"></i>
                     <i class="fa-solid fa-star"></i>
                 </div>
+                <!-- Student Summary Details -->
+                <p class="text-xs text-gray-500 mt-2 font-semibold">ผู้ทดสอบ: <span id="resultStudentName" class="text-purple-700"></span> (<span id="resultStudentClass" class="text-purple-700"></span>)</p>
             </div>
 
-            <p class="text-sm font-medium text-purple-600 bg-purple-100 py-2 px-4 rounded-full inline-block mb-8" id="resultFeedback">
+            <!-- Submit to Google Sheets Section -->
+            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 mb-4 flex flex-col items-center">
+                <p class="text-xs text-indigo-700 font-bold mb-2"><i class="fa-solid fa-cloud-arrow-up mr-1"></i>ส่งรายงานคะแนนของคุณครู</p>
+                <button id="sendSheetBtn" onclick="uploadScoreToGoogleSheet()" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-extrabold rounded-xl shadow-md flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-file-export"></i> <span>บันทึกคะแนนลง Google Sheet 📝</span>
+                </button>
+                <p id="uploadStatusText" class="text-xs text-gray-500 mt-1.5 font-medium hidden">กำลังเตรียมส่งคะแนน...</p>
+            </div>
+
+            <p class="text-xs font-medium text-purple-600 bg-purple-100 py-1.5 px-4 rounded-full inline-block mb-4" id="resultFeedback">
                 เก่งมากเลยครับ! หนูพร้อมสอบวันที่ 10 มิ.ย. 69 แน่นอน!
             </p>
 
-            <div class="flex flex-col gap-3">
-                <button onclick="changeScreen('lobby')" class="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-extrabold rounded-2xl shadow-lg border-b-4 border-indigo-800 text-lg">
+            <div class="flex flex-col gap-2">
+                <button onclick="changeScreen('lobby')" class="w-full py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-extrabold rounded-xl shadow-lg border-b-4 border-indigo-800 text-base">
                     🎮 กลับไปเล่นโหมดอื่น
                 </button>
-                <button onclick="restartCurrentMode()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-colors">
+                <button onclick="restartCurrentMode()" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors text-sm">
                     🔄 เล่นโหมดนี้อีกรอบ
                 </button>
             </div>
@@ -299,9 +337,74 @@
 
     </main>
 
+    <!-- ORIGINAL WORKSHEET VIEW MODAL (259.jpg Reference) -->
+    <div id="worksheetModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl p-5 max-w-md w-full border-4 border-yellow-300 shadow-2xl relative text-center">
+            <button onclick="toggleWorksheetModal(false)" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-2xl" title="ปิดหน้าต่าง">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-purple-700 mb-3 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-invoice text-yellow-500"></i> <span>ใบงานคำศัพท์เตรียมสอบ ป.3 (259.jpg)</span>
+            </h3>
+            <p class="text-gray-500 text-xs mb-3">เปรียบเทียบคำศัพท์ที่ใช้ทดสอบกับกระดาษสอบจริงในห้องเรียน</p>
+            
+            <div class="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 mb-4 max-h-[55vh] flex items-center justify-center">
+                <!-- Reference to file 259.jpg verbatim -->
+                <img src="259.jpg" alt="Worksheet 259.jpg" class="max-h-full max-w-full object-contain shadow-inner">
+            </div>
+
+            <button onclick="toggleWorksheetModal(false)" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-extrabold rounded-xl text-sm transition-all shadow-md">
+                กลับเข้าสู่เกมทบทวน 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- TEACHER SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full border-4 border-indigo-200 shadow-2xl relative">
+            <button onclick="toggleSettingsModal(false)" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-indigo-700 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-screwdriver-wrench"></i> <span>ตั้งค่าระบบหลังบ้านคุณครู</span>
+            </h3>
+            <p class="text-gray-500 text-xs mb-4 leading-relaxed">
+                กำหนด Google Apps Script Web App URL เพื่อส่งคะแนนบันทึกเข้าไปยัง Google Sheet ไฟล์ ID: <strong class="text-indigo-600 select-all font-mono">1GrvgmkCiHZgxM9J0K4LFk1HMu7K1_nLBc24YNLSQ6sM</strong> (แผ่นงาน: <strong>ScoreData</strong>)
+            </p>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-600 mb-1">Google Apps Script Web App URL:</label>
+                <input type="url" id="googleScriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" 
+                       class="w-full px-4 py-2 text-sm rounded-xl border-2 border-indigo-200 focus:outline-none focus:border-indigo-500 font-mono text-gray-700">
+                <p class="text-[10px] text-gray-400 mt-1">หลังจากคัดลอก Web App URL จากขั้นตอนการ Deploy ของ Google Sheets แล้ว ให้นำมาวางที่นี่และกดบันทึก</p>
+            </div>
+
+            <!-- Instruction Help Accordion Inside Modal -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 text-left">
+                <p class="text-xs font-bold text-gray-700 mb-1"><i class="fa-solid fa-info-circle mr-1"></i> วิธีการติดตั้ง Apps Script ใน Google Sheet</p>
+                <ol class="text-[11px] text-gray-500 list-decimal pl-4 space-y-1">
+                    <li>เปิด Google Sheet ไฟล์ของคุณครู</li>
+                    <li>เข้าที่เมนู <strong>ส่วนขยาย (Extensions)</strong> &gt; <strong>Apps Script</strong></li>
+                    <li>คัดลอกไฟล์โค้ด Apps Script ไปวางทับหน้าว่าง แล้วกด บันทึก</li>
+                    <li>กดปุ่ม <strong>การทำให้ใช้งานได้ (Deploy)</strong> &gt; <strong>การทำให้ใช้งานได้ใหม่ (New deployment)</strong> เลือกชนิดเป็น <strong>เว็บแอป (Web app)</strong></li>
+                    <li>ตั้งค่าสิทธิ์ให้ "ผู้มีสิทธิ์เข้าถึง (Who has access)" เป็น <strong>"ทุกคน (Anyone)"</strong> จากนั้นนำ URL ที่ได้มาป้อนที่นี่</li>
+                </ol>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="saveSettings()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all shadow-md">
+                    💾 บันทึกการเชื่อมต่อ
+                </button>
+                <button onclick="toggleSettingsModal(false)" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl text-sm transition-all">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer Credit -->
-    <footer class="max-w-4xl w-full mx-auto text-center mt-6 text-gray-400 text-xs font-semibold">
-        <p>© 2026 เกมทดสอบภาษาอังกฤษ ป.3 • ออกแบบขึ้นเพื่อความสนุกและความรู้ของเด็กๆ 🌟</p>
+    <footer class="max-w-4xl w-full mx-auto text-center mt-6 text-gray-400 text-[10px] md:text-xs font-semibold">
+        <p>© 2026 เกมทดสอบภาษาอังกฤษ ป.3 • ออกแบบขึ้นเพื่อความสนุกและการจัดเก็บคะแนนอย่างง่ายดาย 📊</p>
     </footer>
 
     <!-- Custom Modals (Using Toast alerts to avoid native alert popups) -->
@@ -334,6 +437,10 @@
         let currentScreen = "lobby";
         let currentStudyIndex = 0;
         let isCardFlipped = false;
+
+        // Student Data
+        let studentName = "";
+        let studentClass = "";
 
         // Quiz State
         let currentQuizIndex = 0;
@@ -457,9 +564,18 @@
             }
         }
 
-        // INIT LOBBY
+        // INIT LOBBY & DATA LOADING
         window.onload = function() {
             renderAvatars();
+            
+            // Load saved student metadata from localStorage if exists
+            const savedName = localStorage.getItem('p3_vocab_studentName');
+            const savedClass = localStorage.getItem('p3_vocab_studentClass');
+            const savedUrl = localStorage.getItem('p3_vocab_googleScriptUrl');
+            
+            if (savedName) document.getElementById('studentNameInput').value = savedName;
+            if (savedClass) document.getElementById('studentClassInput').value = savedClass;
+            if (savedUrl) document.getElementById('googleScriptUrlInput').value = savedUrl;
             
             // Allow spelling inputs to check with Enter key
             document.getElementById('spellingInput').addEventListener('keypress', function(e) {
@@ -488,6 +604,39 @@
             });
         }
 
+        // SETTINGS & WORKSHEET MODAL HANDLERS
+        function toggleSettingsModal(show) {
+            playSound('click');
+            const modal = document.getElementById('settingsModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function toggleWorksheetModal(show) {
+            playSound('click');
+            const modal = document.getElementById('worksheetModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function saveSettings() {
+            const urlInput = document.getElementById('googleScriptUrlInput').value.trim();
+            localStorage.setItem('p3_vocab_googleScriptUrl', urlInput);
+            playSound('correct');
+            showToast("บันทึกการตั้งค่าลิงก์เชื่อมโยงเรียบร้อย!", "✅");
+            toggleSettingsModal(false);
+        }
+
         // TOAST NOTIFICATIONS
         function showToast(message, icon = "⭐") {
             const toast = document.getElementById('toast');
@@ -499,6 +648,35 @@
             setTimeout(() => {
                 toast.className = toast.className.replace('translate-y-0 opacity-100 pointer-events-auto', 'translate-y-[-100px] opacity-0 pointer-events-none');
             }, 3000);
+        }
+
+        // CHECK VALIDATION BEFORE STARTING GAMES
+        function checkInfoAndChangeScreen(targetScreen) {
+            const nameField = document.getElementById('studentNameInput').value.trim();
+            const classField = document.getElementById('studentClassInput').value.trim();
+
+            if (nameField === "" || classField === "") {
+                playSound('wrong');
+                showToast("คุณครูขอให้ระบุ 'ชื่อ-นามสกุล' และ 'ชั้นเรียน/เลขที่' ก่อนเริ่มเกมน้าเด็กๆ! ✏️", "⚠️");
+                
+                // Highlight inputs
+                document.getElementById('studentNameInput').classList.add('border-rose-400');
+                document.getElementById('studentClassInput').classList.add('border-rose-400');
+                return;
+            }
+
+            // Remove error highlights
+            document.getElementById('studentNameInput').classList.remove('border-rose-400');
+            document.getElementById('studentClassInput').classList.remove('border-rose-400');
+
+            // Save info to states and storage
+            studentName = nameField;
+            studentClass = classField;
+            localStorage.setItem('p3_vocab_studentName', studentName);
+            localStorage.setItem('p3_vocab_studentClass', studentClass);
+
+            // Change Screen
+            changeScreen(targetScreen);
         }
 
         // SCREEN NAVIGATOR
@@ -804,7 +982,7 @@
             // Clear input box
             const inputField = document.getElementById('spellingInput');
             inputField.value = "";
-            inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase";
+            inputField.className = "w-full px-4 py-3 text-xl font-bold tracking-wider text-center border-3 border-sky-300 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 uppercase";
             inputField.disabled = false;
             
             renderSpellingUnderscores(currentItem.word);
@@ -874,7 +1052,7 @@
             if (userInput === correctWord) {
                 playSound('correct');
                 spellingScore++;
-                inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-2xl uppercase";
+                inputField.className = "w-full px-4 py-3 text-xl font-bold tracking-wider text-center border-3 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-2xl uppercase";
                 
                 for (let i = 0; i < correctWord.length; i++) {
                     const box = document.getElementById(`spellingBox-${i}`);
@@ -892,7 +1070,7 @@
 
             } else {
                 playSound('wrong');
-                inputField.className = "w-full px-6 py-4 text-2xl font-bold tracking-wider text-center border-3 border-rose-500 bg-rose-50 text-rose-700 rounded-2xl uppercase";
+                inputField.className = "w-full px-4 py-3 text-xl font-bold tracking-wider text-center border-3 border-rose-500 bg-rose-50 text-rose-700 rounded-2xl uppercase";
                 
                 for (let i = 0; i < correctWord.length; i++) {
                     const box = document.getElementById(`spellingBox-${i}`);
@@ -910,7 +1088,7 @@
         }
 
         // ==========================================
-        // END GAME SCREEN LOGIC
+        // END GAME & RESULTS SCREEN LOGIC
         // ==========================================
         function endGameMode(mode) {
             playSound('win');
@@ -920,16 +1098,31 @@
             let feedback = "";
             let emoji = "🏆";
             let starsHtml = "";
+            let modeText = "";
 
             if (mode === 'quiz') {
                 score = quizScore;
+                modeText = "เกมตอบคำถาม (4 ตัวเลือก)";
                 document.getElementById('resultModeTitle').innerText = "ผลคะแนนสอบประลองตอบคำถามรวดเร็ว";
             } else {
                 score = spellingScore;
+                modeText = "เกมฝึกสะกดคำศัพท์";
                 document.getElementById('resultModeTitle').innerText = "ผลคะแนนสอบเกมเขียนสะกดคำยอดอัจฉริยะ";
             }
 
             document.getElementById('resultScore').innerText = `${score} / 10`;
+            document.getElementById('resultStudentName').innerText = studentName;
+            document.getElementById('resultStudentClass').innerText = studentClass;
+
+            // Reset the Google Sheets Button State
+            const sendBtn = document.getElementById('sendSheetBtn');
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = `<i class="fa-solid fa-file-export"></i> <span>บันทึกคะแนนลง Google Sheet 📝</span>`;
+            sendBtn.className = "w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-extrabold rounded-xl shadow-md flex items-center justify-center gap-2 transition-all";
+            
+            const statusText = document.getElementById('uploadStatusText');
+            statusText.classList.add('hidden');
+            statusText.innerText = "";
 
             if (score === 10) {
                 feedback = "ว้าว สุดยอดแชมเปี้ยน! หนูได้คะแนนเต็มพร้อมทำข้อสอบวันที่ 10 มิ.ย. 69 แน่นอน!";
@@ -971,6 +1164,83 @@
             document.getElementById('resultMiniBadge').innerText = selectedAvatar;
             document.getElementById('resultFeedback').innerText = feedback;
             document.getElementById('resultStars').innerHTML = starsHtml;
+        }
+
+        // GOOGLE SHEET EXPORTER WITH FAILSAFE & CORS REDIRECT HANDLING
+        function uploadScoreToGoogleSheet() {
+            const scriptUrl = localStorage.getItem('p3_vocab_googleScriptUrl');
+            
+            if (!scriptUrl || scriptUrl.trim() === "") {
+                playSound('wrong');
+                showToast("ยังไม่มีลิงก์คุณครู! รบกวนคุณครูกดปุ่ม ⚙️ ขวาบนเพื่อตั้งค่าระบบชีตก่อนนะครับ", "⚠️");
+                return;
+            }
+
+            playSound('click');
+            const sendBtn = document.getElementById('sendSheetBtn');
+            const statusText = document.getElementById('uploadStatusText');
+
+            // Change UI to Loading State
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>กำลังบันทึกคะแนนลงชีต...</span>`;
+            sendBtn.className = "w-full py-2.5 px-4 bg-gray-400 text-white text-sm font-extrabold rounded-xl shadow-md flex items-center justify-center gap-2 cursor-not-allowed";
+            
+            statusText.classList.remove('hidden');
+            statusText.innerText = "กำลังเชื่อมโยงข้อมูลกับเซิร์ฟเวอร์ Google Sheets...";
+            statusText.className = "text-xs text-amber-600 mt-1.5 font-bold animate-pulse";
+
+            const modeTitleText = document.getElementById('resultModeTitle').innerText;
+            const gameMode = modeTitleText.includes('ตอบคำถาม') ? "เกมตอบคำถาม (4 ตัวเลือก)" : "เกมฝึกสะกดคำศัพท์";
+            const finalScoreStr = document.getElementById('resultScore').innerText;
+            const finalScore = parseInt(finalScoreStr.split(' / ')[0]);
+
+            // Construct payload matching Apps Script
+            const payload = {
+                studentName: studentName,
+                studentClass: studentClass,
+                avatar: selectedAvatar,
+                mode: gameMode,
+                score: finalScore,
+                fullScore: 10
+            };
+
+            // Fetch to Apps Script Web App (Standard CORS Mode with automatic redirection handling)
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Standard dynamic sandbox bypass for Google Apps Scripts
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                // Since mode: 'no-cors' yields an opaque response, we confirm network dispatch success.
+                playSound('correct');
+                sendBtn.innerHTML = `<i class="fa-solid fa-cloud-check"></i> <span>บันทึกสำเร็จเรียบร้อย! 🎉</span>`;
+                sendBtn.className = "w-full py-2.5 px-4 bg-emerald-500 text-white text-sm font-extrabold rounded-xl shadow-md flex items-center justify-center gap-2 cursor-default";
+                
+                statusText.innerText = "ส่งคำขอเข้าระบบ Google Sheets เรียบร้อยแล้ว!";
+                statusText.className = "text-xs text-emerald-600 mt-1.5 font-bold animate-bounce";
+                showToast("ส่งข้อมูลคะแนนเข้า Google Sheet เรียบร้อยแล้วครับ!", "🎉");
+                
+                confetti({
+                    particleCount: 15,
+                    spread: 20,
+                    origin: { y: 0.8 }
+                });
+            })
+            .catch(error => {
+                console.error("Upload error:", error);
+                playSound('wrong');
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>ลองบันทึกใหมี่อีกครั้ง 📝</span>`;
+                sendBtn.className = "w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-sm font-extrabold rounded-xl shadow-md flex items-center justify-center gap-2 transition-all";
+                
+                statusText.innerText = "เกิดข้อผิดพลาด: โปรดตรวจสอบลิงก์ตั้งค่า Apps Script";
+                statusText.className = "text-xs text-rose-600 mt-1.5 font-bold";
+                showToast("ระบบขัดข้อง! กรุณาตรวจสอบลิงก์สคริปต์ของคุณครูอีกครั้งครับ", "❌");
+            });
         }
 
         // CONFETTI EFFECTS
