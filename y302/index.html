@@ -28,6 +28,20 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-out {
+            animation: fadeOut 0.25s ease-in forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-15px); }
+        }
         .card-inner {
             transition: transform 0.6s;
             transform-style: preserve-3d;
@@ -704,35 +718,50 @@
             unlockAudioOnFirstTouch(); // Unlock safely
             playSound('click');
             
-            // Hide all
-            document.getElementById('lobbyScreen').classList.add('hidden');
-            document.getElementById('studyScreen').classList.add('hidden');
-            document.getElementById('quizScreen').classList.add('hidden');
-            document.getElementById('spellingScreen').classList.add('hidden');
-            document.getElementById('resultScreen').classList.add('hidden');
-
+            const currentScreenEl = document.getElementById(currentScreen + 'Screen');
+            
             // Clear any active interval timers
             if (quizTimer) clearInterval(quizTimer);
 
-            currentScreen = screenName;
+            const showNewScreen = () => {
+                // Hide all
+                const screens = ['lobbyScreen', 'studyScreen', 'quizScreen', 'spellingScreen', 'resultScreen'];
+                screens.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.add('hidden');
+                        el.classList.remove('fade-out', 'fade-in');
+                    }
+                });
 
-            // Show active
-            if (screenName === 'lobby') {
-                document.getElementById('lobbyScreen').classList.remove('hidden');
-                renderLeaderboard(); // Update leaderboard view when returning to lobby
-            } else if (screenName === 'study') {
-                document.getElementById('studyScreen').classList.remove('hidden');
-                currentStudyIndex = 0;
-                resetCardState();
-                updateCardData();
-            } else if (screenName === 'quiz') {
-                document.getElementById('quizScreen').classList.remove('hidden');
-                startQuizMode();
-            } else if (screenName === 'spelling') {
-                document.getElementById('spellingScreen').classList.remove('hidden');
-                startSpellingMode();
-            } else if (screenName === 'result') {
-                document.getElementById('resultScreen').classList.remove('hidden');
+                currentScreen = screenName;
+                const newScreenEl = document.getElementById(screenName + 'Screen');
+                if (newScreenEl) {
+                    newScreenEl.classList.remove('hidden');
+                    newScreenEl.classList.add('fade-in');
+                }
+
+                // Show active logic
+                if (screenName === 'lobby') {
+                    renderLeaderboard(); // Update leaderboard view when returning to lobby
+                } else if (screenName === 'study') {
+                    currentStudyIndex = 0;
+                    resetCardState();
+                    updateCardData();
+                } else if (screenName === 'quiz') {
+                    startQuizMode();
+                } else if (screenName === 'spelling') {
+                    startSpellingMode();
+                }
+            };
+
+            // Animate out current screen before showing the new one
+            if (currentScreenEl && !currentScreenEl.classList.contains('hidden') && currentScreen !== screenName) {
+                currentScreenEl.classList.remove('fade-in');
+                currentScreenEl.classList.add('fade-out');
+                setTimeout(showNewScreen, 250); // wait for fade-out to finish
+            } else {
+                showNewScreen();
             }
         }
 
