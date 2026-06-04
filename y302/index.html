@@ -6,10 +6,10 @@
     <title>เกมคำศัพท์แสนสนุก ป.3 - เตรียมสอบ 10 มิ.ย. 69</title>
     <!-- Tailwind CSS for modern & responsive UI -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Fredoka for English, Kanit for Thai -->
+    <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Canvas Confetti for celebrations -->
@@ -17,8 +17,8 @@
 
     <style>
         body {
-            font-family: 'Fredoka', 'Kanit', sans-serif;
-            background: linear-gradient(135deg, #FFE5EC 0%, #F0E6FF 50%, #E8F0FE 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, hsl(340,70%,90%) 0%, hsl(210,70%,95%) 50%, hsl(180,60%,95%) 100%);
             min-height: 100vh;
         }
         .bouncy {
@@ -58,10 +58,10 @@
             </button>
         </div>
         
-        <div class="inline-block bg-yellow-300 text-yellow-800 font-bold px-4 py-2 rounded-full shadow-md text-sm md:text-base border-2 border-yellow-400 mb-2 bouncy">
+        <div class="inline-block bg-gradient-to-r from-amber-300 to-pink-300 text-white font-bold px-4 py-2 rounded-full shadow-md text-sm md:text-base border-2 border-white mb-2 animate-bounce">
             📅 ตารางสอบ: 10 มิ.ย. 69 🎉
         </div>
-        <h1 class="text-3xl md:text-5xl font-black text-purple-700 tracking-wide drop-shadow-md">
+        <h1 class="text-3xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 tracking-wide drop-shadow-md">
             English Vocabulary P.3
         </h1>
         <p class="text-gray-600 mt-1 text-sm md:text-base font-semibold">ตะลุยเกาะมหาสมบัติคำศัพท์แสนสนุก ทั้งหมด 10 คำ!</p>
@@ -83,7 +83,7 @@
             <h2 class="text-2xl md:text-3xl font-bold text-purple-600 mb-4">ยินดีต้อนรับเข้าสู่เกาะคำศัพท์!</h2>
             
             <!-- Student Information Input Card -->
-            <div class="w-full max-w-md bg-purple-50 border border-purple-200 p-4 rounded-2xl mb-6 shadow-inner text-left">
+            <div class="w-full max-w-md bg-white/60 backdrop-blur-md border border-purple-200 p-4 rounded-2xl mb-6 shadow-xl text-left">
                 <p class="text-purple-700 font-bold mb-3 text-center"><i class="fa-solid fa-user-pen mr-2"></i>ข้อมูลผู้เข้าทดสอบคำศัพท์</p>
                 <div class="grid grid-cols-1 gap-3">
                     <div>
@@ -110,21 +110,21 @@
             <!-- Game Mode Buttons -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
                 <!-- Mode 1 Button -->
-                <button onclick="checkInfoAndChangeScreen('study')" class="flex flex-col items-center bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-orange-700">
+                <button onclick="checkInfoAndChangeScreen('study')" class="flex flex-col items-center bg-gradient-to-br from-amber-300 to-orange-400 hover:from-amber-200 hover:to-orange-300 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-orange-600">
                     <span class="text-4xl mb-2">🃏</span>
                     <span class="text-lg">1. การ์ดฝึกฝนคำศัพท์</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ฝึกฟัง พลิกดูคำแปล</span>
                 </button>
 
                 <!-- Mode 2 Button -->
-                <button onclick="checkInfoAndChangeScreen('quiz')" class="flex flex-col items-center bg-gradient-to-br from-emerald-400 to-teal-600 hover:from-emerald-300 hover:to-teal-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-teal-800">
+                <button onclick="checkInfoAndChangeScreen('quiz')" class="flex flex-col items-center bg-gradient-to-br from-emerald-300 to-teal-400 hover:from-emerald-200 hover:to-teal-300 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-teal-600">
                     <span class="text-4xl mb-2">🎯</span>
                     <span class="text-lg">2. เกมตอบคำถาม (4 ตัวเลือก)</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ทดสอบความจำชิงดาว</span>
                 </button>
 
                 <!-- Mode 3 Button -->
-                <button onclick="checkInfoAndChangeScreen('spelling')" class="flex flex-col items-center bg-gradient-to-br from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-blue-800">
+                <button onclick="checkInfoAndChangeScreen('spelling')" class="flex flex-col items-center bg-gradient-to-br from-sky-300 to-blue-400 hover:from-sky-200 hover:to-blue-300 text-white font-bold p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 active:translate-y-0 border-b-4 border-blue-600">
                     <span class="text-4xl mb-2">✍️</span>
                     <span class="text-lg">3. เกมฝึกสะกดคำศัพท์</span>
                     <span class="text-xs font-normal opacity-90 mt-1">ฝึกพิมพ์สะกดคำให้แม่น</span>
@@ -132,7 +132,7 @@
             </div>
 
             <!-- Top 5 Leaderboard Display -->
-            <div class="w-full max-w-2xl bg-indigo-50 border-2 border-indigo-200 rounded-3xl p-5 mt-6 shadow-inner text-left">
+            <div class="w-full max-w-2xl bg-white/60 backdrop-blur-md border-2 border-indigo-200 rounded-3xl p-5 mt-6 shadow-xl text-left">
                 <p class="text-indigo-800 font-extrabold text-center text-lg mb-4 flex items-center justify-center gap-2">
                     🏆 ทำเนียบสุดยอดฝีมือ 5 อันดับแรก (Top 5 Leaderboard)
                 </p>
@@ -154,7 +154,7 @@
             </div>
 
             <!-- Flashcard Arena -->
-            <div class="relative w-full h-80 cursor-pointer" onclick="flipCard()">
+            <div class="relative w-full h-80 cursor-pointer bg-white/30 backdrop-blur-md rounded-2xl shadow-lg" onclick="flipCard()">
                 <div id="flashcard" class="card-inner w-full h-full relative duration-500">
                     
                     <!-- Card Front (English) -->
@@ -297,7 +297,7 @@
         </div>
 
         <!-- SCREEN 5: RESULTS SCREEN -->
-        <div id="resultScreen" class="w-full max-w-md bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-purple-300 text-center hidden">
+        <div id="resultScreen" class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-purple-300 text-center hidden">
             <!-- Reward Icon -->
             <div class="relative inline-block mb-4">
                 <span class="text-7xl md:text-8xl" id="resultIcon">🏆</span>
@@ -349,7 +349,7 @@
 
     <!-- ORIGINAL WORKSHEET VIEW MODAL (259.jpg Reference) -->
     <div id="worksheetModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-3xl p-5 max-w-md w-full border-4 border-yellow-300 shadow-2xl relative text-center">
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-5 max-w-md w-full border-4 border-yellow-300 shadow-2xl relative text-center">
             <button onclick="toggleWorksheetModal(false)" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-2xl" title="ปิดหน้าต่าง">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -371,7 +371,7 @@
 
     <!-- TEACHER SETTINGS MODAL -->
     <div id="settingsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-3xl p-6 max-w-lg w-full border-4 border-indigo-200 shadow-2xl relative">
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 max-w-lg w-full border-4 border-indigo-200 shadow-2xl relative">
             <button onclick="toggleSettingsModal(false)" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-2xl">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -414,7 +414,7 @@
 
     <!-- Footer Credit -->
     <footer class="max-w-4xl w-full mx-auto text-center mt-6 text-gray-400 text-[10px] md:text-xs font-semibold">
-        <p>© 2026 เกมทดสอบภาษาอังกฤษ ป.3 • ออกแบบขึ้นเพื่อความสนุกและการจัดเก็บคะแนนอย่างง่ายดาย 📊</p>
+        <p>© 2026 เกมทดสอบภาษาอังกฤษ ป.3 • พัฒนาโดย พ่อแกน</p>
     </footer>
 
     <!-- Custom Modals (Using Toast alerts to avoid native alert popups) -->
