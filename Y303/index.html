@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Test - Family & Relatives with Study Tips</title>
+    <title>Spelling Test - Family & Relatives with Database Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -69,7 +69,16 @@
                 <i data-lucide="book-open" class="w-12 h-12"></i>
             </div>
             <h2 class="text-xl font-semibold text-gray-800 mb-2">หมวดหมู่: ครอบครัว (Family)</h2>
-            <p class="text-gray-500 mb-6 text-sm">ทบทวนคำศัพท์และทำแบบทดสอบเพื่อเตรียมความพร้อมก่อนวันสอบจริง</p>
+            <p class="text-gray-500 mb-4 text-sm">ทบทวนคำศัพท์และทำแบบทดสอบเพื่อเตรียมความพร้อมก่อนวันสอบจริง</p>
+            
+            <!-- Input Player Name Before Playing -->
+            <div class="mb-5 bg-indigo-50 p-4 rounded-2xl border border-indigo-100 text-left">
+                <label for="player-name-start" class="block text-xs font-bold text-indigo-800 mb-1.5 flex items-center gap-1">
+                    <i data-lucide="user" class="w-4 h-4 text-indigo-500"></i> พิมพ์ชื่อเล่นผู้เล่นก่อนเริ่มทดสอบ (ภาษาไทย/อังกฤษ):
+                </label>
+                <input type="text" id="player-name-start" placeholder="เช่น น้องกานต์, Bobby..." maxlength="12"
+                    class="w-full py-2.5 px-4 text-sm border-2 border-gray-200 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all">
+            </div>
             
             <div class="space-y-3">
                 <button onclick="startPracticeMode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-emerald-200">
@@ -81,8 +90,13 @@
                     <i data-lucide="sparkles" class="w-5 h-5"></i>
                     เคล็ดลับการจำ & ทบทวน (Tips)
                 </button>
+
+                <button onclick="showLeaderboard()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-blue-200">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
+                    ตารางอันดับคะแนน (Leaderboard)
+                </button>
                 
-                <button onclick="startTestMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-indigo-200">
+                <button onclick="startTestMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-indigo-200 pt-4">
                     <i data-lucide="pen-tool" class="w-5 h-5"></i>
                     เริ่มทำแบบทดสอบ (Test)
                 </button>
@@ -288,6 +302,29 @@
             </div>
         </div>
 
+        <!-- ================= LEADERBOARD SCREEN ================= -->
+        <div id="leaderboard-screen" class="hidden flex flex-col h-[550px] p-6">
+            <div class="text-center mb-4">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2 text-amber-500">
+                    <i data-lucide="trophy" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">ตารางอันดับคนเก่ง 🏆</h2>
+                <p class="text-xs text-gray-500">ซิงค์คะแนนจริงผ่านระบบ Neon.com Cloud</p>
+            </div>
+
+            <!-- List Container -->
+            <div id="leaderboard-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
+                <!-- ข้อมูลถูกโหลดขึ้นมาแบบเรียลไทม์ผ่าน API -->
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 pt-3 border-t border-gray-100 flex gap-2">
+                <button onclick="initApp()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1.5 text-sm">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับหน้าหลัก
+                </button>
+            </div>
+        </div>
+
         <!-- ================= PRACTICE (FLASHCARD) SCREEN ================= -->
         <div id="practice-screen" class="hidden p-6">
             <div class="flex justify-between items-center mb-4 text-sm font-medium text-gray-500">
@@ -380,27 +417,46 @@
 
         <!-- ================= RESULT SCREEN ================= -->
         <div id="result-screen" class="hidden p-6">
-            <div class="text-center mb-6">
+            <div class="text-center mb-4">
                 <div id="result-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <!-- Icon injected by JS -->
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">สรุปผลคะแนน</h2>
-                <p id="final-score" class="text-4xl font-black text-indigo-600 my-2">8/10</p>
-                <p id="result-message" class="text-gray-500">ยอดเยี่ยมมาก!</p>
+                <p id="final-score" class="text-4xl font-black text-indigo-600 my-1">8/10</p>
+                <p id="result-message" class="text-gray-500 text-sm">ยอดเยี่ยมมาก!</p>
             </div>
 
-            <div class="max-h-56 overflow-y-auto bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 text-sm">
-                <ul id="history-list" class="space-y-3">
+            <!-- Save Score Section (Auto-save status) -->
+            <div id="save-score-section" class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 mb-4">
+                <div id="save-status-container" class="flex items-center justify-center gap-2 py-1">
+                    <span id="save-status-icon" class="text-indigo-600 flex items-center">
+                        <i data-lucide="loader" class="w-4 h-4 animate-spin"></i>
+                    </span>
+                    <span id="save-status-text" class="text-xs font-bold text-indigo-800">
+                        กำลังบันทึกผลคะแนนไปยังคลาวด์...
+                    </span>
+                </div>
+                <div id="retry-save-div" class="hidden mt-2 flex gap-2">
+                    <input type="text" id="player-name-input" placeholder="ชื่อเล่นของคุณ..." maxlength="12"
+                        class="flex-1 py-2 px-3 text-sm border-2 border-gray-200 rounded-xl focus:border-indigo-500 outline-none bg-white transition-colors">
+                    <button id="save-btn" onclick="savePlayerScore()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all active:scale-95 shadow-md shadow-indigo-100">
+                        ลองอีกครั้ง
+                    </button>
+                </div>
+            </div>
+
+            <div class="max-h-36 overflow-y-auto bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 text-xs">
+                <ul id="history-list" class="space-y-2">
                     <!-- History list injected by JS -->
                 </ul>
             </div>
 
-            <div class="flex gap-3">
-                <button onclick="showStudyTips()" class="flex-1 bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
+            <div class="flex gap-2">
+                <button onclick="showStudyTips()" class="flex-1 bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 font-semibold py-2.5 px-1 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
                     ดูวิธีจำอีกครั้ง
                 </button>
-                <button onclick="startTestMode()" class="flex-1 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
+                <button onclick="startTestMode()" class="flex-1 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 px-1 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     สอบแก้ตัวใหม่
                 </button>
@@ -410,7 +466,10 @@
     </div>
 
     <script>
-        // Data from the image
+        // กำหนดที่อยู่ของ API เซิร์ฟเวอร์หลังบ้าน 
+        // หากอัปโหลดขึ้น Render/Railway แล้ว ให้แก้จาก 'http://localhost:3000' เป็นลิงก์ของคุณ เช่น 'https://your-app.onrender.com'
+        const API_URL = 'http://localhost:3000';
+
         const originalVocabulary = [
             { word: "Cousin", meaning: "ลูกพี่ลูกน้อง" },
             { word: "Groom", meaning: "เจ้าบ่าว" },
@@ -431,6 +490,7 @@
         let userHistory = [];
         let isChecking = false;
         let synthVoices = [];
+        let leaderboardData = [];
 
         // Preload voices
         if ('speechSynthesis' in window) {
@@ -448,6 +508,7 @@
             start: document.getElementById('start-screen'),
             practice: document.getElementById('practice-screen'),
             tips: document.getElementById('tips-screen'),
+            leaderboard: document.getElementById('leaderboard-screen'),
             game: document.getElementById('game-screen'),
             result: document.getElementById('result-screen')
         };
@@ -476,7 +537,6 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 
-                // ถ้าระบุให้สะกดคำ ให้แยกตัวอักษรด้วยช่องว่าง
                 const textToSpeak = spell ? text.split('').join(' . ') : text;
                 const utterance = new SpeechSynthesisUtterance(textToSpeak);
                 
@@ -506,7 +566,7 @@
         function showStudyTips() {
             unlockAudio();
             showScreen('tips');
-            switchTab('assoc'); // ดีฟอลต์แท็บแรก
+            switchTab('assoc');
         }
 
         function switchTab(tabName) {
@@ -529,11 +589,157 @@
             });
         }
 
+        // ================= LEADERBOARD =================
+        function showLeaderboard() {
+            unlockAudio();
+            showScreen('leaderboard');
+            fetchLeaderboard();
+        }
+
+        // เชื่อมต่อฐานข้อมูลหลังบ้านเพื่อดึงอันดับล่าสุด
+        async function fetchLeaderboard() {
+            const listContainer = document.getElementById('leaderboard-list');
+            listContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full mb-2"></div>
+                    <p class="text-sm text-gray-500">กำลังเชื่อมต่อฐานข้อมูล Neon...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_URL}/api/leaderboard`);
+                if (!response.ok) throw new Error('Network error');
+                leaderboardData = await response.json();
+                renderLeaderboard();
+            } catch (err) {
+                console.error('Fetch error:', err);
+                listContainer.innerHTML = `
+                    <div class="text-center py-8 bg-red-50 rounded-2xl border border-red-100 p-4">
+                        <i data-lucide="wifi-off" class="w-8 h-8 text-red-500 mx-auto mb-2"></i>
+                        <p class="text-sm font-semibold text-red-800">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้</p>
+                        <p class="text-xs text-red-500 mt-1">โปรดตรวจสอบว่าได้รัน server.js หรืออัปโหลดโค้ดขึ้นระบบแล้ว</p>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        function renderLeaderboard() {
+            const listContainer = document.getElementById('leaderboard-list');
+            listContainer.innerHTML = '';
+
+            if (leaderboardData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-sm text-gray-400 py-8">ยังไม่มีอันดับคะแนน บันทึกคะแนนคนแรกเลย!</p>';
+                return;
+            }
+
+            leaderboardData.forEach((item, index) => {
+                let badgeHtml = '';
+                let bgClass = 'bg-gray-50';
+                let borderClass = 'border-gray-100';
+
+                if (index === 0) {
+                    badgeHtml = '🥇';
+                    bgClass = 'bg-yellow-50/70';
+                    borderClass = 'border-yellow-200';
+                } else if (index === 1) {
+                    badgeHtml = '🥈';
+                    bgClass = 'bg-slate-50';
+                    borderClass = 'border-slate-200';
+                } else if (index === 2) {
+                    badgeHtml = '🥉';
+                    bgClass = 'bg-amber-50/70';
+                    borderClass = 'border-amber-100';
+                } else {
+                    badgeHtml = `<span class="text-xs font-bold text-gray-400">#${index + 1}</span>`;
+                }
+
+                let stars = '';
+                if (item.score === 10) stars = '⭐⭐⭐';
+                else if (item.score >= 7) stars = '⭐⭐';
+                else if (item.score >= 4) stars = '⭐';
+                else stars = '👍';
+
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-3 rounded-2xl border ${bgClass} ${borderClass} transition-all duration-300 pop-in`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-white shadow-sm font-semibold">
+                            ${badgeHtml}
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">${item.player_name}</div>
+                            <div class="text-[10px] text-gray-400">สอบเมื่อ: ${item.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-indigo-600 text-lg">${item.score}</span>
+                        <span class="text-xs text-gray-400">/10</span>
+                        <div class="text-xs ml-1">${stars}</div>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        // เชื่อมหลังบ้านเพื่อส่งข้อมูลผลคะแนนไปบันทึกลงคลาวด์
+        async function savePlayerScore() {
+            const inputEl = document.getElementById('player-name-input');
+            const retryDiv = document.getElementById('retry-save-div');
+            const statusIcon = document.getElementById('save-status-icon');
+            const statusText = document.getElementById('save-status-text');
+            const name = inputEl.value.trim();
+
+            if (!name) {
+                inputEl.classList.add('shake');
+                setTimeout(() => inputEl.classList.remove('shake'), 500);
+                return;
+            }
+
+            // แสดงสถานะการกำลังบันทึก
+            retryDiv.classList.add('hidden');
+            statusIcon.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>`;
+            statusText.textContent = 'กำลังบันทึกคะแนนไปยังคลาวด์...';
+            statusText.className = 'text-xs font-bold text-indigo-800';
+            lucide.createIcons();
+
+            try {
+                const response = await fetch(`${API_URL}/api/scores`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        player_name: name,
+                        score: score,
+                        history: userHistory
+                    })
+                });
+
+                if (!response.ok) throw new Error('เซฟคะแนนไม่สำเร็จ');
+
+                // บันทึกสำเร็จ
+                statusIcon.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>`;
+                statusText.textContent = `บันทึกคะแนนของ "${name}" สำเร็จแล้ว!`;
+                statusText.className = 'text-xs font-bold text-emerald-600';
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Error saving score:', err);
+                // บันทึกล้มเหลว (เช่น เซิร์ฟเวอร์ยังไม่เปิด)
+                statusIcon.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>`;
+                statusText.textContent = 'บันทึกคะแนนล้มเหลว (คุณอาจยังไม่ได้เปิดเซิร์ฟเวอร์ server.js)';
+                statusText.className = 'text-xs font-bold text-red-500';
+                retryDiv.classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
+
         // ================= PRACTICE MODE =================
         function startPracticeMode() {
             unlockAudio();
             practiceIndex = 0;
-            vocabulary = [...originalVocabulary]; // เรียงตามปกติสำหรับโหมดฝึก
+            vocabulary = [...originalVocabulary];
             showScreen('practice');
             loadPracticeWord();
         }
@@ -544,10 +750,7 @@
             document.getElementById('practice-meaning').textContent = currentWord.meaning;
             document.getElementById('practice-counter').textContent = `คำที่ ${practiceIndex + 1} / ${vocabulary.length}`;
             
-            // จัดการสถานะการพลิกการ์ด (ให้หงายหน้าภาษาอังกฤษขึ้นเสมอเมื่อเปลี่ยนคำ)
             document.getElementById('flashcard').classList.remove('flipped');
-            
-            // จัดการปุ่ม ก่อนหน้า/ถัดไป
             document.getElementById('btn-prev-practice').disabled = (practiceIndex === 0);
             
             if (practiceIndex === vocabulary.length - 1) {
@@ -572,7 +775,7 @@
             const word = vocabulary[practiceIndex].word;
             speakText(word, 0.8);
             setTimeout(() => {
-                speakText(word, 0.6, true); // true = สะกดคำทีละตัวอักษร
+                speakText(word, 0.6, true);
             }, 1000);
         }
 
@@ -592,16 +795,43 @@
             }
         }
 
-
         // ================= TEST MODE =================
         function startTestMode() {
+            const nameStartInput = document.getElementById('player-name-start');
+            const name = nameStartInput.value.trim();
+            
+            if (!name) {
+                // If they are not on the start screen, redirect to the start screen first
+                showScreen('start');
+                
+                // Highlight and shake the input box
+                nameStartInput.classList.add('shake', 'border-red-500');
+                nameStartInput.focus();
+                
+                // Remove shake and red border styling after animation completes
+                setTimeout(() => {
+                    nameStartInput.classList.remove('shake');
+                }, 500);
+
+                // Clear red border when typing
+                nameStartInput.addEventListener('input', () => {
+                    nameStartInput.classList.remove('border-red-500');
+                }, { once: true });
+
+                return;
+            }
+            
+            nameStartInput.classList.remove('border-red-500');
+            
             unlockAudio();
             testIndex = 0;
             score = 0;
             userHistory = [];
             isChecking = false;
             
-            // สลับลำดับคำศัพท์สำหรับโหมดสอบเพื่อวัดความจำจริง
+            document.getElementById('save-score-section').classList.remove('hidden');
+            document.getElementById('player-name-input').value = name;
+
             vocabulary = [...originalVocabulary].sort(() => Math.random() - 0.5);
             
             showScreen('game');
@@ -648,7 +878,6 @@
             const currentWord = vocabulary[testIndex];
             const isCorrect = userInput.toLowerCase() === currentWord.word.toLowerCase();
 
-            // Save history
             userHistory.push({
                 word: currentWord.word,
                 meaning: currentWord.meaning,
@@ -656,7 +885,6 @@
                 isCorrect: isCorrect
             });
 
-            // Show Feedback
             const feedbackOverlay = document.getElementById('feedback-overlay');
             const feedbackContent = document.getElementById('feedback-content');
             
@@ -675,7 +903,6 @@
             }
             lucide.createIcons();
 
-            // Wait then next question
             setTimeout(() => {
                 feedbackOverlay.classList.add('hidden');
                 inputEl.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
@@ -702,18 +929,17 @@
             if (score === vocabulary.length) {
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-100 text-green-500";
                 resultIcon.innerHTML = `<i data-lucide="award" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "เก่งมาก! คุณสะกดถูกต้องทุกคำเลย";
+                resultMsg.textContent = "เก่งมาก! คุณสะกดถูกต้องทุกคำเลย 🌟⭐🌟";
             } else if (score >= vocabulary.length / 2) {
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-yellow-100 text-yellow-500";
                 resultIcon.innerHTML = `<i data-lucide="thumbs-up" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "ทำได้ดี! ฝึกอีกนิดก็จะจำได้ทั้งหมดแล้ว";
+                resultMsg.textContent = "ทำได้ดี! ฝึกอีกนิดก็จะจำได้ทั้งหมดแล้ว 🌟";
             } else {
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100 text-red-500";
                 resultIcon.innerHTML = `<i data-lucide="book-open" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "พยายามเข้านะ ลองทบทวนคำศัพท์และคำแนะนำเพื่อลองใหม่อีกครั้ง";
+                resultMsg.textContent = "พยายามเข้านะ ลองทบทวนคำแนะนำแล้วลองใหมู่อีกรอบ 👍";
             }
 
-            // Render History List
             const historyContainer = document.getElementById('history-list');
             historyContainer.innerHTML = '';
             
@@ -739,9 +965,11 @@
             });
             
             lucide.createIcons();
+
+            // Automatically save score when the test ends
+            savePlayerScore();
         }
 
-        // Initialize on load
         window.onload = initApp;
     </script>
 </body>
