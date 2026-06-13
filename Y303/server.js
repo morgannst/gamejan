@@ -142,7 +142,11 @@ app.get('/api/teacher/error-analysis', async (req, res) => {
     }
 });
 
-// เปิดรันตัวแอปพลิเคชันผ่านพอร์ตที่กำหนด
-app.listen(PORT, () => {
-    console.log(`🚀 เซิร์ฟเวอร์หลังบ้านเริ่มต้นทำงานที่พอร์ต http://localhost:${PORT}`);
-});
+// เปิดรันตัวแอปพลิเคชันผ่านพอร์ตที่กำหนด (จะทำงานเฉพาะตอนรันเครื่องตัวเอง หรือระบบที่ไม่ใช่ Serverless Vercel)
+if (process.env.NODE_ENV !== 'production' && require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 เซิร์ฟเวอร์หลังบ้านเริ่มต้นทำงานที่พอร์ต http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
