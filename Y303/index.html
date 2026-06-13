@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -466,9 +467,9 @@
     </div>
 
     <script>
-        // กำหนดที่อยู่ของ API เซิร์ฟเวอร์หลังบ้าน 
-        // หากอัปโหลดขึ้น Render/Railway แล้ว ให้แก้จาก 'http://localhost:3000' เป็นลิงก์ของคุณ เช่น 'https://your-app.onrender.com'
-        const API_URL = 'https://gamejan.vercel.app';
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:'
+            ? 'http://localhost:3000'
+            : 'https://gamejan.vercel.app';
 
         const originalVocabulary = [
             { word: "Cousin", meaning: "ลูกพี่ลูกน้อง" },
@@ -852,6 +853,57 @@
             setTimeout(() => playTestAudio(), 500);
         }
 
+        function playSFX(type) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                if (type === 'correct') {
+                    // เล่นเสียงติ๊งสองตัวโน้ตใสๆ (C5 แล้วก็ E5)
+                    const now = ctx.currentTime;
+                    
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(523.25, now); // C5
+                    gain1.gain.setValueAtTime(0.15, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.25);
+                    
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    gain2.gain.setValueAtTime(0.15, now + 0.08);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.08);
+                    osc2.stop(now + 0.35);
+                } else if (type === 'incorrect') {
+                    // เล่นเสียงตึ้งต่ำๆ คล้ายตอบผิด (เสียงทุ้มสไลด์ลง)
+                    const now = ctx.currentTime;
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(90, now + 0.35);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch (e) {
+                console.warn('AudioContext SFX failed:', e);
+            }
+        }
+
         function playTestAudio() {
             speakText(vocabulary[testIndex].word, 0.8);
         }
@@ -891,10 +943,12 @@
             feedbackOverlay.classList.remove('hidden');
             if (isCorrect) {
                 score++;
+                playSFX('correct');
                 document.getElementById('score-display').textContent = `คะแนน: ${score}`;
                 inputEl.classList.add('border-green-500', 'bg-green-50');
                 feedbackContent.innerHTML = `<i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i><span class="text-green-600">ถูกต้อง!</span>`;
             } else {
+                playSFX('incorrect');
                 inputEl.classList.add('border-red-500', 'bg-red-50');
                 feedbackContent.innerHTML = `<div class="text-center">
                     <div class="flex items-center justify-center gap-2 mb-1"><i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i><span class="text-red-600">ผิดพลาด</span></div>
@@ -930,10 +984,28 @@
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-100 text-green-500";
                 resultIcon.innerHTML = `<i data-lucide="award" class="w-10 h-10"></i>`;
                 resultMsg.textContent = "เก่งมาก! คุณสะกดถูกต้องทุกคำเลย 🌟⭐🌟";
+                
+                // เอฟเฟกต์พลุกระดาษขนาดใหญ่สำหรับคะแนนเต็ม!
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 150,
+                        spread: 85,
+                        origin: { y: 0.6 }
+                    });
+                }
             } else if (score >= vocabulary.length / 2) {
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-yellow-100 text-yellow-500";
                 resultIcon.innerHTML = `<i data-lucide="thumbs-up" class="w-10 h-10"></i>`;
                 resultMsg.textContent = "ทำได้ดี! ฝึกอีกนิดก็จะจำได้ทั้งหมดแล้ว 🌟";
+                
+                // เอฟเฟกต์พลุกระดาษขนาดเล็กสำหรับสอบผ่าน!
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6 }
+                    });
+                }
             } else {
                 resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100 text-red-500";
                 resultIcon.innerHTML = `<i data-lucide="book-open" class="w-10 h-10"></i>`;
