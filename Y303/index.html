@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Test - Family & Relatives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pop-in {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* สำหรับ Flashcard พลิกหน้า-หลัง */
+        .perspective { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { 
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden; /* เพิ่มรองรับ Safari */
+        }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flashcard-inner { transition: transform 0.6s; }
+        .flashcard-inner.flipped { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden relative pop-in">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-center text-white relative">
+            <button id="home-btn" onclick="initApp()" class="hidden absolute left-4 top-1/2 -translate-y-1/2 text-indigo-200 hover:text-white transition-colors">
+                <i data-lucide="home" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-2xl font-bold tracking-wider">SPELLING TEST</h1>
+            <p class="text-indigo-200 mt-1 flex items-center justify-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                เตรียมสอบ 17/6/69
+            </p>
+        </div>
+
+        <!-- ================= START SCREEN ================= -->
+        <div id="start-screen" class="p-8 text-center">
+            <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600">
+                <i data-lucide="book-open" class="w-12 h-12"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">หมวดหมู่: ครอบครัว (Family)</h2>
+            <p class="text-gray-500 mb-8 text-sm">เลือกโหมดที่คุณต้องการ</p>
+            
+            <div class="space-y-4">
+                <button onclick="startPracticeMode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-emerald-200">
+                    <i data-lucide="library" class="w-5 h-5"></i>
+                    ฝึกท่องคำศัพท์ (Flashcards)
+                </button>
+                
+                <button onclick="startTestMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-indigo-200">
+                    <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                    เริ่มทำแบบทดสอบ (Test)
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= PRACTICE (FLASHCARD) SCREEN ================= -->
+        <div id="practice-screen" class="hidden p-6">
+            <div class="flex justify-between items-center mb-4 text-sm font-medium text-gray-500">
+                <span id="practice-counter">คำที่ 1 / 10</span>
+                <span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">โหมดฝึกซ้อม</span>
+            </div>
+
+            <!-- Flashcard -->
+            <div class="perspective w-full h-64 mb-6 cursor-pointer" onclick="flipCard()">
+                <div id="flashcard" class="flashcard-inner w-full h-full relative transform-style-3d">
+                    
+                    <!-- ด้านหน้า: ภาษาอังกฤษ -->
+                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-emerald-200 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center">
+                        <p class="text-sm text-gray-400 mb-2">แตะเพื่อดูคำแปล</p>
+                        <h3 id="practice-word" class="text-4xl font-bold text-gray-800 tracking-wider">Cousin</h3>
+                    </div>
+
+                    <!-- ด้านหลัง: คำแปลภาษาไทย -->
+                    <div class="absolute w-full h-full backface-hidden bg-emerald-50 border-2 border-emerald-300 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center rotate-y-180">
+                        <h3 id="practice-meaning" class="text-3xl font-bold text-emerald-800">ลูกพี่ลูกน้อง</h3>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4 mb-6">
+                <button onclick="playPracticeAudio()" class="w-14 h-14 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group">
+                    <i data-lucide="volume-2" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                </button>
+                <button onclick="spellWord()" class="w-14 h-14 bg-amber-100 hover:bg-amber-200 text-amber-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group" title="สะกดคำ">
+                    <i data-lucide="spell-check" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                </button>
+            </div>
+
+            <div class="flex justify-between gap-4">
+                <button onclick="prevPracticeWord()" id="btn-prev-practice" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all active:scale-95 flex justify-center items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i> ก่อนหน้า
+                </button>
+                <button onclick="nextPracticeWord()" id="btn-next-practice" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-xl transition-all active:scale-95 flex justify-center items-center gap-1">
+                    ถัดไป <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <button onclick="startTestMode()" class="w-full mt-6 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-6 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-2">
+                ไปทำแบบทดสอบเลย <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- ================= GAME SCREEN (TEST) ================= -->
+        <div id="game-screen" class="hidden">
+            <!-- Progress Bar -->
+            <div class="h-2 w-full bg-gray-100">
+                <div id="progress-bar" class="h-2 bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6 text-sm font-medium text-gray-500">
+                    <span id="question-counter">คำที่ 1 / 10</span>
+                    <span id="score-display" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">คะแนน: 0</span>
+                </div>
+
+                <div class="text-center mb-8 relative">
+                    <p class="text-sm text-gray-500 mb-2">คำแปล</p>
+                    <h3 id="test-meaning" class="text-3xl font-bold text-gray-800 mb-6">ลูกพี่ลูกน้อง</h3>
+                    
+                    <button onclick="playTestAudio()" class="mx-auto w-16 h-16 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group">
+                        <i data-lucide="volume-2" class="w-8 h-8 group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <p class="text-xs text-blue-500 mt-2">กดเพื่อฟังเสียง</p>
+                </div>
+
+                <div class="mb-4 relative">
+                    <input type="text" id="word-input" autocomplete="off" placeholder="พิมพ์คำศัพท์ภาษาอังกฤษที่นี่..." 
+                        class="w-full text-center text-xl font-medium py-4 px-4 border-2 border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
+                        onkeypress="handleKeyPress(event)">
+                    
+                    <!-- Feedback Overlay -->
+                    <div id="feedback-overlay" class="hidden absolute inset-0 flex items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm z-10">
+                        <div id="feedback-content" class="flex items-center gap-2 font-bold text-xl">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <button id="submit-btn" onclick="checkAnswer()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-200">
+                    ตรวจคำตอบ
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= RESULT SCREEN ================= -->
+        <div id="result-screen" class="hidden p-6">
+            <div class="text-center mb-6">
+                <div id="result-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <!-- Icon injected by JS -->
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">สรุปผลคะแนน</h2>
+                <p id="final-score" class="text-4xl font-black text-indigo-600 my-2">8/10</p>
+                <p id="result-message" class="text-gray-500">ยอดเยี่ยมมาก!</p>
+            </div>
+
+            <div class="max-h-60 overflow-y-auto bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 text-sm">
+                <ul id="history-list" class="space-y-3">
+                    <!-- History list injected by JS -->
+                </ul>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="startPracticeMode()" class="flex-1 bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-sm">
+                    <i data-lucide="library" class="w-4 h-4"></i>
+                    ฝึกท่องใหม่
+                </button>
+                <button onclick="startTestMode()" class="flex-1 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    สอบอีกครั้ง
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data from the image
+        const originalVocabulary = [
+            { word: "Cousin", meaning: "ลูกพี่ลูกน้อง" },
+            { word: "Groom", meaning: "เจ้าบ่าว" },
+            { word: "Bride", meaning: "เจ้าสาว" },
+            { word: "Father", meaning: "พ่อ" },
+            { word: "Mother", meaning: "แม่" },
+            { word: "Aunt", meaning: "ป้า, น้าผู้หญิง, อาผู้หญิง" },
+            { word: "Uncle", meaning: "ลุง, น้าผู้ชาย, อาผู้ชาย" },
+            { word: "Grandmother", meaning: "ย่า, ยาย" },
+            { word: "Grandson", meaning: "หลานชาย" },
+            { word: "Granddaughter", meaning: "หลานสาว" }
+        ];
+
+        let vocabulary = [...originalVocabulary];
+        let practiceIndex = 0;
+        let testIndex = 0;
+        let score = 0;
+        let userHistory = [];
+        let isChecking = false;
+        let synthVoices = [];
+
+        // Preload voices
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                synthVoices = window.speechSynthesis.getVoices();
+            };
+            synthVoices = window.speechSynthesis.getVoices();
+        }
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // DOM Elements
+        const screens = {
+            start: document.getElementById('start-screen'),
+            practice: document.getElementById('practice-screen'),
+            game: document.getElementById('game-screen'),
+            result: document.getElementById('result-screen')
+        };
+        const homeBtn = document.getElementById('home-btn');
+
+        function showScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[screenName].classList.remove('hidden');
+            
+            if (screenName === 'start') {
+                homeBtn.classList.add('hidden');
+            } else {
+                homeBtn.classList.remove('hidden');
+            }
+        }
+
+        function unlockAudio() {
+            if ('speechSynthesis' in window) {
+                let dummyUtterance = new SpeechSynthesisUtterance('');
+                dummyUtterance.volume = 0;
+                window.speechSynthesis.speak(dummyUtterance);
+            }
+        }
+
+        function speakText(text, rate = 0.8, spell = false) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                // ถ้าระบุให้สะกดคำ ให้แยกตัวอักษรด้วยช่องว่าง
+                const textToSpeak = spell ? text.split('').join(' . ') : text;
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                
+                if (synthVoices.length === 0) {
+                    synthVoices = window.speechSynthesis.getVoices();
+                }
+                const enVoice = synthVoices.find(voice => voice.lang.startsWith('en-') || voice.lang === 'en' || voice.name.includes('English'));
+                if (enVoice) {
+                    utterance.voice = enVoice;
+                }
+                
+                utterance.lang = 'en-US';
+                utterance.rate = rate; 
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียงอ่าน");
+            }
+        }
+
+        function initApp() {
+            window.speechSynthesis.cancel();
+            showScreen('start');
+        }
+
+        // ================= PRACTICE MODE =================
+        function startPracticeMode() {
+            unlockAudio();
+            practiceIndex = 0;
+            vocabulary = [...originalVocabulary]; // เรียงตามปกติสำหรับโหมดฝึก
+            showScreen('practice');
+            loadPracticeWord();
+        }
+
+        function loadPracticeWord() {
+            const currentWord = vocabulary[practiceIndex];
+            document.getElementById('practice-word').textContent = currentWord.word;
+            document.getElementById('practice-meaning').textContent = currentWord.meaning;
+            document.getElementById('practice-counter').textContent = `คำที่ ${practiceIndex + 1} / ${vocabulary.length}`;
+            
+            // จัดการสถานะการพลิกการ์ด (ให้หงายหน้าภาษาอังกฤษขึ้นเสมอเมื่อเปลี่ยนคำ)
+            document.getElementById('flashcard').classList.remove('flipped');
+            
+            // จัดการปุ่ม ก่อนหน้า/ถัดไป
+            document.getElementById('btn-prev-practice').disabled = (practiceIndex === 0);
+            
+            if (practiceIndex === vocabulary.length - 1) {
+                document.getElementById('btn-next-practice').innerHTML = 'เริ่มสอบ <i data-lucide="pen-tool" class="w-5 h-5"></i>';
+            } else {
+                document.getElementById('btn-next-practice').innerHTML = 'ถัดไป <i data-lucide="chevron-right" class="w-5 h-5"></i>';
+            }
+            lucide.createIcons();
+
+            setTimeout(() => playPracticeAudio(), 300);
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function playPracticeAudio() {
+            speakText(vocabulary[practiceIndex].word, 0.9);
+        }
+
+        function spellWord() {
+            // อ่านคำศัพท์ปกติก่อน แล้วตามด้วยการสะกด
+            const word = vocabulary[practiceIndex].word;
+            speakText(word, 0.8);
+            setTimeout(() => {
+                speakText(word, 0.6, true); // true = สะกดคำ
+            }, 1000);
+        }
+
+        function prevPracticeWord() {
+            if (practiceIndex > 0) {
+                practiceIndex--;
+                loadPracticeWord();
+            }
+        }
+
+        function nextPracticeWord() {
+            if (practiceIndex < vocabulary.length - 1) {
+                practiceIndex++;
+                loadPracticeWord();
+            } else {
+                // ถ้าเป็นคำสุดท้าย ให้ไปหน้าสอบ
+                startTestMode();
+            }
+        }
+
+
+        // ================= TEST MODE =================
+        function startTestMode() {
+            unlockAudio();
+            testIndex = 0;
+            score = 0;
+            userHistory = [];
+            isChecking = false;
+            
+            // Randomize array order for test
+            vocabulary = [...originalVocabulary].sort(() => Math.random() - 0.5);
+            
+            showScreen('game');
+            loadTestQuestion();
+        }
+
+        function loadTestQuestion() {
+            const currentWord = vocabulary[testIndex];
+            document.getElementById('test-meaning').textContent = currentWord.meaning;
+            const inputEl = document.getElementById('word-input');
+            inputEl.value = '';
+            inputEl.focus();
+            
+            document.getElementById('question-counter').textContent = `คำที่ ${testIndex + 1} / ${vocabulary.length}`;
+            document.getElementById('score-display').textContent = `คะแนน: ${score}`;
+            document.getElementById('progress-bar').style.width = `${(testIndex / vocabulary.length) * 100}%`;
+            
+            setTimeout(() => playTestAudio(), 500);
+        }
+
+        function playTestAudio() {
+            speakText(vocabulary[testIndex].word, 0.8);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !isChecking && !document.getElementById('game-screen').classList.contains('hidden')) {
+                checkAnswer();
+            }
+        }
+
+        function checkAnswer() {
+            if (isChecking) return;
+            
+            const inputEl = document.getElementById('word-input');
+            const userInput = inputEl.value.trim();
+            
+            if (!userInput) {
+                inputEl.classList.add('shake');
+                setTimeout(() => inputEl.classList.remove('shake'), 500);
+                return;
+            }
+
+            isChecking = true;
+            const currentWord = vocabulary[testIndex];
+            const isCorrect = userInput.toLowerCase() === currentWord.word.toLowerCase();
+
+            // Save history
+            userHistory.push({
+                word: currentWord.word,
+                meaning: currentWord.meaning,
+                userAnswer: userInput,
+                isCorrect: isCorrect
+            });
+
+            // Show Feedback
+            const feedbackOverlay = document.getElementById('feedback-overlay');
+            const feedbackContent = document.getElementById('feedback-content');
+            
+            feedbackOverlay.classList.remove('hidden');
+            if (isCorrect) {
+                score++;
+                document.getElementById('score-display').textContent = `คะแนน: ${score}`;
+                inputEl.classList.add('border-green-500', 'bg-green-50');
+                feedbackContent.innerHTML = `<i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i><span class="text-green-600">ถูกต้อง!</span>`;
+            } else {
+                inputEl.classList.add('border-red-500', 'bg-red-50');
+                feedbackContent.innerHTML = `<div class="text-center">
+                    <div class="flex items-center justify-center gap-2 mb-1"><i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i><span class="text-red-600">ผิดพลาด</span></div>
+                    <div class="text-sm font-normal text-gray-600">คำที่ถูกต้องคือ <span class="font-bold text-green-600">${currentWord.word}</span></div>
+                </div>`;
+            }
+            lucide.createIcons();
+
+            // Wait then next question
+            setTimeout(() => {
+                feedbackOverlay.classList.add('hidden');
+                inputEl.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                
+                testIndex++;
+                isChecking = false;
+
+                if (testIndex < vocabulary.length) {
+                    loadTestQuestion();
+                } else {
+                    endGame();
+                }
+            }, 2000);
+        }
+
+        function endGame() {
+            showScreen('result');
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('final-score').textContent = `${score} / ${vocabulary.length}`;
+            
+            const resultIcon = document.getElementById('result-icon');
+            const resultMsg = document.getElementById('result-message');
+            
+            if (score === vocabulary.length) {
+                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-100 text-green-500";
+                resultIcon.innerHTML = `<i data-lucide="award" class="w-10 h-10"></i>`;
+                resultMsg.textContent = "เก่งมาก! คุณสะกดถูกต้องทุกคำเลย";
+            } else if (score >= vocabulary.length / 2) {
+                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-yellow-100 text-yellow-500";
+                resultIcon.innerHTML = `<i data-lucide="thumbs-up" class="w-10 h-10"></i>`;
+                resultMsg.textContent = "ทำได้ดี! ฝึกอีกนิดก็จะจำได้ทั้งหมดแล้ว";
+            } else {
+                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100 text-red-500";
+                resultIcon.innerHTML = `<i data-lucide="book-open" class="w-10 h-10"></i>`;
+                resultMsg.textContent = "พยายามเข้านะ ลองทบทวนคำศัพท์แล้วสอบใหม่อีกครั้ง";
+            }
+
+            // Render History List
+            const historyContainer = document.getElementById('history-list');
+            historyContainer.innerHTML = '';
+            
+            userHistory.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = `flex justify-between items-center p-3 rounded-lg border-l-4 ${item.isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`;
+                
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <div class="text-xs text-gray-500 mb-1">${index + 1}. ${item.meaning}</div>
+                        <div class="font-semibold ${item.isCorrect ? 'text-green-700' : 'text-red-700'} line-through opacity-80 decoration-2">
+                            ${item.isCorrect ? '' : item.userAnswer}
+                        </div>
+                        <div class="font-bold text-gray-800 text-lg">${item.word}</div>
+                    </div>
+                    <div>
+                        ${item.isCorrect 
+                            ? '<i data-lucide="check" class="text-green-500 w-5 h-5"></i>' 
+                            : '<i data-lucide="x" class="text-red-500 w-5 h-5"></i>'}
+                    </div>
+                `;
+                historyContainer.appendChild(li);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
