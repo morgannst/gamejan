@@ -582,5 +582,10 @@ function endGame() {
     savePlayerScore();
 }
 
-// ==================== BOOT ====================
-window.onload = initApp;
+window.onload = () => {
+    if (typeof showHub === 'function') {
+        showHub();
+    } else {
+        initApp();
+    }
+};

@@ -115,6 +115,81 @@ app.post('/api/scores', async (req, res) => {
 
 /**
  * --------------------------------------------------------------------
+ * API ENDPOINT: ดึงข้อมูลตารางอันดับคะแนน (Religion Game)
+ * --------------------------------------------------------------------
+ */
+app.get('/api/religion-leaderboard', async (req, res) => {
+    try {
+        const { mode } = req.query; // 'trivia' or 'sorting'
+        const queryText = `
+            SELECT 
+                player_name, 
+                score, 
+                TO_CHAR(created_at + INTERVAL '7 hours', 'DD/MM/YYYY HH24:MI') as date
+            FROM religion_scores
+            WHERE mode = $1
+            ORDER BY score DESC, created_at ASC
+            LIMIT 10;
+        `;
+        const result = await pool.query(queryText, [mode]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching religion leaderboard:', err);
+        res.status(500).json({ error: 'ไม่สามารถดึงข้อมูลอันดับคะแนนได้' });
+    }
+});
+
+/**
+ * --------------------------------------------------------------------
+ * API ENDPOINT: บันทึกคะแนน และสถิติ (Religion Game)
+ * --------------------------------------------------------------------
+ */
+app.post('/api/religion-scores', async (req, res) => {
+    const { player_name, mode, score, history } = req.body;
+
+    if (!player_name || !mode || score === undefined || !history) {
+        return res.status(400).json({ error: 'ข้อมูลที่ส่งมาไม่ครบถ้วน' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. บันทึกคะแนน
+        const insertScoreQuery = `
+            INSERT INTO religion_scores (player_name, mode, score, history)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id;
+        `;
+        await client.query(insertScoreQuery, [player_name, mode, score, JSON.stringify(history)]);
+
+        // 2. อัปเดตสถิติข้อที่ผิด (upsert)
+        for (const record of history) {
+            if (record.isCorrect === false) {
+                const item_name = record.item_name || record.question || 'Unknown';
+                const updateErrorQuery = `
+                    INSERT INTO religion_errors_stats (item_name, mode, error_count)
+                    VALUES ($1, $2, 1)
+                    ON CONFLICT (item_name) DO UPDATE 
+                    SET error_count = religion_errors_stats.error_count + 1;
+                `;
+                await client.query(updateErrorQuery, [item_name, mode]);
+            }
+        }
+
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'บันทึกคะแนนเกมศาสนาสำเร็จแล้ว!' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error saving religion score:', err);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในระบบเซิร์ฟเวอร์ขณะบันทึกข้อมูล' });
+    } finally {
+        client.release();
+    }
+});
+
+/**
+ * --------------------------------------------------------------------
  * API ENDPOINT: ดึงสถิติคำสะกดผิดยอดฮิตของคุณครู (สำหรับคุณครูวิเคราะห์วิชาการ)
  * --------------------------------------------------------------------
  */

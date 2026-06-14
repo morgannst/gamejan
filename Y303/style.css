@@ -56,3 +56,64 @@ body {
 .flashcard-inner.flipped {
     transform: rotateY(180deg);
 }
+
+/* ============================================================
+   RELIGION GAME — Stylesheet Additions
+   ============================================================ */
+
+.font-kanit {
+    font-family: 'Kanit', sans-serif;
+}
+.font-mali {
+    font-family: 'Mali', sans-serif;
+}
+
+.bubbly-button {
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bubbly-button:active {
+    transform: scale(0.95);
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border: 4px solid #FFF;
+}
+/* Custom scrollbar for cute look */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #FFF5F5;
+}
+::-webkit-scrollbar-thumb {
+    background: #FFD2D2;
+    border-radius: 10px;
+}
+/* Animated floating background circles */
+.circle-bg {
+    position: absolute;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.6;
+    animation: float 8s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+}
+.shake-animation {
+    animation: shakeAnim 0.5s ease-in-out;
+}
+@keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+.bounce-animation {
+    animation: bounce 0.5s ease-in-out;
+}
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}

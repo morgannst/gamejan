@@ -43,6 +43,29 @@ async function init() {
     `);
     console.log('✅ Table "word_errors_stats" created or already exists.');
 
+    // Create religion_scores table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS religion_scores (
+        id SERIAL PRIMARY KEY,
+        player_name VARCHAR(100) NOT NULL,
+        mode VARCHAR(50) NOT NULL,
+        score INT NOT NULL,
+        history JSONB NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('✅ Table "religion_scores" created or already exists.');
+
+    // Create religion_errors_stats table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS religion_errors_stats (
+        item_name VARCHAR(255) PRIMARY KEY,
+        mode VARCHAR(50) NOT NULL,
+        error_count INT DEFAULT 0
+      );
+    `);
+    console.log('✅ Table "religion_errors_stats" created or already exists.');
+
     // Initialize vocabulary
     const vocabulary = [
       { word: "Cousin", meaning: "ลูกพี่ลูกน้อง" },
