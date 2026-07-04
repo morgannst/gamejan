@@ -1,748 +1,945 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Test - Family & Relatives with Study Tips</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #f0f9ff;
-            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spelling Adventure - Unit 3 Desert Words</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root {
+    --sand-light: #fde8c4;
+    --sand: #f4c977;
+    --sand-dark: #d49a4e;
+    --accent: #e85d3d;
+    --accent-dark: #c84a2e;
+    --success: #4caf50;
+    --error: #f44336;
+    --text-dark: #4a2f1a;
+    --text-light: #7a5c45;
+  }
+  
+  * {
+    font-family: 'Baloo 2', cursive;
+  }
+  
+  body {
+    background: linear-gradient(180deg, #ffd89b 0%, #ff9a76 40%, #f4c977 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    margin: 0;
+  }
+  
+  .desert-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .sun {
+    position: absolute;
+    top: 40px;
+    right: 80px;
+    width: 110px;
+    height: 110px;
+    background: radial-gradient(circle, #fff5b1 0%, #ffd700 50%, #ff8c00 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 80px rgba(255, 200, 0, 0.6);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 80px rgba(255, 200, 0, 0.6); }
+    50% { transform: scale(1.05); box-shadow: 0 0 100px rgba(255, 200, 0, 0.8); }
+  }
+  
+  .dunes {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 200px;
+  }
+  
+  .card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(180, 100, 50, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 10;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #ff8c42 0%, #e85d3d 100%);
+    color: white;
+    font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 50px;
+    box-shadow: 0 8px 0 #c84a2e, 0 12px 25px rgba(232, 93, 61, 0.4);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: none;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.25rem;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(2px);
+    box-shadow: 0 6px 0 #c84a2e, 0 8px 20px rgba(232, 93, 61, 0.4);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(8px);
+    box-shadow: 0 0 0 #c84a2e, 0 2px 10px rgba(232, 93, 61, 0.4);
+  }
+  
+  .btn-secondary {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: white;
+    font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 50px;
+    box-shadow: 0 8px 0 #616a6b, 0 12px 25px rgba(127, 140, 141, 0.4);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 1.25rem;
+  }
+  
+  .btn-listen {
+    background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
+    color: white;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    box-shadow: 0 10px 0 #197a8f, 0 14px 30px rgba(33, 147, 176, 0.5);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .btn-listen:active {
+    transform: translateY(10px);
+    box-shadow: 0 0 0 #197a8f, 0 2px 10px rgba(33, 147, 176, 0.5);
+  }
+  
+  .sound-wave {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 3px solid rgba(109, 213, 237, 0.7);
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .btn-listen.playing .sound-wave {
+    animation: wave 1.5s ease-out infinite;
+  }
+  
+  .btn-listen.playing .sound-wave:nth-child(3) { animation-delay: 0.3s; }
+  .btn-listen.playing .sound-wave:nth-child(4) { animation-delay: 0.6s; }
+  
+  @keyframes wave {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+  
+  .input-field {
+    background: white;
+    border: 4px solid #f4c977;
+    border-radius: 20px;
+    padding: 18px 24px;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    color: var(--text-dark);
+    transition: all 0.2s ease;
+    letter-spacing: 3px;
+    box-sizing: border-box;
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: #e85d3d;
+    box-shadow: 0 0 0 4px rgba(232, 93, 61, 0.2);
+  }
+  
+  .progress-bar {
+    background: rgba(255, 255, 255, 0.6);
+    height: 18px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .progress-fill {
+    background: linear-gradient(90deg, #ff8c42 0%, #e85d3d 100%);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+  
+  .shake {
+    animation: shake 0.5s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-12px); }
+    40% { transform: translateX(12px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
+  
+  .bounce-in {
+    animation: bounceIn 0.5s ease-out;
+  }
+  
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
-        .pop-in {
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+  .emoji-bounce {
+    display: inline-block;
+    animation: emojiBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+  @keyframes emojiBounce {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+  .slide-out {
+    animation: slideOut 0.3s forwards;
+  }
+  .slide-in {
+    animation: slideIn 0.3s forwards;
+  }
+  @keyframes slideOut {
+    to { transform: translateX(-100%); opacity: 0; }
+  }
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  .word-badge {
+    background: linear-gradient(135deg, #ffd89b 0%, #ff9a76 100%);
+    color: #4a2f1a;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  
+  .star-big {
+    font-size: 4rem;
+    color: #ffd700;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    display: inline-block;
+  }
+  
+  .star-big.empty {
+    color: rgba(255, 215, 0, 0.25);
+    text-shadow: none;
+  }
+  
+  .word-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 8px;
+  }
+  
+  .word-result.correct {
+    border-left: 6px solid #4caf50;
+  }
+  
+  .word-result.wrong {
+    border-left: 6px solid #f44336;
+  }
+  
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+    box-sizing: border-box;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
 
-        /* สำหรับ Flashcard พลิกหน้า-หลัง */
-        .perspective { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { 
-            backface-visibility: hidden; 
-            -webkit-backface-visibility: hidden;
-        }
-        .rotate-y-180 { transform: rotateY(180deg); }
-        .flashcard-inner { transition: transform 0.6s; }
-        .flashcard-inner.flipped { transform: rotateY(180deg); }
-    </style>
+  #feedback {
+    min-height: 40px;
+  }
+</style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-
-    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden relative pop-in">
-        
-        <!-- Header -->
-        <div class="bg-indigo-600 p-6 text-center text-white relative">
-            <button id="home-btn" onclick="initApp()" class="hidden absolute left-4 top-1/2 -translate-y-1/2 text-indigo-200 hover:text-white transition-colors">
-                <i data-lucide="home" class="w-6 h-6"></i>
-            </button>
-            <h1 class="text-2xl font-bold tracking-wider">SPELLING TEST</h1>
-            <p class="text-indigo-200 mt-1 flex items-center justify-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
-                เตรียมสอบ 17/6/69
-            </p>
-        </div>
-
-        <!-- ================= START SCREEN ================= -->
-        <div id="start-screen" class="p-8 text-center">
-            <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600">
-                <i data-lucide="book-open" class="w-12 h-12"></i>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-800 mb-2">หมวดหมู่: ครอบครัว (Family)</h2>
-            <p class="text-gray-500 mb-6 text-sm">ทบทวนคำศัพท์และทำแบบทดสอบเพื่อเตรียมความพร้อมก่อนวันสอบจริง</p>
-            
-            <div class="space-y-3">
-                <button onclick="startPracticeMode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-emerald-200">
-                    <i data-lucide="library" class="w-5 h-5"></i>
-                    ฝึกท่องคำศัพท์ (Flashcards)
-                </button>
-
-                <button onclick="showStudyTips()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-amber-200">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
-                    เคล็ดลับการจำ & ทบทวน (Tips)
-                </button>
-                
-                <button onclick="startTestMode()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-indigo-200">
-                    <i data-lucide="pen-tool" class="w-5 h-5"></i>
-                    เริ่มทำแบบทดสอบ (Test)
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= STUDY TIPS SCREEN ================= -->
-        <div id="tips-screen" class="hidden flex flex-col h-[550px]">
-            <!-- Tab Headers -->
-            <div class="flex border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
-                <button onclick="switchTab('assoc')" id="tab-assoc" class="flex-1 py-3 text-center border-b-2 border-amber-500 text-amber-600">
-                    💡 จัดกลุ่มจำ
-                </button>
-                <button onclick="switchTab('traps')" id="tab-traps" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-gray-700">
-                    ⚠️ จุดระวังผิด
-                </button>
-                <button onclick="switchTab('plan')" id="tab-plan" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-gray-700">
-                    📅 แผน 4 วัน
-                </button>
-            </div>
-
-            <!-- Tab Content (Scrollable) -->
-            <div class="flex-1 overflow-y-auto p-5 space-y-4">
-                
-                <!-- Tab 1: Association Groups -->
-                <div id="content-assoc" class="space-y-4">
-                    <p class="text-xs text-gray-500 mb-1">💡 จัดกลุ่มความสัมพันธ์ช่วยให้สมองจำง่ายขึ้น (กดลำโพงเพื่อฟังเสียง)</p>
-                    
-                    <!-- Group 1 -->
-                    <div class="bg-blue-50/60 border border-blue-100 rounded-2xl p-4">
-                        <h4 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-1">
-                            <i data-lucide="heart" class="w-4 h-4 fill-blue-800"></i> 1. กลุ่มคู่แต่งงาน
-                        </h4>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div onclick="speakText('Bride')" class="bg-white p-2.5 rounded-xl border border-blue-50 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors">
-                                <div>
-                                    <div class="font-bold text-gray-800 text-sm">Bride</div>
-                                    <div class="text-xs text-gray-500">เจ้าสาว</div>
-                                </div>
-                                <i data-lucide="volume-2" class="w-4 h-4 text-blue-400"></i>
-                            </div>
-                            <div onclick="speakText('Groom')" class="bg-white p-2.5 rounded-xl border border-blue-50 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors">
-                                <div>
-                                    <div class="font-bold text-gray-800 text-sm">Groom</div>
-                                    <div class="text-xs text-gray-500">เจ้าบ่าว</div>
-                                </div>
-                                <i data-lucide="volume-2" class="w-4 h-4 text-blue-400"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Group 2 -->
-                    <div class="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-4">
-                        <h4 class="font-bold text-indigo-800 text-sm mb-2 flex items-center gap-1">
-                            <i data-lucide="users" class="w-4 h-4 text-indigo-800"></i> 2. บุพการีและญาติผู้ใหญ่
-                        </h4>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div onclick="speakText('Father')" class="bg-white p-2 rounded-xl border border-indigo-50 flex items-center justify-between cursor-pointer hover:bg-indigo-50 transition-colors">
-                                <div><div class="font-bold text-gray-800 text-xs">Father (พ่อ)</div></div>
-                                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                            </div>
-                            <div onclick="speakText('Mother')" class="bg-white p-2 rounded-xl border border-indigo-50 flex items-center justify-between cursor-pointer hover:bg-indigo-50 transition-colors">
-                                <div><div class="font-bold text-gray-800 text-xs">Mother (แม่)</div></div>
-                                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                            </div>
-                            <div onclick="speakText('Uncle')" class="bg-white p-2 rounded-xl border border-indigo-50 flex items-center justify-between cursor-pointer hover:bg-indigo-50 transition-colors">
-                                <div><div class="font-bold text-gray-800 text-xs">Uncle (ลุง/น้า/อาชาย)</div></div>
-                                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                            </div>
-                            <div onclick="speakText('Aunt')" class="bg-white p-2 rounded-xl border border-indigo-50 flex items-center justify-between cursor-pointer hover:bg-indigo-50 transition-colors">
-                                <div><div class="font-bold text-gray-800 text-xs">Aunt (ป้า/น้า/อาหญิง)</div></div>
-                                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Group 3 -->
-                    <div class="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-4">
-                        <h4 class="font-bold text-emerald-800 text-sm mb-2 flex items-center gap-1">
-                            <i data-lucide="smile" class="w-4 h-4 text-emerald-800"></i> 3. รุ่นปู่ย่าตายาย
-                        </h4>
-                        <div onclick="speakText('Grandmother')" class="bg-white p-3 rounded-xl border border-emerald-50 flex items-center justify-between cursor-pointer hover:bg-emerald-50 transition-colors w-full">
-                            <div>
-                                <div class="font-bold text-gray-800 text-sm">Grandmother</div>
-                                <div class="text-xs text-gray-500">คุณย่า / คุณยาย (Grand + Mother)</div>
-                            </div>
-                            <i data-lucide="volume-2" class="w-4 h-4 text-emerald-400"></i>
-                        </div>
-                    </div>
-
-                    <!-- Group 4 -->
-                    <div class="bg-pink-50/60 border border-pink-100 rounded-2xl p-4">
-                        <h4 class="font-bold text-pink-800 text-sm mb-2 flex items-center gap-1">
-                            <i data-lucide="baby" class="w-4 h-4 text-pink-800"></i> 4. รุ่นหลานๆ และญาติสนิท
-                        </h4>
-                        <div class="space-y-2">
-                            <div onclick="speakText('Grandson')" class="bg-white p-2.5 rounded-xl border border-pink-50 flex items-center justify-between cursor-pointer hover:bg-pink-50 transition-colors">
-                                <div><span class="font-bold text-gray-800 text-xs">Grandson</span> <span class="text-xs text-gray-500">(หลานชาย)</span></div>
-                                <i data-lucide="volume-2" class="w-4 h-4 text-pink-400"></i>
-                            </div>
-                            <div onclick="speakText('Granddaughter')" class="bg-white p-2.5 rounded-xl border border-pink-50 flex items-center justify-between cursor-pointer hover:bg-pink-50 transition-colors">
-                                <div><span class="font-bold text-gray-800 text-xs">Granddaughter</span> <span class="text-xs text-gray-500">(หลานสาว)</span></div>
-                                <i data-lucide="volume-2" class="w-4 h-4 text-pink-400"></i>
-                            </div>
-                            <div onclick="speakText('Cousin')" class="bg-white p-2.5 rounded-xl border border-pink-50 flex items-center justify-between cursor-pointer hover:bg-pink-50 transition-colors">
-                                <div><span class="font-bold text-gray-800 text-xs">Cousin</span> <span class="text-xs text-gray-500">(ลูกพี่ลูกน้อง)</span></div>
-                                <i data-lucide="volume-2" class="w-4 h-4 text-pink-400"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Traps -->
-                <div id="content-traps" class="hidden space-y-4">
-                    <p class="text-xs text-gray-500 mb-1">⚠️ 3 คำยอดฮิตที่เด็กๆ มักสะกดผิดบ่อยที่สุด ระวังอย่าให้โดนหลอกนะ!</p>
-                    
-                    <!-- Trap 1 -->
-                    <div class="bg-red-50 border border-red-100 rounded-2xl p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-full font-bold">1</span>
-                            <h4 class="font-bold text-red-800 text-sm">Cousin (ลูกพี่ลูกน้อง)</h4>
-                        </div>
-                        <p class="text-xs text-gray-600 mb-2">❌ มักสะกดผิดเป็น: <span class="line-through text-red-500">Cusin</span> หรือ <span class="line-through text-red-500">Cozin</span></p>
-                        <div class="bg-white p-3 rounded-xl border border-red-100">
-                            <span class="text-xs text-gray-500 block">✔️ สะกดที่ถูกต้อง:</span>
-                            <span class="text-xl font-bold text-emerald-600 tracking-wider">C-o-u-s-i-n</span>
-                            <span class="text-xs text-gray-500 block mt-1">💡 มีสระร่วมกันสองตัวคือ <strong class="text-amber-600">"ou"</strong> ด้านหน้า</span>
-                        </div>
-                    </div>
-
-                    <!-- Trap 2 -->
-                    <div class="bg-red-50 border border-red-100 rounded-2xl p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-full font-bold">2</span>
-                            <h4 class="font-bold text-red-800 text-sm">Granddaughter (หลานสาว)</h4>
-                        </div>
-                        <p class="text-xs text-gray-600 mb-2">❌ มักสะกดผิดเป็น: <span class="line-through text-red-500">Grandaughter</span> (ขาดตัว d)</p>
-                        <div class="bg-white p-3 rounded-xl border border-red-100">
-                            <span class="text-xs text-gray-500 block">✔️ สะกดที่ถูกต้อง:</span>
-                            <span class="text-xl font-bold text-emerald-600 tracking-wider">Gran<u class="no-underline text-amber-500 font-black">dd</u>aughter</span>
-                            <span class="text-xs text-gray-500 block mt-1">💡 ต้องมีตัว <strong class="text-amber-600">"d" สองตัวคู่กัน</strong> เสมอ! เพราะมาจาก Gran<u>d</u> + <u>d</u>aughter</span>
-                        </div>
-                    </div>
-
-                    <!-- Trap 3 -->
-                    <div class="bg-red-50 border border-red-100 rounded-2xl p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-full font-bold">3</span>
-                            <h4 class="font-bold text-red-800 text-sm">Daughter (ใน Granddaughter)</h4>
-                        </div>
-                        <p class="text-xs text-gray-600 mb-2">❌ มักสะกดผิดเป็น: <span class="line-through text-red-500">Dauter</span> หรือ <span class="line-through text-red-500">Dater</span></p>
-                        <div class="bg-white p-3 rounded-xl border border-red-100">
-                            <span class="text-xs text-gray-500 block">✔️ สะกดที่ถูกต้อง:</span>
-                            <span class="text-xl font-bold text-emerald-600 tracking-wider">d-a-u-<u class="no-underline text-amber-500 font-black">g-h</u>-t-e-r</span>
-                            <span class="text-xs text-gray-500 block mt-1">💡 ท่องสูตรว่า <strong class="text-amber-600">"ดอ-จี-เอช-เตอร์"</strong> มีตัวสะกดเงียบ "gh" อยู่ตรงกลาง</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 3: Day Plan -->
-                <div id="content-plan" class="hidden space-y-4">
-                    <p class="text-xs text-gray-500 mb-2">📅 แผนเตรียมสอบ 4 วันสำหรับคว้าคะแนนเต็ม 10/10!</p>
-                    
-                    <!-- Timeline -->
-                    <div class="relative border-l-2 border-amber-200 ml-4 pl-6 space-y-6">
-                        <!-- Day 1 -->
-                        <div class="relative">
-                            <span class="absolute -left-[31px] top-0 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
-                            <h5 class="font-bold text-gray-800 text-xs">วันแรก: ทำความคุ้นเคย</h5>
-                            <p class="text-xs text-gray-500 mt-0.5">เปิดโหมด "ฝึกท่องคำศัพท์ (Flashcards)" ฝึกฟังเสียงและกดปุ่มสะกดคำช้าๆ คำละ 3 รอบ</p>
-                        </div>
-                        <!-- Day 2 -->
-                        <div class="relative">
-                            <span class="absolute -left-[31px] top-0 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
-                            <h5 class="font-bold text-gray-800 text-xs">วันที่สอง: เทคนิคปิดตาเขียน</h5>
-                            <p class="text-xs text-gray-500 mt-0.5">ลองใช้วิธี <strong class="text-amber-600">Look-Cover-Write-Check</strong> มองคำศัพท์ ปิดตา แล้วลองคัดลายมือลงกระดาษ ตรวจทานดูว่าถูกต้องไหม</p>
-                        </div>
-                        <!-- Day 3 -->
-                        <div class="relative">
-                            <span class="absolute -left-[31px] top-0 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">3</span>
-                            <h5 class="font-bold text-gray-800 text-xs">วันที่สาม: จำลองสนามสอบ</h5>
-                            <p class="text-xs text-gray-500 mt-0.5">กดเข้าโหมด "เริ่มทำแบบทดสอบ" ในเกมนี้ ลองฝึกทำอย่างจริงจังให้ได้คะแนนเต็มติดต่อกันอย่างน้อย 2 รอบ</p>
-                        </div>
-                        <!-- Day 4 -->
-                        <div class="relative">
-                            <span class="absolute -left-[31px] top-0 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">4</span>
-                            <h5 class="font-bold text-gray-800 text-xs">วันสุดท้าย: ปิดจุดอ่อน</h5>
-                            <p class="text-xs text-gray-500 mt-0.5">ดูบันทึกประวัติว่าเราพิมพ์ผิดคำไหนบ่อยสุด เน้นทวนและคัดเฉพาะคำที่ผิดนั้นอีก 3-5 รอบก่อนเข้าห้องสอบจริง!</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Footer Action Button -->
-            <div class="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-                <button onclick="startPracticeMode()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-95 text-xs flex items-center justify-center gap-1">
-                    <i data-lucide="library" class="w-4 h-4"></i> ไปหน้าฝึกท่อง
-                </button>
-                <button onclick="startTestMode()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-95 text-xs flex items-center justify-center gap-1">
-                    <i data-lucide="pen-tool" class="w-4 h-4"></i> พร้อมแล้ว! สอบเลย
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= PRACTICE (FLASHCARD) SCREEN ================= -->
-        <div id="practice-screen" class="hidden p-6">
-            <div class="flex justify-between items-center mb-4 text-sm font-medium text-gray-500">
-                <span id="practice-counter">คำที่ 1 / 10</span>
-                <span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">โหมดฝึกซ้อม</span>
-            </div>
-
-            <!-- Flashcard -->
-            <div class="perspective w-full h-64 mb-6 cursor-pointer" onclick="flipCard()">
-                <div id="flashcard" class="flashcard-inner w-full h-full relative transform-style-3d">
-                    
-                    <!-- ด้านหน้า: ภาษาอังกฤษ -->
-                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-emerald-200 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center">
-                        <p class="text-sm text-gray-400 mb-2">แตะเพื่อดูคำแปล</p>
-                        <h3 id="practice-word" class="text-4xl font-bold text-gray-800 tracking-wider">Cousin</h3>
-                    </div>
-
-                    <!-- ด้านหลัง: คำแปลภาษาไทย -->
-                    <div class="absolute w-full h-full backface-hidden bg-emerald-50 border-2 border-emerald-300 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center rotate-y-180">
-                        <h3 id="practice-meaning" class="text-3xl font-bold text-emerald-800">ลูกพี่ลูกน้อง</h3>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="flex justify-center gap-4 mb-6">
-                <button onclick="playPracticeAudio()" class="w-14 h-14 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group">
-                    <i data-lucide="volume-2" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-                </button>
-                <button onclick="spellWord()" class="w-14 h-14 bg-amber-100 hover:bg-amber-200 text-amber-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group" title="สะกดคำ">
-                    <i data-lucide="spell-check" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-                </button>
-            </div>
-
-            <div class="flex justify-between gap-4">
-                <button onclick="prevPracticeWord()" id="btn-prev-practice" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all active:scale-95 flex justify-center items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i data-lucide="chevron-left" class="w-5 h-5"></i> ก่อนหน้า
-                </button>
-                <button onclick="nextPracticeWord()" id="btn-next-practice" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-xl transition-all active:scale-95 flex justify-center items-center gap-1">
-                    ถัดไป <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <button onclick="startTestMode()" class="w-full mt-6 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-6 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-2">
-                ไปทำแบบทดสอบเลย <i data-lucide="arrow-right" class="w-5 h-5"></i>
-            </button>
-        </div>
-
-        <!-- ================= GAME SCREEN (TEST) ================= -->
-        <div id="game-screen" class="hidden">
-            <!-- Progress Bar -->
-            <div class="h-2 w-full bg-gray-100">
-                <div id="progress-bar" class="h-2 bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6 text-sm font-medium text-gray-500">
-                    <span id="question-counter">คำที่ 1 / 10</span>
-                    <span id="score-display" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">คะแนน: 0</span>
-                </div>
-
-                <div class="text-center mb-8 relative">
-                    <p class="text-sm text-gray-500 mb-2">คำแปล</p>
-                    <h3 id="test-meaning" class="text-3xl font-bold text-gray-800 mb-6">ลูกพี่ลูกน้อง</h3>
-                    
-                    <button onclick="playTestAudio()" class="mx-auto w-16 h-16 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer group">
-                        <i data-lucide="volume-2" class="w-8 h-8 group-hover:scale-110 transition-transform"></i>
-                    </button>
-                    <p class="text-xs text-blue-500 mt-2">กดเพื่อฟังเสียง</p>
-                </div>
-
-                <div class="mb-4 relative">
-                    <input type="text" id="word-input" autocomplete="off" placeholder="พิมพ์คำศัพท์ภาษาอังกฤษที่นี่..." 
-                        class="w-full text-center text-xl font-medium py-4 px-4 border-2 border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all"
-                        onkeypress="handleKeyPress(event)">
-                    
-                    <!-- Feedback Overlay -->
-                    <div id="feedback-overlay" class="hidden absolute inset-0 flex items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm z-10">
-                        <div id="feedback-content" class="flex items-center gap-2 font-bold text-xl">
-                            <!-- Injected by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <button id="submit-btn" onclick="checkAnswer()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-200">
-                    ตรวจคำตอบ
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= RESULT SCREEN ================= -->
-        <div id="result-screen" class="hidden p-6">
-            <div class="text-center mb-6">
-                <div id="result-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <!-- Icon injected by JS -->
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800">สรุปผลคะแนน</h2>
-                <p id="final-score" class="text-4xl font-black text-indigo-600 my-2">8/10</p>
-                <p id="result-message" class="text-gray-500">ยอดเยี่ยมมาก!</p>
-            </div>
-
-            <div class="max-h-56 overflow-y-auto bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 text-sm">
-                <ul id="history-list" class="space-y-3">
-                    <!-- History list injected by JS -->
-                </ul>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="showStudyTips()" class="flex-1 bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    ดูวิธีจำอีกครั้ง
-                </button>
-                <button onclick="startTestMode()" class="flex-1 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-2 rounded-xl transition-all transform active:scale-95 flex justify-center items-center gap-1 text-xs">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                    สอบแก้ตัวใหม่
-                </button>
-            </div>
-        </div>
-
+<body>
+  <div class="desert-bg">
+    <div class="sun"></div>
+    <svg class="dunes" viewBox="0 0 1440 200" preserveAspectRatio="none">
+      <path fill="#d49a4e" fill-opacity="0.6" d="M0,160 C200,100 400,180 720,140 C1040,100 1240,180 1440,120 L1440,200 L0,200 Z"></path>
+      <path fill="#8b6f47" fill-opacity="0.7" d="M0,180 C300,140 500,200 720,170 C940,140 1140,200 1440,170 L1440,200 L0,200 Z"></path>
+    </svg>
+  </div>
+  
+  <!-- Start Screen -->
+  <div id="startScreen" class="screen">
+    <div class="card max-w-2xl p-8 md:p-10 text-center">
+      <div class="text-6xl mb-4">🏜️🐪🌵</div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-3" style="color: var(--text-dark);">Spelling Adventure</h1>
+      <p class="text-xl mb-4" style="color: var(--text-light);">การผจญภัยสะกดคำศัพท์</p>
+      <div class="word-badge mb-6">Unit 3: Desert Words</div>
+      <div id="startHighScore" class="mb-4 text-lg font-bold text-orange-600 hidden">
+        <i class="fas fa-crown text-yellow-500"></i> สถิติสูงสุด: <span id="startHighScoreValue">0</span>/10
+      </div>
+      
+      <div class="bg-orange-50 rounded-2xl p-5 mb-6 text-left">
+        <h2 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--accent);">
+          <i class="fas fa-clipboard-list"></i> วิธีเล่น
+        </h2>
+        <ol class="space-y-2 text-base md:text-lg" style="color: var(--text-dark);">
+          <li class="flex gap-2"><span class="font-bold text-orange-500">1.</span> กดปุ่มลำโพงสีฟ้าเพื่อฟังคำศัพท์</li>
+          <li class="flex gap-2"><span class="font-bold text-orange-500">2.</span> พิมพ์คำที่ได้ยินลงในช่องคำตอบ</li>
+          <li class="flex gap-2"><span class="font-bold text-orange-500">3.</span> กดปุ่ม "ตรวจคำตอบ" เพื่อดูผล</li>
+          <li class="flex gap-2"><span class="font-bold text-orange-500">4.</span> มีทั้งหมด 10 คำ ลองรับดาวเต็ม 5 ดวงกัน!</li>
+        </ol>
+      </div>
+      
+      <div class="flex flex-col gap-3 mt-4">
+        <button class="btn-primary text-xl md:text-2xl" onclick="showReview()">
+          <i class="fas fa-book-open mr-2"></i> ทบทวนคำศัพท์ก่อนเล่น
+        </button>
+        <button class="btn-secondary text-xl md:text-2xl" style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); box-shadow: 0 8px 0 #2e7031, 0 12px 25px rgba(76, 175, 80, 0.4);" onclick="startGame()">
+          <i class="fas fa-play mr-2"></i> เริ่มเล่นทันที
+        </button>
+      </div>
     </div>
+  </div>
+  
+  <!-- Review Screen -->
+  <div id="reviewScreen" class="screen hidden">
+    <div class="card max-w-4xl w-full p-6 md:p-8">
+      <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--text-dark);">
+        <i class="fas fa-book-reader mr-2"></i> ทบทวนคำศัพท์
+      </h2>
+      
+      <div id="reviewGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <!-- Review cards will be injected here -->
+      </div>
+      
+      <div class="flex justify-center">
+        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <button class="btn-secondary text-xl md:text-2xl" onclick="showStartScreen()">
+            <i class="fas fa-home mr-2"></i> กลับหน้าแรก
+          </button>
+          <button class="btn-primary text-xl md:text-2xl" onclick="startGame()">
+            <i class="fas fa-play mr-2"></i> เข้าสู่โหมดทดสอบ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Game Screen -->
+  <div id="gameScreen" class="screen hidden">
+    <div class="card max-w-2xl w-full p-6 md:p-8">
+      <div class="flex justify-between items-center mb-4 gap-3 flex-wrap">
+        <button class="btn-secondary" style="padding: 8px 16px; font-size: 1rem; box-shadow: 0 5px 0 #616a6b, 0 8px 18px rgba(127, 140, 141, 0.3);" onclick="showStartScreen()" aria-label="กลับหน้าแรก">
+          <i class="fas fa-home mr-1"></i> โฮม
+        </button>
+        <div class="word-badge">
+          <i class="fas fa-star"></i> <span id="currentScore">0</span><span class="opacity-60">/10</span>
+        </div>
+        <div class="word-badge">
+          คำที่ <span id="wordNumber">1</span>/10
+        </div>
+      </div>
+      
+      <div class="progress-bar mb-6">
+        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+      </div>
+      
+      <div class="text-center mb-6">
+        <p class="text-base md:text-lg mb-4" style="color: var(--text-light);">
+          <i class="fas fa-headphones"></i> กดปุ่มเพื่อฟังคำศัพท์ แล้วพิมพ์คำที่ได้ยิน
+        </p>
+        <button id="listenBtn" class="btn-listen" aria-label="ฟังคำศัพท์">
+          <i class="fas fa-volume-up"></i>
+          <span class="sound-wave"></span>
+          <span class="sound-wave"></span>
+          <span class="sound-wave"></span>
+        </button>
+        <div class="mt-4">
+          <span style="background: rgba(255, 255, 255, 0.6); padding: 8px 16px; border-radius: 50px; color: var(--text-light);">
+            <i class="fas fa-lightbulb text-yellow-500"></i>
+            คำนี้มี <span id="letterCount" class="font-bold text-orange-600">--</span> ตัวอักษร
+          </span>
+        </div>
+      </div>
+      
+      <!-- Flash Card UI (Listen Before Typing) -->
+      <div id="flashCardUI" class="hidden text-center mb-6 bg-white p-6 rounded-2xl border-4 border-orange-300 shadow-md">
+        <div class="text-6xl mb-2" id="flashCardEmoji"></div>
+        <div class="text-4xl font-bold mb-2 text-orange-600" id="flashCardWord"></div>
+        <div class="text-xl text-gray-500 mb-4" id="flashCardTranslation"></div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-orange-500 h-2.5 rounded-full" id="flashCardTimerBar" style="width: 100%;"></div>
+        </div>
+      </div>
 
-    <script>
-        // Data from the image
-        const originalVocabulary = [
-            { word: "Cousin", meaning: "ลูกพี่ลูกน้อง" },
-            { word: "Groom", meaning: "เจ้าบ่าว" },
-            { word: "Bride", meaning: "เจ้าสาว" },
-            { word: "Father", meaning: "พ่อ" },
-            { word: "Mother", meaning: "แม่" },
-            { word: "Aunt", meaning: "ป้า, น้าผู้หญิง, อาผู้หญิง" },
-            { word: "Uncle", meaning: "ลุง, น้าผู้ชาย, อาผู้ชาย" },
-            { word: "Grandmother", meaning: "ย่า, ยาย" },
-            { word: "Grandson", meaning: "หลานชาย" },
-            { word: "Granddaughter", meaning: "หลานสาว" }
-        ];
+      <div class="mb-4" id="inputContainer">
+        <input type="text" id="answerInput" class="input-field" placeholder="พิมพ์คำตอบที่นี่..." autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      
+      <div class="flex gap-3 justify-center flex-wrap" id="actionButtons">
+        <button id="submitBtn" class="btn-primary" onclick="submitAnswer()">
+          <i class="fas fa-check mr-2"></i> ตรวจคำตอบ
+        </button>
+        <button id="nextBtn" class="btn-primary hidden" style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); box-shadow: 0 8px 0 #1b5e20;" onclick="nextWord()">
+          <i class="fas fa-arrow-right mr-2"></i> คำถัดไป
+        </button>
+        <button id="skipBtn" class="btn-secondary" onclick="skipWord()">
+          <i class="fas fa-forward mr-2"></i> ข้าม
+        </button>
+      </div>
+      
+      <div id="feedback" class="text-center mt-4 text-lg md:text-2xl font-bold"></div>
+    </div>
+  </div>
+  
+  <!-- Result Screen -->
+  <div id="resultScreen" class="screen hidden">
+    <div class="card max-w-2xl w-full p-6 md:p-8">
+      <div class="text-center mb-6">
+        <div class="text-6xl mb-2">🏆</div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: var(--text-dark);">จบเกมแล้ว!</h1>
+        <p class="text-lg md:text-xl mb-4" style="color: var(--text-light);">คะแนนของคุณ</p>
+        
+        <div class="text-6xl md:text-7xl font-bold mb-4" style="color: var(--accent);">
+          <span id="finalScore">0</span><span class="text-3xl md:text-4xl">/10</span>
+        </div>
+        
+        <p class="text-md md:text-lg mb-4 text-gray-500 font-bold hidden" id="highScoreDisplay">
+          <i class="fas fa-crown text-yellow-500"></i> สถิติสูงสุด: <span id="highScoreValue">0</span>/10
+        </p>
 
-        let vocabulary = [...originalVocabulary];
-        let practiceIndex = 0;
-        let testIndex = 0;
-        let score = 0;
-        let userHistory = [];
-        let isChecking = false;
-        let synthVoices = [];
+        <div id="starsContainer" class="mb-4"></div>
+        
+        <p id="resultMessage" class="text-lg md:text-xl font-bold mb-2" style="color: var(--text-dark);"></p>
+      </div>
+      
+      <div id="analyticsContainer" class="bg-white rounded-2xl p-4 mb-6 border-2 border-orange-200 shadow-sm text-left">
+        <h3 class="text-xl font-bold mb-3" style="color: var(--text-dark);"><i class="fas fa-chart-bar text-orange-500"></i> สถิติการเรียนรู้</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-green-50 p-3 rounded-xl border border-green-200">
+            <div class="text-green-700 font-bold mb-1"><i class="fas fa-thumbs-up"></i> คำที่เก่งที่สุด (ตอบถูกทันที)</div>
+            <div id="easiestWords" class="text-gray-700 text-sm">-</div>
+          </div>
+          <div class="bg-red-50 p-3 rounded-xl border border-red-200">
+            <div class="text-red-700 font-bold mb-1"><i class="fas fa-dumbbell"></i> คำที่ควรฝึกเพิ่ม</div>
+            <div id="hardestWords" class="text-gray-700 text-sm">-</div>
+          </div>
+        </div>
+      </div>
 
-        // Preload voices
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                synthVoices = window.speechSynthesis.getVoices();
-            };
-            synthVoices = window.speechSynthesis.getVoices();
-        }
+      <div class="bg-orange-50 rounded-2xl p-4 mb-6 max-h-80 overflow-y-auto text-left">
+        <h3 class="text-xl font-bold mb-3" style="color: var(--text-dark);">ตรวจสอบคำตอบ:</h3>
+        <div id="reviewList"></div>
+      </div>
+      
+      <div class="flex flex-col md:flex-row gap-3 justify-center items-center">
+        <button class="btn-secondary w-full md:w-auto" onclick="showStartScreen()">
+          <i class="fas fa-home mr-2"></i> กลับหน้าแรก
+        </button>
+        <button id="retryWrongBtn" class="btn-secondary hidden w-full md:w-auto" onclick="startGame(true)">
+          <i class="fas fa-history mr-2"></i> ทบทวนเฉพาะข้อที่ผิด
+        </button>
+        <button class="btn-primary w-full md:w-auto" onclick="startGame()">
+          <i class="fas fa-redo mr-2"></i> เล่นใหม่ทั้งหมด
+        </button>
+      </div>
+    </div>
+  </div>
 
-        // Initialize Lucide Icons
-        lucide.createIcons();
+  <script>
+    // คำศัพท์ทั้ง 10 คำจากใบงาน พร้อม Emoji ภาพประกอบ และคำแปลภาษาไทย
+    const wordsData = [
+      { word: "desert", emoji: "🏜️", translation: "ทะเลทราย" },
+      { word: "sand", emoji: "⏳", translation: "ทราย" },
+      { word: "oasis", emoji: "🌴", translation: "โอเอซิส" },
+      { word: "cactus", emoji: "🌵", translation: "กระบองเพชร" },
+      { word: "camel", emoji: "🐪", translation: "อูฐ" },
+      { word: "coyote", emoji: "🐺", translation: "หมาป่าโคโยตี้" },
+      { word: "gecko", emoji: "🦎", translation: "ตุ๊กแก" },
+      { word: "lizard", emoji: "🦎", translation: "กิ้งก่า" },
+      { word: "rattlesnake", emoji: "🐍", translation: "งูหางกระดิ่ง" },
+      { word: "dangerous", emoji: "⚠️", translation: "อันตราย" }
+    ];
 
-        // DOM Elements
-        const screens = {
-            start: document.getElementById('start-screen'),
-            practice: document.getElementById('practice-screen'),
-            tips: document.getElementById('tips-screen'),
-            game: document.getElementById('game-screen'),
-            result: document.getElementById('result-screen')
+    let activeWordsData = []; // คำศัพท์ที่ถูกเลือกมาเล่นในรอบนั้นๆ
+    let currentWordIndex = 0;
+    let score = 0;
+    let attempts = 0; // จำนวนครั้งที่ตอบผิดในแต่ละคำ
+    let results = []; // เก็บผลคำตอบ {word, userAnswer, isCorrect, emoji, attempts}
+
+    function formatScore(value) {
+      return Number.isInteger(value) ? String(value) : value.toFixed(1);
+    }
+
+    function showStartScreen() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      document.getElementById('reviewScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+    }
+
+    // แสดงหน้าทบทวนคำศัพท์
+    function showReview() {
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('reviewScreen').classList.remove('hidden');
+      
+      const grid = document.getElementById('reviewGrid');
+      grid.innerHTML = '';
+      wordsData.forEach((w) => {
+        grid.innerHTML += `
+          <div class="bg-orange-50 rounded-xl p-4 flex items-center gap-4 shadow-sm border border-orange-100">
+            <span class="text-4xl">${w.emoji}</span>
+            <div>
+              <div class="font-bold text-xl" style="color: var(--primary)">${w.word}</div>
+              <div class="text-gray-600 text-sm">แปลว่า: ${w.translation}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // โหลด High Score ตอนเริ่มต้น
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedHighScore = localStorage.getItem('spellingHighScore');
+      if (savedHighScore !== null) {
+        document.getElementById('startHighScore').classList.remove('hidden');
+        document.getElementById('startHighScoreValue').textContent = savedHighScore;
+      }
+    });
+
+    // ระบบสร้างเสียง (Web Audio API) สำหรับ Sound Effects
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      if (type === 'correct') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    // ระบบเสียงพูด (Text-to-Speech)
+    function speakWord(word) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // หยุดเสียงเดิมถ้ามี
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.8; // พูดช้าลงเล็กน้อยให้เด็กฟังทัน
+        utterance.onstart = () => {
+          document.getElementById('listenBtn').classList.add('playing');
         };
-        const homeBtn = document.getElementById('home-btn');
+        utterance.onend = () => {
+          document.getElementById('listenBtn').classList.remove('playing');
+        };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("ขออภัย เบราว์เซอร์ของคุณไม่รองรับระบบเสียง");
+      }
+    }
 
-        function showScreen(screenName) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[screenName].classList.remove('hidden');
-            
-            if (screenName === 'start') {
-                homeBtn.classList.add('hidden');
-            } else {
-                homeBtn.classList.remove('hidden');
-            }
+    // สุ่มลำดับคำศัพท์
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    // เริ่มเกม
+    function startGame(retryWrongOnly = false) {
+      if (!audioCtx) audioCtx = new AudioContext();
+      
+      if (retryWrongOnly) {
+        // ดึงเฉพาะคำที่ตอบผิดมาเล่นใหม่
+        const wrongWords = results.filter(r => !r.isCorrect).map(r => wordsData.find(w => w.word === r.word));
+        activeWordsData = [...wrongWords];
+      } else {
+        // เล่นทั้งหมด
+        activeWordsData = [...wordsData];
+      }
+      
+      shuffleArray(activeWordsData);
+      currentWordIndex = 0;
+      score = 0;
+      results = [];
+      
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('reviewScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      loadWord();
+    }
+
+    // โหลดคำศัพท์ใหม่
+    function loadWord() {
+      if (currentWordIndex >= activeWordsData.length) {
+        showResults();
+        return;
+      }
+
+      attempts = 0; // รีเซ็ตจำนวนครั้งที่พยายาม
+      const wordObj = activeWordsData[currentWordIndex];
+      document.getElementById('currentScore').textContent = formatScore(score);
+      document.getElementById('currentScore').nextElementSibling.textContent = '/' + activeWordsData.length;
+      document.getElementById('wordNumber').parentNode.innerHTML = `คำที่ <span id="wordNumber">${currentWordIndex + 1}</span>/${activeWordsData.length}`;
+      document.getElementById('progressFill').style.width = `${(currentWordIndex / activeWordsData.length) * 100}%`;
+      document.getElementById('letterCount').textContent = wordObj.word.length;
+      
+      const inputElement = document.getElementById('answerInput');
+      inputElement.value = '';
+      inputElement.disabled = false;
+      
+      document.getElementById('feedback').innerHTML = '';
+      document.getElementById('feedback').className = '';
+      
+      document.getElementById('submitBtn').classList.remove('hidden');
+      document.getElementById('skipBtn').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.add('hidden');
+
+      // โหมดดูคำก่อนพิมพ์ (Flash Card Mode)
+      const flashCard = document.getElementById('flashCardUI');
+      const inputCont = document.getElementById('inputContainer');
+      const actionBtns = document.getElementById('actionButtons');
+      const timerBar = document.getElementById('flashCardTimerBar');
+      
+      // แสดง Flash Card, ซ่อน Input
+      flashCard.classList.remove('hidden');
+      inputCont.classList.add('hidden');
+      actionBtns.classList.add('hidden');
+      
+      document.getElementById('flashCardEmoji').textContent = wordObj.emoji;
+      document.getElementById('flashCardWord').textContent = wordObj.word;
+      document.getElementById('flashCardTranslation').textContent = wordObj.translation;
+      
+      // รีเซ็ตหลอดเวลาให้เต็มทันที
+      timerBar.style.transition = 'none';
+      timerBar.style.width = '100%';
+      
+      // ฟังเสียง
+      speakWord(wordObj.word);
+
+      // เริ่มนับถอยหลังหลอดเวลา และซ่อน Flash Card หลัง 3 วินาที
+      setTimeout(() => {
+        timerBar.style.transition = 'width 3s linear';
+        timerBar.style.width = '0%';
+      }, 50);
+      
+      setTimeout(() => {
+        flashCard.classList.add('hidden');
+        inputCont.classList.remove('hidden');
+        actionBtns.classList.remove('hidden');
+        inputElement.focus();
+      }, 3000);
+    }
+
+    // ตรวจคำตอบ
+    function submitAnswer() {
+      const wordObj = activeWordsData[currentWordIndex];
+      const inputElement = document.getElementById('answerInput');
+      const userAnswer = inputElement.value.trim().toLowerCase();
+      const feedback = document.getElementById('feedback');
+
+      if (userAnswer === '') {
+        return; // ไม่ให้กดโดยที่ยังไม่พิมพ์
+      }
+
+      if (userAnswer === wordObj.word.toLowerCase()) {
+        const earnedScore = attempts === 0 ? 1 : 0.5;
+        inputElement.disabled = true;
+        document.getElementById('submitBtn').classList.add('hidden');
+        document.getElementById('skipBtn').classList.add('hidden');
+        document.getElementById('nextBtn').classList.remove('hidden');
+        setTimeout(() => document.getElementById('nextBtn').focus(), 100);
+
+        score += earnedScore;
+        playSound('correct');
+        const scoreText = earnedScore === 1 ? '+1 คะแนน' : '+0.5 คะแนน (ใช้คำใบ้)';
+        feedback.innerHTML = `<i class="fas fa-check-circle text-green-500"></i> ถูกต้อง! <span class="emoji-bounce">${wordObj.emoji}</span> <br><span style="color:var(--text-light); font-size:1.2rem;">${scoreText} | คำแปล: ${wordObj.translation}</span>`;
+        feedback.style.color = 'var(--success)';
+        results.push({ word: wordObj.word, emoji: wordObj.emoji, translation: wordObj.translation, userAnswer: userAnswer, isCorrect: true, attempts: attempts, scoreEarned: earnedScore });
+        
+        document.getElementById('currentScore').textContent = formatScore(score);
+        document.getElementById('currentScore').nextElementSibling.textContent = '/' + activeWordsData.length;
+      } else {
+        attempts++;
+        playSound('wrong');
+        inputElement.classList.add('shake');
+        setTimeout(() => inputElement.classList.remove('shake'), 500);
+
+        if (attempts === 1) {
+          // คำใบ้ครั้งแรก
+          let hint = wordObj.word[0] + ' ' + '_ '.repeat(wordObj.word.length - 1).trim();
+          feedback.innerHTML = `<i class="fas fa-lightbulb text-yellow-500"></i> ลองอีกครั้งนะ! คำใบ้: <b>${hint}</b>`;
+          feedback.style.color = 'var(--accent)';
+          inputElement.value = ''; // ล้างช่องให้พิมพ์ใหม่
+          inputElement.focus();
+        } else {
+          // ผิด 2 ครั้ง เฉลย
+          inputElement.disabled = true;
+          document.getElementById('submitBtn').classList.add('hidden');
+          document.getElementById('skipBtn').classList.add('hidden');
+          document.getElementById('nextBtn').classList.remove('hidden');
+          setTimeout(() => document.getElementById('nextBtn').focus(), 100);
+
+          feedback.innerHTML = `<i class="fas fa-times-circle text-red-500"></i> คำที่ถูกคือ <span style="color:var(--accent)">${wordObj.word}</span> ${wordObj.emoji} <br><span style="color:var(--text-light); font-size:1.2rem;">(คำแปล: ${wordObj.translation})</span>`;
+          feedback.style.color = 'var(--error)';
+          results.push({ word: wordObj.word, emoji: wordObj.emoji, translation: wordObj.translation, userAnswer: userAnswer, isCorrect: false, attempts: attempts, scoreEarned: 0 });
         }
+      }
+    }
 
-        function unlockAudio() {
-            if ('speechSynthesis' in window) {
-                let dummyUtterance = new SpeechSynthesisUtterance('');
-                dummyUtterance.volume = 0;
-                window.speechSynthesis.speak(dummyUtterance);
-            }
+    // ข้ามคำ (นับเป็นข้อผิดพลาด)
+    function skipWord() {
+      const card = document.querySelector('#gameScreen .card');
+      card.classList.add('slide-out');
+      
+      setTimeout(() => {
+        const wordObj = activeWordsData[currentWordIndex];
+        results.push({ word: wordObj.word, emoji: wordObj.emoji, translation: wordObj.translation, userAnswer: '(ข้าม)', isCorrect: false, attempts: 999, scoreEarned: 0 });
+        currentWordIndex++;
+        loadWord();
+        card.classList.remove('slide-out');
+        card.classList.add('slide-in');
+        setTimeout(() => card.classList.remove('slide-in'), 300);
+      }, 300);
+    }
+
+    // ไปคำถัดไป
+    function nextWord() {
+      const card = document.querySelector('#gameScreen .card');
+      card.classList.add('slide-out');
+      
+      setTimeout(() => {
+        currentWordIndex++;
+        loadWord();
+        card.classList.remove('slide-out');
+        card.classList.add('slide-in');
+        setTimeout(() => card.classList.remove('slide-in'), 300);
+      }, 300);
+    }
+
+    // แสดงหน้าผลคะแนน
+    function showResults() {
+      document.getElementById('progressFill').style.width = `100%`;
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+      
+      document.getElementById('finalScore').textContent = formatScore(score);
+      document.getElementById('finalScore').nextElementSibling.textContent = `/${activeWordsData.length}`;
+
+      // บันทึกและแสดง High Score (บันทึกเฉพาะตอนที่เล่นครบทุกคำเท่านั้น)
+      let highScore = parseFloat(localStorage.getItem('spellingHighScore') || '0');
+      if (activeWordsData.length === wordsData.length && score > highScore) {
+        highScore = score;
+        localStorage.setItem('spellingHighScore', formatScore(highScore));
+        const startHsValue = document.getElementById('startHighScoreValue');
+        if(startHsValue) startHsValue.textContent = formatScore(highScore);
+        const startHs = document.getElementById('startHighScore');
+        if(startHs) startHs.classList.remove('hidden');
+      }
+      
+      const hsDisplay = document.getElementById('highScoreDisplay');
+      if (hsDisplay) {
+        hsDisplay.classList.remove('hidden');
+        document.getElementById('highScoreValue').textContent = formatScore(highScore);
+      }
+      
+      // คำนวณดาว (เต็ม 5 ดวง)
+      const stars = Math.round((score / activeWordsData.length) * 5);
+      let starsHtml = '';
+      for (let i = 0; i < 5; i++) {
+        starsHtml += `<span class="star-big ${i < stars ? '' : 'empty'}"><i class="fas fa-star"></i></span>`;
+      }
+      document.getElementById('starsContainer').innerHTML = starsHtml;
+
+      // ข้อความล่อใจ และ พลุฉลอง
+      let message = '';
+      const scoreRatio = score / activeWordsData.length;
+      if (scoreRatio === 1) {
+        message = 'ยอดเยี่ยมมาก! เก่งสุดๆ 🎉';
+        triggerConfetti();
+      } else if (scoreRatio >= 0.7) {
+        message = 'เก่งมาก! พยายามอีกนิดนะ 💪';
+        triggerConfetti();
+      } else if (scoreRatio >= 0.5) {
+        message = 'ทำได้ดี! ลองฝึกอีกครั้งนะ 👍';
+      } else {
+        message = 'อย่าท้อนะ! ลองทบทวนคำศัพท์แล้วเล่นใหม่นะ 🌵';
+      }
+      document.getElementById('resultMessage').textContent = message;
+
+      // วิเคราะห์สถิติการเรียนรู้
+      const easiestWordsEl = document.getElementById('easiestWords');
+      const hardestWordsEl = document.getElementById('hardestWords');
+      const retryWrongBtn = document.getElementById('retryWrongBtn');
+      
+      let wrongCount = 0;
+      let easiest = [];
+      let hardest = [];
+      
+      results.forEach(r => {
+        if (!r.isCorrect) wrongCount++;
+        
+        if (r.attempts === 0 && r.isCorrect) {
+          easiest.push(r.word);
+        } else if (r.attempts > 0 || !r.isCorrect) {
+          hardest.push(r.word);
         }
-
-        function speakText(text, rate = 0.8, spell = false) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                
-                // ถ้าระบุให้สะกดคำ ให้แยกตัวอักษรด้วยช่องว่าง
-                const textToSpeak = spell ? text.split('').join(' . ') : text;
-                const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                
-                if (synthVoices.length === 0) {
-                    synthVoices = window.speechSynthesis.getVoices();
-                }
-                const enVoice = synthVoices.find(voice => voice.lang.startsWith('en-') || voice.lang === 'en' || voice.name.includes('English'));
-                if (enVoice) {
-                    utterance.voice = enVoice;
-                }
-                
-                utterance.lang = 'en-US';
-                utterance.rate = rate; 
-                utterance.pitch = 1;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียงอ่าน");
-            }
+      });
+      
+      if (easiestWordsEl) easiestWordsEl.textContent = easiest.length > 0 ? easiest.join(', ') : '-';
+      if (hardestWordsEl) hardestWordsEl.textContent = hardest.length > 0 ? hardest.join(', ') : '-';
+      
+      if (retryWrongBtn) {
+        if (wrongCount > 0) {
+          retryWrongBtn.classList.remove('hidden');
+        } else {
+          retryWrongBtn.classList.add('hidden');
         }
+      }
 
-        function initApp() {
-            window.speechSynthesis.cancel();
-            showScreen('start');
+      // แสดงรายการตรวจสอบคำตอบ
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+      results.forEach((result, index) => {
+        const div = document.createElement('div');
+        div.className = `word-result ${result.isCorrect ? 'correct' : 'wrong'}`;
+        div.innerHTML = `
+          <span style="font-weight:700; width:30px;">${index + 1}.</span>
+          <span style="font-size: 1.5rem; margin-right: 10px;">${result.emoji}</span>
+          <span style="flex:1; font-size:1.1rem;">
+            คำที่ถูก: <b>${result.word}</b> <span style="color:var(--text-light); font-size:0.95rem;">(= ${result.translation})</span><br>
+            <span style="color: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; font-size:0.95rem;">
+              คุณตอบ: ${result.userAnswer} | คะแนน: ${formatScore(result.scoreEarned)}
+            </span>
+          </span>
+          <i class="fas ${result.isCorrect ? 'fa-check text-green-500' : 'fa-times text-red-500'} text-xl"></i>
+        `;
+        reviewList.appendChild(div);
+      });
+    }
+
+    // ฟังก์ชันยิง Confetti
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+          confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#e85d3d', '#f4c977', '#4caf50']
+          });
+          confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#e85d3d', '#f4c977', '#4caf50']
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      }
+    }
+
+    // เริ่มเกมใหม่
+    function restartGame() {
+      startGame();
+    }
+
+    // ผูก Event ปุ่มฟังเสียง
+    document.getElementById('listenBtn').addEventListener('click', () => {
+      const currentWord = activeWordsData[currentWordIndex];
+      if (currentWord) {
+        speakWord(currentWord.word);
+      }
+    });
+
+    // กด Enter เพื่อตรวจคำตอบ หรือไปคำถัดไป
+    document.getElementById('answerInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        if (!document.getElementById('submitBtn').classList.contains('hidden')) {
+          submitAnswer();
+        } else if (!document.getElementById('nextBtn').classList.contains('hidden')) {
+          nextWord();
         }
-
-        // ================= STUDY TIPS SCREEN =================
-        function showStudyTips() {
-            unlockAudio();
-            showScreen('tips');
-            switchTab('assoc'); // ดีฟอลต์แท็บแรก
-        }
-
-        function switchTab(tabName) {
-            const tabs = {
-                assoc: { btn: document.getElementById('tab-assoc'), content: document.getElementById('content-assoc') },
-                traps: { btn: document.getElementById('tab-traps'), content: document.getElementById('content-traps') },
-                plan: { btn: document.getElementById('tab-plan'), content: document.getElementById('content-plan') }
-            };
-
-            Object.keys(tabs).forEach(key => {
-                if (key === tabName) {
-                    tabs[key].btn.classList.add('border-amber-500', 'text-amber-600');
-                    tabs[key].btn.classList.remove('border-transparent', 'hover:text-gray-700');
-                    tabs[key].content.classList.remove('hidden');
-                } else {
-                    tabs[key].btn.classList.remove('border-amber-500', 'text-amber-600');
-                    tabs[key].btn.classList.add('border-transparent', 'hover:text-gray-700');
-                    tabs[key].content.classList.add('hidden');
-                }
-            });
-        }
-
-        // ================= PRACTICE MODE =================
-        function startPracticeMode() {
-            unlockAudio();
-            practiceIndex = 0;
-            vocabulary = [...originalVocabulary]; // เรียงตามปกติสำหรับโหมดฝึก
-            showScreen('practice');
-            loadPracticeWord();
-        }
-
-        function loadPracticeWord() {
-            const currentWord = vocabulary[practiceIndex];
-            document.getElementById('practice-word').textContent = currentWord.word;
-            document.getElementById('practice-meaning').textContent = currentWord.meaning;
-            document.getElementById('practice-counter').textContent = `คำที่ ${practiceIndex + 1} / ${vocabulary.length}`;
-            
-            // จัดการสถานะการพลิกการ์ด (ให้หงายหน้าภาษาอังกฤษขึ้นเสมอเมื่อเปลี่ยนคำ)
-            document.getElementById('flashcard').classList.remove('flipped');
-            
-            // จัดการปุ่ม ก่อนหน้า/ถัดไป
-            document.getElementById('btn-prev-practice').disabled = (practiceIndex === 0);
-            
-            if (practiceIndex === vocabulary.length - 1) {
-                document.getElementById('btn-next-practice').innerHTML = 'เริ่มสอบ <i data-lucide="pen-tool" class="w-5 h-5"></i>';
-            } else {
-                document.getElementById('btn-next-practice').innerHTML = 'ถัดไป <i data-lucide="chevron-right" class="w-5 h-5"></i>';
-            }
-            lucide.createIcons();
-
-            setTimeout(() => playPracticeAudio(), 300);
-        }
-
-        function flipCard() {
-            document.getElementById('flashcard').classList.toggle('flipped');
-        }
-
-        function playPracticeAudio() {
-            speakText(vocabulary[practiceIndex].word, 0.9);
-        }
-
-        function spellWord() {
-            const word = vocabulary[practiceIndex].word;
-            speakText(word, 0.8);
-            setTimeout(() => {
-                speakText(word, 0.6, true); // true = สะกดคำทีละตัวอักษร
-            }, 1000);
-        }
-
-        function prevPracticeWord() {
-            if (practiceIndex > 0) {
-                practiceIndex--;
-                loadPracticeWord();
-            }
-        }
-
-        function nextPracticeWord() {
-            if (practiceIndex < vocabulary.length - 1) {
-                practiceIndex++;
-                loadPracticeWord();
-            } else {
-                startTestMode();
-            }
-        }
-
-
-        // ================= TEST MODE =================
-        function startTestMode() {
-            unlockAudio();
-            testIndex = 0;
-            score = 0;
-            userHistory = [];
-            isChecking = false;
-            
-            // สลับลำดับคำศัพท์สำหรับโหมดสอบเพื่อวัดความจำจริง
-            vocabulary = [...originalVocabulary].sort(() => Math.random() - 0.5);
-            
-            showScreen('game');
-            loadTestQuestion();
-        }
-
-        function loadTestQuestion() {
-            const currentWord = vocabulary[testIndex];
-            document.getElementById('test-meaning').textContent = currentWord.meaning;
-            const inputEl = document.getElementById('word-input');
-            inputEl.value = '';
-            inputEl.focus();
-            
-            document.getElementById('question-counter').textContent = `คำที่ ${testIndex + 1} / ${vocabulary.length}`;
-            document.getElementById('score-display').textContent = `คะแนน: ${score}`;
-            document.getElementById('progress-bar').style.width = `${(testIndex / vocabulary.length) * 100}%`;
-            
-            setTimeout(() => playTestAudio(), 500);
-        }
-
-        function playTestAudio() {
-            speakText(vocabulary[testIndex].word, 0.8);
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter' && !isChecking && !document.getElementById('game-screen').classList.contains('hidden')) {
-                checkAnswer();
-            }
-        }
-
-        function checkAnswer() {
-            if (isChecking) return;
-            
-            const inputEl = document.getElementById('word-input');
-            const userInput = inputEl.value.trim();
-            
-            if (!userInput) {
-                inputEl.classList.add('shake');
-                setTimeout(() => inputEl.classList.remove('shake'), 500);
-                return;
-            }
-
-            isChecking = true;
-            const currentWord = vocabulary[testIndex];
-            const isCorrect = userInput.toLowerCase() === currentWord.word.toLowerCase();
-
-            // Save history
-            userHistory.push({
-                word: currentWord.word,
-                meaning: currentWord.meaning,
-                userAnswer: userInput,
-                isCorrect: isCorrect
-            });
-
-            // Show Feedback
-            const feedbackOverlay = document.getElementById('feedback-overlay');
-            const feedbackContent = document.getElementById('feedback-content');
-            
-            feedbackOverlay.classList.remove('hidden');
-            if (isCorrect) {
-                score++;
-                document.getElementById('score-display').textContent = `คะแนน: ${score}`;
-                inputEl.classList.add('border-green-500', 'bg-green-50');
-                feedbackContent.innerHTML = `<i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i><span class="text-green-600">ถูกต้อง!</span>`;
-            } else {
-                inputEl.classList.add('border-red-500', 'bg-red-50');
-                feedbackContent.innerHTML = `<div class="text-center">
-                    <div class="flex items-center justify-center gap-2 mb-1"><i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i><span class="text-red-600">ผิดพลาด</span></div>
-                    <div class="text-sm font-normal text-gray-600">คำที่ถูกต้องคือ <span class="font-bold text-green-600">${currentWord.word}</span></div>
-                </div>`;
-            }
-            lucide.createIcons();
-
-            // Wait then next question
-            setTimeout(() => {
-                feedbackOverlay.classList.add('hidden');
-                inputEl.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
-                
-                testIndex++;
-                isChecking = false;
-
-                if (testIndex < vocabulary.length) {
-                    loadTestQuestion();
-                } else {
-                    endGame();
-                }
-            }, 2000);
-        }
-
-        function endGame() {
-            showScreen('result');
-            document.getElementById('progress-bar').style.width = '100%';
-            document.getElementById('final-score').textContent = `${score} / ${vocabulary.length}`;
-            
-            const resultIcon = document.getElementById('result-icon');
-            const resultMsg = document.getElementById('result-message');
-            
-            if (score === vocabulary.length) {
-                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-100 text-green-500";
-                resultIcon.innerHTML = `<i data-lucide="award" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "เก่งมาก! คุณสะกดถูกต้องทุกคำเลย";
-            } else if (score >= vocabulary.length / 2) {
-                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-yellow-100 text-yellow-500";
-                resultIcon.innerHTML = `<i data-lucide="thumbs-up" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "ทำได้ดี! ฝึกอีกนิดก็จะจำได้ทั้งหมดแล้ว";
-            } else {
-                resultIcon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100 text-red-500";
-                resultIcon.innerHTML = `<i data-lucide="book-open" class="w-10 h-10"></i>`;
-                resultMsg.textContent = "พยายามเข้านะ ลองทบทวนคำศัพท์และคำแนะนำเพื่อลองใหม่อีกครั้ง";
-            }
-
-            // Render History List
-            const historyContainer = document.getElementById('history-list');
-            historyContainer.innerHTML = '';
-            
-            userHistory.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = `flex justify-between items-center p-3 rounded-lg border-l-4 ${item.isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`;
-                
-                li.innerHTML = `
-                    <div class="flex-1">
-                        <div class="text-xs text-gray-500 mb-1">${index + 1}. ${item.meaning}</div>
-                        <div class="font-semibold ${item.isCorrect ? 'text-green-700' : 'text-red-700'} line-through opacity-80 decoration-2">
-                            ${item.isCorrect ? '' : item.userAnswer}
-                        </div>
-                        <div class="font-bold text-gray-800 text-lg">${item.word}</div>
-                    </div>
-                    <div>
-                        ${item.isCorrect 
-                            ? '<i data-lucide="check" class="text-green-500 w-5 h-5"></i>' 
-                            : '<i data-lucide="x" class="text-red-500 w-5 h-5"></i>'}
-                    </div>
-                `;
-                historyContainer.appendChild(li);
-            });
-            
-            lucide.createIcons();
-        }
-
-        // Initialize on load
-        window.onload = initApp;
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
