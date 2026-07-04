@@ -369,7 +369,10 @@
   <!-- Game Screen -->
   <div id="gameScreen" class="screen hidden">
     <div class="card max-w-2xl w-full p-6 md:p-8">
-      <div class="flex justify-between items-center mb-4 gap-3">
+      <div class="flex justify-between items-center mb-4 gap-3 flex-wrap">
+        <button class="btn-secondary" style="padding: 8px 16px; font-size: 1rem; box-shadow: 0 5px 0 #616a6b, 0 8px 18px rgba(127, 140, 141, 0.3);" onclick="showStartScreen()" aria-label="กลับหน้าแรก">
+          <i class="fas fa-home mr-1"></i> โฮม
+        </button>
         <div class="word-badge">
           <i class="fas fa-star"></i> <span id="currentScore">0</span><span class="opacity-60">/10</span>
         </div>
