@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairy Spelling Kingdom - เกมทายคำศัพท์ภาษาอังกฤษสำหรับเด็ก</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Prompt & Fredoka & Tracing-style font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Prompt:wght@300;400;500;600;700&family=Teachers:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Prompt', 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 50%, #e0e7ff 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .font-english {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        /* Floating animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(244, 114, 182, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(217, 70, 239, 0.8); }
+        }
+        .glow-effect {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Slot Typing Glow Effect */
+        @keyframes typing-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0px rgba(236, 72, 153, 0); }
+            50% { transform: scale(1.08); box-shadow: 0 0 12px rgba(236, 72, 153, 0.6); }
+            100% { transform: scale(1.03); box-shadow: 0 0 6px rgba(217, 70, 239, 0.4); }
+        }
+
+        .slot-active {
+            animation: typing-pulse 0.25s ease-out forwards;
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%) !important;
+            border-color: #ec4899 !important;
+            color: #7e22ce !important;
+        }
+
+        /* Combo Popup Animation */
+        @keyframes combo-bounce {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .combo-anim {
+            animation: combo-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Sparkle items background */
+        .sparkle-bg {
+            background-image: radial-gradient(rgba(244, 114, 182, 0.2) 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fbcfe8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+
+        .bubble-btn {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bubble-btn:active {
+            transform: scale(0.92);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+        }
+
+        /* On-screen Keyboard button styling */
+        .key-btn {
+            background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+            border: 2px solid #f472b6;
+            box-shadow: 0 4px 0 #db2777;
+            transition: all 0.1s ease;
+        }
+        .key-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #db2777;
+        }
+
+        /* Printable Worksheet CSS */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-worksheet, #printable-worksheet * {
+                visibility: visible;
+            }
+            #printable-worksheet {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+                padding: 20px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="sparkle-bg text-gray-800 flex flex-col min-h-screen justify-between p-3 sm:p-6 overflow-x-hidden">
+
+    <!-- Floating Background Decor -->
+    <div class="fixed top-5 left-5 text-pink-300 text-3xl animate-float pointer-events-none z-0"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+    <div class="fixed top-20 right-8 text-purple-300 text-4xl animate-float pointer-events-none z-0" style="animation-delay: 1s;"><i class="fa-solid fa-heart"></i></div>
+    <div class="fixed bottom-12 left-10 text-indigo-300 text-3xl animate-float pointer-events-none z-0" style="animation-delay: 2s;"><i class="fa-solid fa-star"></i></div>
+    <div class="fixed bottom-20 right-12 text-pink-300 text-4xl animate-float pointer-events-none z-0" style="animation-delay: 1.5s;"><i class="fa-solid fa-cloud"></i></div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-3xl w-full mx-auto z-10 my-auto">
+        
+        <!-- HEADER / NAVIGATION -->
+        <header class="flex justify-between items-center bg-white/90 rounded-2xl p-4 mb-4 shadow-lg border-2 border-pink-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-tr from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white text-2xl shadow-md animate-bounce">
+                    👑
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-english">
+                        Fairy Words Kingdom
+                    </h1>
+                    <p class="text-xs text-pink-500 font-medium">เกมนางฟ้าฝึกสะกดคำศัพท์ 10 คำ ✨</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button onclick="openWorksheetModal()" class="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1 border border-purple-300 shadow-sm" title="พิมพ์ใบงานคัดลายมือ">
+                    <i class="fa-solid fa-print"></i>
+                    <span class="hidden sm:inline">ใบงานคัดลายมือ</span>
+                </button>
+                <button onclick="showSection('flashcards')" class="px-3 py-2 bg-pink-100 hover:bg-pink-200 text-pink-700 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1 border border-pink-300 shadow-sm">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span class="hidden sm:inline">สมุดศัพท์</span>
+                </button>
+                <button onclick="toggleSoundMenu()" id="sound-btn" class="p-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl text-sm transition border border-purple-300">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- SECTION 1: MAIN MENU / HOME -->
+        <section id="sec-home" class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl text-center border-4 border-pink-200 transition-all">
+            <div class="relative inline-block mb-4">
+                <div class="text-7xl sm:text-8xl animate-float">🧚‍♀️</div>
+                <div class="absolute -top-2 -right-2 text-3xl animate-spin" style="animation-duration: 8s;">✨</div>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-bold text-purple-800 mb-2 font-english">
+                Welcome, Little Princess!
+            </h2>
+            <p class="text-gray-600 mb-5 text-sm sm:text-base leading-relaxed">
+                มาฝึกฟังเสียงคำใบ้ แล้วสะกดคำศัพท์ภาษาอังกฤษทั้ง 10 คำให้ถูกต้อง <br class="hidden sm:block">เพื่อพานางฟ้าผ่านเส้นทางสู่ปราสาทเวทมนตร์กันเลยค่ะ!
+            </p>
+
+            <!-- Vocabulary Preview Pills -->
+            <div class="bg-pink-50/90 rounded-2xl p-4 mb-6 border border-pink-200 shadow-inner">
+                <p class="text-xs font-bold text-pink-600 mb-2 uppercase tracking-wider">รายการคำศัพท์ประจำบทเรียน (10 คำ)</p>
+                <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">1. optical illusion</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">2. cube</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">3. always</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">4. usually</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">5. often</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">6. sometimes</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">7. unhappy</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">8. unafraid</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">9. impolite</span>
+                    <span class="px-2.5 py-1 bg-white text-pink-600 text-xs font-semibold rounded-lg shadow-sm border border-pink-100 font-english">10. impossible</span>
+                </div>
+            </div>
+
+            <!-- Start Game Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+                <button onclick="startGame()" class="bubble-btn px-8 py-4 bg-gradient-to-r from-pink-400 via-pink-500 to-purple-500 text-white rounded-2xl font-bold text-lg sm:text-xl shadow-xl hover:shadow-pink-300/50 flex items-center justify-center space-x-2 border-b-4 border-purple-700">
+                    <i class="fa-solid fa-play"></i>
+                    <span>เริ่มเล่นเกม (สุ่มคำศัพท์)</span>
+                </button>
+                <button onclick="showSection('flashcards')" class="bubble-btn px-6 py-4 bg-white text-purple-600 border-2 border-purple-300 hover:bg-purple-50 rounded-2xl font-bold text-base shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>สมุดเรียนรู้คำศัพท์</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: FLASHCARDS (PRACTICE) -->
+        <section id="sec-flashcards" class="hidden glass-card rounded-3xl p-5 sm:p-7 shadow-2xl border-4 border-purple-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3 border-purple-100">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-purple-800 flex items-center space-x-2">
+                        <span>📖 สมุดคำศัพท์เจ้าหญิง</span>
+                    </h2>
+                    <p class="text-xs text-purple-500">พร้อมการแบ่งพยางค์ (Syllables) และตัวอย่างประโยคใช้งาน</p>
+                </div>
+                <button onclick="showSection('home')" class="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> กลับหน้าหลัก
+                </button>
+            </div>
+
+            <div id="flashcards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[58vh] overflow-y-auto pr-2">
+                <!-- Dynamically filled by JS -->
+            </div>
+
+            <div class="mt-5 flex flex-wrap justify-center gap-3">
+                <button onclick="openWorksheetModal()" class="bubble-btn px-5 py-3 bg-white text-purple-700 border-2 border-purple-300 rounded-2xl font-bold text-sm shadow-md flex items-center space-x-2">
+                    <i class="fa-solid fa-print text-pink-500"></i>
+                    <span>พิมพ์ใบงานคัดลายมือ</span>
+                </button>
+                <button onclick="startGame()" class="bubble-btn px-8 py-3.5 bg-gradient-to-r from-pink-400 to-purple-500 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg">
+                    พร้อมแล้ว! เริ่มทดสอบเลย <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: GAMEPLAY -->
+        <section id="sec-game" class="hidden glass-card rounded-3xl p-4 sm:p-6 shadow-2xl border-4 border-pink-300 relative">
+            
+            <!-- MAGICAL CASTLE PATH (GAMIFICATION PROGRESS) -->
+            <div class="mb-4 bg-white/90 p-3 rounded-2xl shadow-md border-2 border-pink-100 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-1 text-xs font-bold text-purple-700">
+                    <span class="flex items-center space-x-1">
+                        <span>📍 เส้นทางสู่ปราสาท: ข้อที่</span>
+                        <span id="game-progress-text" class="text-pink-600 font-english text-sm">1/10</span>
+                    </span>
+                    <span class="flex items-center space-x-1 text-amber-500 font-english text-base">
+                        <i class="fa-solid fa-star text-amber-400"></i>
+                        <span id="score-counter">0</span>
+                    </span>
+                </div>
+
+                <!-- Castle Track Visual -->
+                <div class="relative py-2 px-1">
+                    <div class="absolute top-1/2 left-3 right-3 h-2 bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 -translate-y-1/2 rounded-full border border-pink-300"></div>
+                    <div id="castle-path-steps" class="relative z-10 flex justify-between items-center">
+                        <!-- Dynamic 10 Step Nodes generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMBO & MULTIPLIER BANNER -->
+            <div id="combo-banner" class="hidden text-center mb-2">
+                <span class="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-400 to-pink-500 text-white rounded-full font-black text-sm sm:text-base shadow-lg combo-anim border-2 border-white">
+                    🔥 COMBO x2! MAGICAL STREAK ✨
+                </span>
+            </div>
+
+            <!-- QUESTION CARD WITH MASCOT EMOTION -->
+            <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-pink-200 text-center mb-4 relative overflow-hidden">
+                
+                <!-- ANIMATED FAIRY MASCOT WITH EMOTION STATE -->
+                <div class="flex flex-col items-center justify-center mb-2">
+                    <div id="mascot-container" class="relative transition-all duration-300">
+                        <div id="mascot-avatar" class="text-5xl sm:text-6xl animate-float">🧚‍♀️</div>
+                        <div id="mascot-sparkles" class="absolute -top-2 -right-3 text-2xl animate-spin" style="animation-duration: 4s;">✨</div>
+                    </div>
+                    <!-- Mascot Dialogue Bubble -->
+                    <div id="mascot-speech" class="mt-1 px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-xs font-semibold border border-pink-200 shadow-sm">
+                        "ถือคทาเอาใจช่วยอยู่นะคะ! สะกดคำศัพท์กันเลย ✨"
+                    </div>
+                </div>
+
+                <!-- Thai Hint & Category -->
+                <div class="flex justify-center items-center space-x-2 my-1">
+                    <span class="text-xl" id="card-emoji">🔮</span>
+                    <span class="text-xs bg-purple-100 text-purple-700 px-3 py-0.5 rounded-full font-semibold border border-purple-200" id="card-category">
+                        หมวดหมู่คำศัพท์
+                    </span>
+                </div>
+
+                <h3 id="thai-meaning" class="text-2xl sm:text-3xl font-bold text-purple-900 my-1">
+                    คำแปลภาษาไทย
+                </h3>
+                
+                <p id="english-clue" class="text-gray-600 text-xs sm:text-sm italic mb-3">
+                    "คำอธิบายคำใบ้ภาษาอังกฤษ"
+                </p>
+
+                <!-- AUDIO LISTEN BUTTONS (NORMAL vs TURTLE MODE SPELL) -->
+                <div class="flex justify-center items-center gap-2 my-1">
+                    <button onclick="playCurrentWordAudio(1.0)" class="bubble-btn px-4 py-2.5 bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-2xl shadow-md flex items-center space-x-2 font-semibold text-xs sm:text-sm">
+                        <i class="fa-solid fa-volume-high text-base"></i>
+                        <span>ฟังเสียงอ่าน</span>
+                    </button>
+                    <button onclick="playTurtleSpelledAudio()" class="bubble-btn px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl border border-amber-300 flex items-center space-x-1.5 text-xs sm:text-sm font-semibold" title="ฟังสะกดทีละตัวอักษร c - u - b - e">
+                        <i class="fa-solid fa-turtle text-base text-amber-600"></i>
+                        <span>ฟังสะกดทีละตัว</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TYPING INPUT & SLOTS DISPLAY -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-1 px-2">
+                    <span class="text-[11px] text-purple-600 font-semibold bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                        ⌨️ พิมพ์คำตอบตรงนี้ หรือใช้คีย์บอร์ดด้านล่างได้ค่ะ
+                    </span>
+                    <button onclick="toggleOnScreenKeyboard()" class="text-[11px] text-pink-600 font-semibold hover:underline flex items-center space-x-1">
+                        <i class="fa-solid fa-keyboard"></i>
+                        <span id="keyboard-toggle-label">ซ่อนคีย์บอร์ดหน้าจอ</span>
+                    </button>
+                </div>
+
+                <!-- DIRECT TYPING INPUT BOX -->
+                <div class="max-w-md mx-auto my-2 relative">
+                    <input type="text" id="typing-input" 
+                           class="w-full text-center text-xl sm:text-2xl font-bold font-english text-purple-900 bg-pink-50/90 border-3 border-pink-300 focus:border-purple-500 focus:bg-white rounded-2xl py-2.5 px-4 shadow-inner outline-none transition-all tracking-widest uppercase placeholder-pink-300"
+                           placeholder="พิมพ์คำศัพท์..." 
+                           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+
+                <!-- Visual Slot Boxes with Glow Effect -->
+                <div id="answer-slots-container" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 my-2 min-h-[42px] items-center">
+                    <!-- Dynamic slots generated by JS -->
+                </div>
+            </div>
+
+            <!-- ON-SCREEN PASTEL KEYBOARD (MOBILE & TABLET FRIENDLY) -->
+            <div id="on-screen-keyboard" class="bg-pink-100/80 p-2.5 rounded-2xl border-2 border-pink-200 mb-4 transition-all">
+                <div class="flex flex-col gap-1.5 max-w-lg mx-auto">
+                    <!-- Row 1 -->
+                    <div class="flex justify-center gap-1">
+                        <button onclick="pressVirtualKey('Q')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">Q</button>
+                        <button onclick="pressVirtualKey('W')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">W</button>
+                        <button onclick="pressVirtualKey('E')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">E</button>
+                        <button onclick="pressVirtualKey('R')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">R</button>
+                        <button onclick="pressVirtualKey('T')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">T</button>
+                        <button onclick="pressVirtualKey('Y')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">Y</button>
+                        <button onclick="pressVirtualKey('U')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">U</button>
+                        <button onclick="pressVirtualKey('I')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">I</button>
+                        <button onclick="pressVirtualKey('O')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">O</button>
+                        <button onclick="pressVirtualKey('P')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">P</button>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="flex justify-center gap-1">
+                        <button onclick="pressVirtualKey('A')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">A</button>
+                        <button onclick="pressVirtualKey('S')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">S</button>
+                        <button onclick="pressVirtualKey('D')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">D</button>
+                        <button onclick="pressVirtualKey('F')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">F</button>
+                        <button onclick="pressVirtualKey('G')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">G</button>
+                        <button onclick="pressVirtualKey('H')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">H</button>
+                        <button onclick="pressVirtualKey('J')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">J</button>
+                        <button onclick="pressVirtualKey('K')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">K</button>
+                        <button onclick="pressVirtualKey('L')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">L</button>
+                    </div>
+                    <!-- Row 3 -->
+                    <div class="flex justify-center gap-1">
+                        <button onclick="pressVirtualKey('Z')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">Z</button>
+                        <button onclick="pressVirtualKey('X')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">X</button>
+                        <button onclick="pressVirtualKey('C')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">C</button>
+                        <button onclick="pressVirtualKey('V')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">V</button>
+                        <button onclick="pressVirtualKey('B')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">B</button>
+                        <button onclick="pressVirtualKey('N')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">N</button>
+                        <button onclick="pressVirtualKey('M')" class="key-btn w-8 h-10 sm:w-10 sm:h-11 rounded-xl font-english font-bold text-purple-800">M</button>
+                        <button onclick="pressVirtualKey('BACKSPACE')" class="key-btn px-3 h-10 sm:h-11 bg-pink-200 text-pink-800 rounded-xl font-bold text-xs"><i class="fa-solid fa-delete-left text-sm"></i></button>
+                    </div>
+                    <!-- Row 4: Space Bar -->
+                    <div class="flex justify-center gap-2 mt-0.5">
+                        <button onclick="pressVirtualKey(' ')" class="key-btn flex-1 max-w-xs h-9 bg-purple-100 text-purple-800 rounded-xl font-bold text-xs flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-arrows-left-right text-xs"></i>
+                            <span>เว้นวรรค (Space)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION CONTROLS -->
+            <div class="flex justify-between items-center gap-2">
+                <button onclick="useHint()" id="hint-btn" class="px-3.5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1 border border-amber-300">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                    <span>คำใบ้นางฟ้า</span>
+                </button>
+
+                <div class="flex gap-2">
+                    <button onclick="clearAnswer()" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs sm:text-sm font-semibold">
+                        <i class="fa-solid fa-eraser"></i> ลบ
+                    </button>
+                    <button onclick="checkAnswer()" class="bubble-btn px-6 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl font-bold text-sm shadow-md flex items-center space-x-1 border-b-2 border-teal-700">
+                        <span>ส่งคำตอบ</span>
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FEEDBACK OVERLAY / MESSAGE BOX -->
+            <div id="feedback-toast" class="hidden absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center p-6 text-center z-30 transition-all backdrop-blur-md">
+                <div id="feedback-icon" class="text-6xl mb-2 animate-bounce">🎉</div>
+                <h3 id="feedback-title" class="text-2xl sm:text-3xl font-bold text-purple-900 mb-1 font-english">Correct!</h3>
+                <p id="feedback-subtitle" class="text-gray-600 text-sm sm:text-base mb-5">เก่งมากค่ะเจ้าหญิง!</p>
+                <button onclick="nextQuestion()" class="bubble-btn px-8 py-3.5 bg-gradient-to-r from-pink-400 to-purple-500 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg flex items-center space-x-2">
+                    <span>ข้อถัดไป</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: GAME OVER / VICTORY SUMMARY -->
+        <section id="sec-result" class="hidden glass-card rounded-3xl p-6 sm:p-8 shadow-2xl text-center border-4 border-amber-200">
+            <div class="text-7xl mb-2 animate-bounce">👑</div>
+            <h2 class="text-3xl font-bold text-purple-900 mb-1 font-english">Congratulations!</h2>
+            <p class="text-pink-600 font-semibold mb-5">ยินดีด้วยค่ะ! เดินทางถึงปราสาทเวทมนตร์เรียบร้อยแล้ว ✨</p>
+
+            <!-- Final Score Card -->
+            <div class="bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-5 mb-5 border border-pink-200 max-w-md mx-auto shadow-inner">
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">คะแนนรวมที่ได้</p>
+                <div class="text-4xl sm:text-5xl font-black text-purple-800 font-english my-1" id="final-score">100 / 100</div>
+                <div class="flex justify-center text-amber-400 text-2xl my-2" id="final-stars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p id="final-message" class="text-sm text-purple-700 font-medium mt-1">สุดยอดความสามารถระดับเจ้าหญิง! ✨</p>
+            </div>
+
+            <!-- MISSED WORDS REVIEW PANEL (แสดงคำตอบที่ผิดเมื่อจบเกม) -->
+            <div id="missed-words-panel" class="hidden mb-6 text-left max-w-md mx-auto bg-white/90 rounded-2xl p-4 border-2 border-pink-200 shadow-sm">
+                <h4 class="text-sm font-bold text-pink-700 mb-2 flex items-center space-x-1">
+                    <i class="fa-solid fa-pen-clip text-amber-500"></i>
+                    <span>คำศัพท์ที่สะกดผิดในรอบนี้ (ทบทวนความถูกต้อง):</span>
+                </h4>
+                <div id="missed-words-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <!-- Dynamic review list -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <button onclick="startGame()" class="bubble-btn px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-500 text-white rounded-xl font-bold shadow-md flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>เล่นใหม่อีกครั้ง (สุ่มคำ)</span>
+                </button>
+                <button onclick="openWorksheetModal()" class="bubble-btn px-5 py-3 bg-white text-purple-700 border-2 border-purple-200 rounded-xl font-bold hover:bg-purple-50 flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-print text-pink-500"></i>
+                    <span>พิมพ์ใบงานคัดลายมือ</span>
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- PRINTABLE WORKSHEET MODAL (ใบงานคัดลายมือสำหรับพิมพ์) -->
+    <div id="worksheet-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl relative my-auto border-4 border-pink-300">
+            <button onclick="closeWorksheetModal()" class="no-print absolute top-4 right-4 w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold">
+                ✕
+            </button>
+
+            <!-- PRINT ACTION TOP BAR -->
+            <div class="no-print flex justify-between items-center mb-4 border-b pb-3 border-pink-100">
+                <h3 class="text-xl font-bold text-purple-900 flex items-center space-x-2">
+                    <span>🖨️ ใบงานคัดลายมือคำศัพท์ภาษาอังกฤษ</span>
+                </h3>
+                <button onclick="window.print()" class="bubble-btn px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-bold text-sm shadow-md flex items-center space-x-2">
+                    <i class="fa-solid fa-print"></i>
+                    <span>พิมพ์ลงกระดาษ (A4)</span>
+                </button>
+            </div>
+
+            <!-- WORKSHEET A4 CONTENT AREA -->
+            <div id="printable-worksheet" class="text-gray-900">
+                <!-- Worksheet Header -->
+                <div class="text-center border-b-2 border-dashed border-pink-300 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-purple-900 font-english">Fairy Spelling Kingdom Worksheet</h2>
+                    <p class="text-xs text-gray-600">แบบฝึกหัดคัดลายมือและทบทวนคำศัพท์ภาษาอังกฤษ 10 คำ</p>
+                    <div class="flex justify-between items-center text-xs text-gray-600 mt-3 px-4">
+                        <span>ชื่อ-นามสกุล (Name): .....................................................</span>
+                        <span>ชั้น (Grade): ............. เลขที่: ........</span>
+                    </div>
+                </div>
+
+                <!-- Worksheet Grid Items -->
+                <div class="space-y-3">
+                    <template id="worksheet-row-template">
+                        <div class="border border-pink-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
+                            <div class="w-1/3">
+                                <span class="text-xs text-pink-600 font-bold font-english word-num">1.</span>
+                                <span class="text-sm font-bold text-purple-900 font-english word-text">optical illusion</span>
+                                <div class="text-[11px] text-gray-500 word-thai">ภาพลวงตา</div>
+                            </div>
+                            <!-- Tracing Lines -->
+                            <div class="w-2/3 flex flex-col justify-center space-y-1">
+                                <div class="border-b-2 border-dashed border-gray-300 text-gray-300 font-english text-base tracking-widest pl-2 uppercase select-none word-trace">
+                                    optical illusion
+                                </div>
+                                <div class="border-b-2 border-dashed border-gray-300 h-6"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <div id="worksheet-rows-container" class="space-y-2">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="text-center text-[10px] text-gray-400 mt-4 border-t pt-2">
+                    ✨ Fairy Vocabulary Kingdom • แบบฝึกหัดคัดคำศัพท์สำหรับการเตรียมสอบ ✨
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-3 text-xs text-purple-400 font-medium z-10">
+        ✨ Designed for Little Princesses • คำศัพท์ 10 คำสำหรับการสอบ ✨
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 10 VOCABULARY DATASET WITH SYLLABLES & SENTENCES
+        const VOCAB_DATA = [
+            {
+                id: 1,
+                word: "optical illusion",
+                syllables: "op · ti · cal   il · lu · sion",
+                thai: "ภาพลวงตา",
+                english: "Something that tricks your eyes and makes you see things differently",
+                sentence: "A mirage in the hot desert is an optical illusion.",
+                category: "วิทยาศาสตร์ & การมองเห็น",
+                emoji: "🌀",
+                tip: "คำนี้มี 2 คำ (มีช่องว่างตรงกลาง) หมายถึง ภาพที่หลอกตาเรา"
+            },
+            {
+                id: 2,
+                word: "cube",
+                syllables: "cube",
+                thai: "ลูกบาศก์ / รูปทรงสี่เหลี่ยมลูกบาศก์",
+                english: "A solid 3D shape with 6 equal square sides",
+                sentence: "An ice cube floats in a glass of cold water.",
+                category: "รูปทรงเรขาคณิต",
+                emoji: "🎲",
+                tip: "รูปทรงเรขาคณิต 3 มิติ มี 6 ด้านเท่ากัน เช่น ลูกเต๋า"
+            },
+            {
+                id: 3,
+                word: "always",
+                syllables: "al · ways",
+                thai: "เสมอ / สม่ำเสมอ (100%)",
+                english: "At all times; 100% of the time without exception",
+                sentence: "She always brushes her teeth before going to sleep.",
+                category: "Adverbs of Frequency (กริยาวิเศษณ์)",
+                emoji: "💯",
+                tip: "ทำตลอดเวลา 100% ไม่มีเว้น"
+            },
+            {
+                id: 4,
+                word: "usually",
+                syllables: "u · su · al · ly",
+                thai: "โดยปกติ / ตามปกติ (~80%)",
+                english: "Under normal conditions; most of the time",
+                sentence: "He usually eats breakfast at 7 o'clock.",
+                category: "Adverbs of Frequency (กริยาวิเศษณ์)",
+                emoji: "📅",
+                tip: "ทำเป็นประจำสม่ำเสมอ ประมาณ 80%"
+            },
+            {
+                id: 5,
+                word: "often",
+                syllables: "of · ten",
+                thai: "บ่อยๆ (~70%)",
+                english: "Many times or frequently",
+                sentence: "We often go to the park on sunny weekends.",
+                category: "Adverbs of Frequency (กริยาวิเศษณ์)",
+                emoji: "🔄",
+                tip: "ทำบ่อยครั้ง ประมาณ 70%"
+            },
+            {
+                id: 6,
+                word: "sometimes",
+                syllables: "some · times",
+                thai: "บางครั้ง (~50%)",
+                english: "Now and then; occasionally",
+                sentence: "Sometimes I like to read comic books.",
+                category: "Adverbs of Frequency (กริยาวิเศษณ์)",
+                emoji: "⚖️",
+                tip: "ทำเป็นบางครั้งบางคราว ประมาณ 50%"
+            },
+            {
+                id: 7,
+                word: "unhappy",
+                syllables: "un · hap · py",
+                thai: "ไม่มีความสุข / เศร้าใจ",
+                english: "Not happy or sad (Prefix 'un-' means 'not')",
+                sentence: "The little puppy was unhappy when it rained.",
+                category: "คำคุณศัพท์ Prefix (un-)",
+                emoji: "😢",
+                tip: "มาจาก un- (แปลว่า ไม่) + happy (มีความสุข) = ไม่มีความสุข"
+            },
+            {
+                id: 8,
+                word: "unafraid",
+                syllables: "un · a · fraid",
+                thai: "ไม่กลัว / กล้าหาญ",
+                english: "Not afraid or feeling brave (Prefix 'un-' means 'not')",
+                sentence: "The brave princess was unafraid of the dark.",
+                category: "คำคุณศัพท์ Prefix (un-)",
+                emoji: "🦁",
+                tip: "มาจาก un- (แปลว่า ไม่) + afraid (เกรงกลัว) = ไม่กลัว"
+            },
+            {
+                id: 9,
+                word: "impolite",
+                syllables: "im · po · lite",
+                thai: "ไม่สุภาพ / หยาบคาย",
+                english: "Not polite or rude (Prefix 'im-' means 'not')",
+                sentence: "It is impolite to talk loudly in the library.",
+                category: "คำคุณศัพท์ Prefix (im-)",
+                emoji: "🚫",
+                tip: "มาจาก im- (แปลว่า ไม่) + polite (สุภาพ) = ไม่สุภาพ"
+            },
+            {
+                id: 10,
+                word: "impossible",
+                syllables: "im · pos · si · ble",
+                thai: "เป็นไปไม่ได้",
+                english: "Not able to occur or be done (Prefix 'im-' means 'not')",
+                sentence: "It is impossible to fly without wings.",
+                category: "คำคุณศัพท์ Prefix (im-)",
+                emoji: "✨",
+                tip: "มาจาก im- (แปลว่า ไม่) + possible (เป็นไปได้) = เป็นไปไม่ได้"
+            }
+        ];
+
+        // GAME STATE VARIABLES
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streakCount = 0;
+        let isSoundMuted = false;
+        let hintUsedForCurrent = false;
+        let gameWords = [];
+        let missedWords = []; // Track missed words for final summary review
+        let isOnScreenKeyboardVisible = true;
+
+        // Shuffle helper (Fisher-Yates)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Web Audio Synthesizer
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthesizedSound(type) {
+            if (isSoundMuted) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const subOsc = audioCtx.createOscillator();
+                        const subGain = audioCtx.createGain();
+                        subOsc.type = 'triangle';
+                        subOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        subGain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                        subGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+                        subOsc.connect(subGain);
+                        subGain.connect(audioCtx.destination);
+                        subOsc.start(now + idx * 0.08);
+                        subOsc.stop(now + idx * 0.08 + 0.3);
+                    });
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(180, now + 0.15);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'hint') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {
+                console.log("Audio synthesis error:", e);
+            }
+        }
+
+        // TEXT-TO-SPEECH (SPEECH SYNTHESIS)
+        function playCurrentWordAudio(rate = 1.0) {
+            const currentObj = gameWords[currentQuestionIndex];
+            if (!currentObj) return;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(currentObj.word);
+            utterance.lang = 'en-US';
+            utterance.rate = rate;
+
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Zira')));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // TURTLE MODE: SPELL OUT LETTER BY LETTER (c - u - b - e)
+        function playTurtleSpelledAudio() {
+            const currentObj = gameWords[currentQuestionIndex];
+            if (!currentObj) return;
+
+            window.speechSynthesis.cancel();
+            // Create spelled out string e.g., "c . u . b . e"
+            const spelledText = currentObj.word.split('').map(ch => ch === ' ' ? ' space ' : ch).join(' . ');
+            
+            const utterance = new SpeechSynthesisUtterance(spelledText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.7; // Slow spell rate
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function playWordByText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // NAVIGATION CONTROL
+        function showSection(sectionId) {
+            document.getElementById('sec-home').classList.add('hidden');
+            document.getElementById('sec-flashcards').classList.add('hidden');
+            document.getElementById('sec-game').classList.add('hidden');
+            document.getElementById('sec-result').classList.add('hidden');
+
+            document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+
+            if (sectionId === 'flashcards') {
+                renderFlashcards();
+            }
+        }
+
+        // RENDER FLASHCARDS WITH SYLLABLES AND SENTENCES
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards-grid');
+            container.innerHTML = "";
+
+            VOCAB_DATA.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl shadow-sm border-2 border-pink-100 hover:border-pink-300 transition flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between mb-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl">${item.emoji}</span>
+                                <div>
+                                    <h4 class="text-lg font-bold text-purple-900 font-english">${item.word}</h4>
+                                    <span class="text-xs text-pink-500 font-medium font-english tracking-wider">(${item.syllables})</span>
+                                </div>
+                            </div>
+                            <button onclick="playWordByText('${item.word}')" class="p-2.5 bg-pink-50 hover:bg-pink-100 text-pink-600 rounded-xl border border-pink-200 transition">
+                                <i class="fa-solid fa-volume-high text-base"></i>
+                            </button>
+                        </div>
+                        <p class="text-pink-600 font-semibold text-sm mb-1">${item.thai}</p>
+                        <p class="text-xs text-gray-500 italic mb-2">"${item.english}"</p>
+                        <div class="bg-purple-50 p-2 rounded-xl border border-purple-100 text-[11px] text-purple-800">
+                            <strong>💬 ตัวอย่าง:</strong> ${item.sentence}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // START GAME
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            streakCount = 0;
+            missedWords = [];
+            gameWords = shuffleArray(VOCAB_DATA); // Shuffle vocabulary for every game session
+            
+            document.getElementById('score-counter').innerText = score;
+            showSection('game');
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // LOAD QUESTION
+        function loadQuestion(index) {
+            if (index >= gameWords.length) {
+                showResults();
+                return;
+            }
+
+            const current = gameWords[index];
+            hintUsedForCurrent = false;
+
+            // Reset UI feedback toasts & combo banners
+            document.getElementById('feedback-toast').classList.add('hidden');
+            document.getElementById('game-progress-text').innerText = `${index + 1}/${gameWords.length}`;
+
+            // Render Castle Path Steps Visual
+            renderCastlePath(index);
+
+            // Set mascot state to neutral/thinking
+            setMascotEmotion('thinking');
+
+            // Render details
+            document.getElementById('card-emoji').innerText = current.emoji;
+            document.getElementById('card-category').innerText = current.category;
+            document.getElementById('thai-meaning').innerText = current.thai;
+            document.getElementById('english-clue').innerText = `"${current.english}"`;
+
+            // Clear input box
+            const typingInput = document.getElementById('typing-input');
+            typingInput.value = "";
+
+            // Auto-play pronunciation sound after brief delay
+            setTimeout(() => {
+                playCurrentWordAudio(0.9);
+                typingInput.focus();
+            }, 300);
+
+            // Render letter slot containers
+            renderSlots();
+            setupInputListener();
+        }
+
+        // RENDER CASTLE PATH STEPS
+        function renderCastlePath(currentIndex) {
+            const pathContainer = document.getElementById('castle-path-steps');
+            pathContainer.innerHTML = "";
+
+            for (let i = 0; i < gameWords.length; i++) {
+                const node = document.createElement('div');
+                node.className = "flex flex-col items-center justify-center relative";
+
+                if (i === currentIndex) {
+                    // Current Step (Fairy Avatar)
+                    node.innerHTML = `
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold ring-4 ring-pink-200 animate-bounce shadow-md">
+                            🧚‍♀️
+                        </div>
+                        <span class="text-[9px] font-bold text-pink-600 mt-0.5">${i + 1}</span>
+                    `;
+                } else if (i < currentIndex) {
+                    // Passed Step
+                    node.innerHTML = `
+                        <div class="w-5 h-5 bg-emerald-400 rounded-full flex items-center justify-center text-white text-[10px] shadow-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <span class="text-[9px] font-semibold text-emerald-600 mt-0.5">${i + 1}</span>
+                    `;
+                } else if (i === gameWords.length - 1) {
+                    // Castle Finish Node
+                    node.innerHTML = `
+                        <div class="w-7 h-7 bg-purple-200 rounded-full flex items-center justify-center text-purple-700 text-sm border border-purple-300">
+                            🏰
+                        </div>
+                        <span class="text-[9px] font-semibold text-purple-500 mt-0.5">ปราสาท</span>
+                    `;
+                } else {
+                    // Future Steps
+                    node.innerHTML = `
+                        <div class="w-5 h-5 bg-white border-2 border-pink-200 rounded-full flex items-center justify-center text-[10px] text-pink-300">
+                            ${i + 1}
+                        </div>
+                    `;
+                }
+                pathContainer.appendChild(node);
+            }
+        }
+
+        // MASCOT ANIMATED EMOTIONS
+        function setMascotEmotion(state) {
+            const avatar = document.getElementById('mascot-avatar');
+            const sparkles = document.getElementById('mascot-sparkles');
+            const speech = document.getElementById('mascot-speech');
+
+            if (state === 'thinking') {
+                avatar.innerText = "🧚‍♀️";
+                avatar.className = "text-5xl sm:text-6xl animate-float";
+                sparkles.innerText = "✨";
+                speech.innerText = "ถือคทาเอาใจช่วยอยู่นะคะ! สะกดคำศัพท์กันเลย ✨";
+                speech.className = "mt-1 px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-xs font-semibold border border-pink-200 shadow-sm";
+            } else if (state === 'correct') {
+                avatar.innerText = "👸✨";
+                avatar.className = "text-5xl sm:text-6xl animate-bounce";
+                sparkles.innerText = "💖";
+                speech.innerText = "บินควงคทา! เก่งมากเลยค่ะเจ้าหญิง! 🎉";
+                speech.className = "mt-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold border border-emerald-200 shadow-sm";
+            } else if (state === 'wrong') {
+                avatar.innerText = "🧚‍♀️💪";
+                avatar.className = "text-5xl sm:text-6xl";
+                sparkles.innerText = "🌸";
+                speech.innerText = "ส่งกำลังใจให้นะคะ! มาดูคำตอบที่ถูกต้องแล้วสู้ต่อข้อถัดไปกัน! ✨";
+                speech.className = "mt-1 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold border border-amber-200 shadow-sm";
+            }
+        }
+
+        // RENDER SLOTS GUIDANCE
+        function renderSlots() {
+            const current = gameWords[currentQuestionIndex];
+            const targetWord = current.word;
+
+            const slotsContainer = document.getElementById('answer-slots-container');
+            slotsContainer.innerHTML = "";
+
+            for (let i = 0; i < targetWord.length; i++) {
+                const char = targetWord[i];
+                const box = document.createElement('div');
+                
+                if (char === ' ') {
+                    box.className = "w-5 h-8 sm:w-7 sm:h-10 flex items-center justify-center text-pink-400 font-bold text-lg";
+                    box.innerText = "•";
+                } else {
+                    box.className = "w-7 h-9 sm:w-9 sm:h-11 border-2 border-pink-300 rounded-xl bg-white shadow-sm flex items-center justify-center font-english text-base sm:text-lg font-bold text-purple-800 uppercase transition-all duration-150";
+                    box.id = `slot-${i}`;
+                }
+                slotsContainer.appendChild(box);
+            }
+        }
+
+        // SETUP TYPING INPUT LISTENERS & REAL-TIME GLOW EFFECT
+        function setupInputListener() {
+            const input = document.getElementById('typing-input');
+
+            input.oninput = function() {
+                updateSlotsUI();
+            };
+
+            input.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            };
+        }
+
+        function clearAnswer() {
+            playSynthesizedSound('pop');
+            const input = document.getElementById('typing-input');
+            input.value = "";
+            input.focus();
+            updateSlotsUI();
+        }
+
+        // REAL-TIME TYPING GLOW EFFECT IN SLOTS
+        function updateSlotsUI() {
+            const targetWord = gameWords[currentQuestionIndex].word;
+            const typedText = document.getElementById('typing-input').value;
+
+            for (let i = 0; i < targetWord.length; i++) {
+                if (targetWord[i] === ' ') continue;
+
+                const slot = document.getElementById(`slot-${i}`);
+                if (!slot) continue;
+
+                if (i < typedText.length) {
+                    slot.innerText = typedText[i];
+                    slot.classList.add('slot-active');
+                } else {
+                    slot.innerText = "";
+                    slot.classList.remove('slot-active');
+                }
+            }
+        }
+
+        // ON-SCREEN KEYBOARD CONTROLS
+        function pressVirtualKey(key) {
+            playSynthesizedSound('pop');
+            const input = document.getElementById('typing-input');
+            
+            if (key === 'BACKSPACE') {
+                input.value = input.value.slice(0, -1);
+            } else {
+                const targetLength = gameWords[currentQuestionIndex].word.length;
+                if (input.value.length < targetLength) {
+                    input.value += key;
+                }
+            }
+            updateSlotsUI();
+            input.focus();
+        }
+
+        function toggleOnScreenKeyboard() {
+            const kb = document.getElementById('on-screen-keyboard');
+            const label = document.getElementById('keyboard-toggle-label');
+            
+            isOnScreenKeyboardVisible = !isOnScreenKeyboardVisible;
+            if (isOnScreenKeyboardVisible) {
+                kb.classList.remove('hidden');
+                label.innerText = "ซ่อนคีย์บอร์ดหน้าจอ";
+            } else {
+                kb.classList.add('hidden');
+                label.innerText = "แสดงคีย์บอร์ดหน้าจอ";
+            }
+        }
+
+        // HINT SYSTEM
+        function useHint() {
+            playSynthesizedSound('hint');
+            const current = gameWords[currentQuestionIndex];
+            alert(`💡 คำใบ้จากนางฟ้า:\n${current.tip}`);
+            hintUsedForCurrent = true;
+            document.getElementById('typing-input').focus();
+        }
+
+        // CHECK ANSWER & HANDLE NEXT QUESTION FLOW
+        function checkAnswer() {
+            const current = gameWords[currentQuestionIndex];
+            const typedVal = document.getElementById('typing-input').value;
+            const normalizedTyped = typedVal.trim().toLowerCase().replace(/\s+/g, ' ');
+            const normalizedTarget = current.word.trim().toLowerCase().replace(/\s+/g, ' ');
+
+            if (normalizedTyped === "") {
+                alert("กรุณาพิมพ์สะกดคำตอบก่อนส่งนะคะ ✨");
+                document.getElementById('typing-input').focus();
+                return;
+            }
+
+            const toast = document.getElementById('feedback-toast');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const subtitle = document.getElementById('feedback-subtitle');
+            const comboBanner = document.getElementById('combo-banner');
+
+            if (normalizedTyped === normalizedTarget) {
+                // CORRECT ANSWER
+                playSynthesizedSound('correct');
+                setMascotEmotion('correct');
+
+                streakCount++;
+                score += hintUsedForCurrent ? 5 : 10;
+                document.getElementById('score-counter').innerText = score;
+
+                // Trigger Confetti
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                // Check Combo Streak Banner (>= 3)
+                if (streakCount >= 3) {
+                    comboBanner.classList.remove('hidden');
+                    comboBanner.innerHTML = `
+                        <span class="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-400 via-pink-500 to-purple-500 text-white rounded-full font-black text-sm sm:text-base shadow-lg combo-anim border-2 border-white">
+                            🔥 COMBO x${streakCount}! MAGICAL STREAK ✨
+                        </span>
+                    `;
+                }
+
+                icon.innerText = "🎉";
+                title.innerText = "Super Star! ถูกต้องค่ะ";
+                title.className = "text-2xl sm:text-3xl font-bold text-emerald-600 font-english mb-1";
+                subtitle.innerText = `คำตอบคือ "${current.word}" (${current.thai})`;
+
+            } else {
+                // INCORRECT ANSWER -> Record Missed Word & Reset Streak
+                playSynthesizedSound('wrong');
+                setMascotEmotion('wrong');
+
+                streakCount = 0; // Reset streak
+                comboBanner.classList.add('hidden');
+
+                // Add to missed words array
+                missedWords.push({
+                    word: current.word,
+                    thai: current.thai,
+                    typed: typedVal,
+                    syllables: current.syllables
+                });
+
+                icon.innerText = "💡";
+                title.innerText = "ไม่ต้องเสียใจนะ!";
+                title.className = "text-2xl sm:text-3xl font-bold text-amber-600 font-english mb-1";
+                subtitle.innerHTML = `คำตอบที่ถูกต้องคือ <strong class="text-purple-800 font-english text-lg underline">${current.word}</strong> <br><span class="text-xs text-gray-500">(${current.thai})</span>`;
+            }
+
+            toast.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-toast').classList.add('hidden');
+            currentQuestionIndex++;
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // SHOW FINAL SCORE & MISSED WORDS REVIEW
+        function showResults() {
+            showSection('result');
+            playSynthesizedSound('correct');
+
+            confetti({
+                particleCount: 160,
+                spread: 110,
+                origin: { y: 0.4 }
+            });
+
+            document.getElementById('final-score').innerText = `${score} / 100`;
+
+            const starsContainer = document.getElementById('final-stars');
+            const finalMsg = document.getElementById('final-message');
+
+            if (score >= 80) {
+                starsContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                finalMsg.innerText = "👑 สุดยอดความสามารถระดับเจ้าหญิง! ผ่านเกณฑ์สมบูรณ์แบบ";
+            } else if (score >= 50) {
+                starsContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>';
+                finalMsg.innerText = "✨ เก่งมากค่ะ! ฝึกฝนอีกนิดจะเป็นยอดเยี่ยมเลย";
+            } else {
+                starsContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>';
+                finalMsg.innerText = "💪 พยายามได้ดีค่ะ ทบทวนคำศัพท์ที่สะกดผิด แล้วลองอีกรอบนะคะ!";
+            }
+
+            // Render Missed Words Review Panel
+            const missedPanel = document.getElementById('missed-words-panel');
+            const missedList = document.getElementById('missed-words-list');
+
+            if (missedWords.length > 0) {
+                missedPanel.classList.remove('hidden');
+                missedList.innerHTML = "";
+
+                missedWords.forEach((item, idx) => {
+                    const row = document.createElement('div');
+                    row.className = "bg-pink-50/80 p-2.5 rounded-xl border border-pink-200 flex items-center justify-between text-xs";
+                    row.innerHTML = `
+                        <div>
+                            <span class="font-bold text-purple-900 font-english">${idx + 1}. ${item.word}</span>
+                            <span class="text-[10px] text-pink-500 font-english">(${item.syllables})</span>
+                            <div class="text-[11px] text-gray-600">${item.thai}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-red-400 block">น้องพิมพ์: "${item.typed}"</span>
+                            <button onclick="playWordByText('${item.word}')" class="mt-1 text-[10px] bg-white px-2 py-0.5 rounded text-pink-600 border border-pink-200 shadow-sm">
+                                <i class="fa-solid fa-volume-high"></i> ฟังเสียง
+                            </button>
+                        </div>
+                    `;
+                    missedList.appendChild(row);
+                });
+            } else {
+                missedPanel.classList.add('hidden');
+            }
+        }
+
+        // WORKSHEET MODAL FUNCTIONS
+        function openWorksheetModal() {
+            const modal = document.getElementById('worksheet-modal');
+            const container = document.getElementById('worksheet-rows-container');
+            const template = document.getElementById('worksheet-row-template').content;
+
+            container.innerHTML = "";
+
+            VOCAB_DATA.forEach((item, idx) => {
+                const clone = document.importNode(template, true);
+                clone.querySelector('.word-num').innerText = `${idx + 1}.`;
+                clone.querySelector('.word-text').innerText = item.word;
+                clone.querySelector('.word-thai').innerText = item.thai;
+                clone.querySelector('.word-trace').innerText = item.word;
+                container.appendChild(clone);
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeWorksheetModal() {
+            document.getElementById('worksheet-modal').classList.add('hidden');
+        }
+
+        // SOUND TOGGLE
+        function toggleSoundMenu() {
+            isSoundMuted = !isSoundMuted;
+            const btn = document.getElementById('sound-btn');
+            if (isSoundMuted) {
+                btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-red-500"></i>';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+            }
+        }
+
+        // INITIALIZE APP ON LOAD
+        window.onload = function() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = function() {
+                    window.speechSynthesis.getVoices();
+                };
+            }
+        };
+    </script>
+</body>
+</html>
